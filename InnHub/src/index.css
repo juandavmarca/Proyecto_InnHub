@@ -58,7 +58,7 @@ p, label, .sidebar-label, .nav-group-title {
 .sidebar {
   width: 120px;
   padding: 1.35rem 1rem;
-  background: linear-gradient(180deg, var(--brand-dark) 0%, #064442 100%);
+  background: linear-gradient(180deg, var(--brand-dark) 0%, #f80303 100%);
   transition: width 0.28s ease, padding 0.28s ease, box-shadow 0.28s ease;
   overflow: hidden;
   box-shadow: 4px 0 40px rgba(0, 0, 0, 0.16);
