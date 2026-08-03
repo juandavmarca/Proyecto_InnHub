@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" role="img" aria-label="InnHub logo">
+  <defs>
+    <linearGradient id="gold-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f0cf6a"/>
+      <stop offset="100%" stop-color="#d5a840"/>
+    </linearGradient>
+  </defs>
+  <rect width="120" height="120" rx="24" fill="#084d3f"/>
+  <path d="M28 28h18v64H28zM28 28h36c10 0 24 8 24 24v12c0 8-6 14-14 14h-10v18H64V66h8c10 0 18-8 18-18V52c0-20-22-26-34-26H28z" fill="url(#gold-grad)"/>
+</svg>
