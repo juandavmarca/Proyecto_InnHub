@@ -1,6 +1,6 @@
 import { NavLink } from "react-router-dom";
 
-const logo = "http://localhost/ERPInnHub/backend/uploads/logos.png";
+const logo = "http://localhost/ERPInnHub/backend/uploads/logovs.png";
 
 export function FormLogin() {
 
@@ -8,7 +8,7 @@ export function FormLogin() {
     <div className="login-page">
       <div className="login-card">
         <div className="login-brand">
-          <img src={logo} alt="InnHub Logo" className="login-brand-logo" />
+          <img src={logo} alt="Hotel Valencia Logo" className="login-brand-logo" />
          
         </div>
         <div className="login-header">
@@ -42,12 +42,7 @@ export function FormLogin() {
         </form>
 
         <div className="login-footer">
-          <div className="login-socials">
-            <button type="button" className="social-btn">F</button>
-            <button type="button" className="social-btn">G</button>
-            <button type="button" className="social-btn">T</button>
-            <button type="button" className="social-btn">GH</button>
-          </div>
+          
         </div>
       </div>
     </div>

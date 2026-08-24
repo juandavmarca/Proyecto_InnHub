@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { crearHabitacion, editarHabitacion } from "../services/api";
 
-const logo = "http://localhost/ERPInnHub/backend/uploads/logos.png";
+const logo = "http://localhost/ERPInnHub/backend/uploads/logovs.png";
 const ESTADO_HABITACION_OPTIONS = [
   "Disponible",
   "No disponible",
@@ -9,7 +9,7 @@ const ESTADO_HABITACION_OPTIONS = [
   "Mantenimiento",
 ];
 
-function HabitacionModal({ onHabitacionCreado, habitacionEditar }) {
+function HabitacionModal({ onHabitacionCreado, onSuccess, habitacionEditar }) {
   const [form, setForm] = useState({
     numero: "",
     tipo: "",
@@ -88,6 +88,7 @@ function HabitacionModal({ onHabitacionCreado, habitacionEditar }) {
 
     setError(null);
     setSuccess(res.message || (isEditing ? "Actualizado correctamente" : "Habitación creada correctamente"));
+    onSuccess?.(res.message || (isEditing ? "Habitación actualizada correctamente" : "Habitación registrada correctamente"));
     setTimeout(() => {
       setSuccess(null);
       onHabitacionCreado();
@@ -105,9 +106,9 @@ function HabitacionModal({ onHabitacionCreado, habitacionEditar }) {
           </div>
           <div className="modal-body">
             <div className="modal-form-brand">
-              <img src={logo} alt="InnHub Logo" className="modal-brand-logo" />
+              <img src={logo} alt="Hotel Valencia Logo" className="modal-brand-logo" />
               <div className="modal-form-brand-copy">
-                <span>InnHub</span>
+                <span>Hotel Valencia</span>
                 <small>{isEditing ? "Editar habitación" : "Nueva habitación"}</small>
               </div>
             </div>

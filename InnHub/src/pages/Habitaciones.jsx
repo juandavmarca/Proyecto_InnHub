@@ -129,6 +129,7 @@ function Habitaciones() {
 
       <HabitacionModal
         habitacionEditar={habitacionEditar}
+        onSuccess={(message) => setToast({ show: true, message, type: "success" })}
         onHabitacionCreado={() => {
           setLoading(true);
           obtenerHabitaciones().then((data) => {
@@ -143,7 +144,8 @@ function Habitaciones() {
         }}
       />
       {/* tabla de habitaciones*/}
-      <table className="table table-striped mt-3 table-innhub">
+      <div className="dashboard-table-card mt-3">
+        <table className="table table-striped table-innhub habitaciones-table">
         <thead>
           <tr>
             
@@ -172,15 +174,15 @@ function Habitaciones() {
                 </td>
                 <td>
                   <div className="d-flex gap-2">
-                    <button className="btn btn-sm" style={{backgroundColor: '#1b6b4f', color: 'white', border: 'none'}} data-bs-toggle="modal" data-bs-target="#habitacionModal" onClick={() => handleEditarHabitacion(habitacion)} title="Editar">
+                    <button className="btn btn-sm" style={{backgroundColor: '#c89629', color: '#090808', border: 'none'}} data-bs-toggle="modal" data-bs-target="#habitacionModal" onClick={() => handleEditarHabitacion(habitacion)} title="Editar">
                       <i className="fa-solid fa-pen"></i>
                     </button>
                     {mostrarDeshabilitados ? (
-                      <button className="btn btn-sm" style={{backgroundColor: '#198754', color: 'white', border: 'none'}} onClick={() => handleHabilitarHabitacion(habitacion)} title="Habilitar">
+                      <button className="btn btn-sm" style={{backgroundColor: '#1f1a17', color: '#c89629', border: '1px solid rgba(255,255,255,0.1)'}} onClick={() => handleHabilitarHabitacion(habitacion)} title="Habilitar">
                         <i className="fa-solid fa-check"></i>
                       </button>
                     ) : (
-                      <button className="btn btn-sm" style={{backgroundColor: '#c82333', color: 'white', border: 'none'}} onClick={() => handleDeshabilitarHabitacion(habitacion)} title="Deshabilitar">
+                      <button className="btn btn-sm" style={{backgroundColor: '#8c1f1f', color: 'white', border: 'none'}} onClick={() => handleDeshabilitarHabitacion(habitacion)} title="Deshabilitar">
                         <i className="fa-solid fa-ban"></i>
                       </button>
                     )}
@@ -190,7 +192,8 @@ function Habitaciones() {
             );
           })}
         </tbody>
-      </table>
+        </table>
+      </div>
       {mostrarDeshabilitados && (
         <div className="mt-3">
           <button className="btn btn-secondary" onClick={() => setMostrarDeshabilitados(false)}>

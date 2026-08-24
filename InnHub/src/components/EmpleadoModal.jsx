@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
 import { crearEmpleado, editarEmpleado } from "../services/api";
 
-const logo = "http://localhost/ERPInnHub/backend/uploads/logos.png";
+const logo = "http://localhost/ERPInnHub/backend/uploads/logovs.png";
 
-function EmpleadoModal({ onEmpleadoCreado, empleadoEditar }) {
+function EmpleadoModal({ onEmpleadoCreado, onSuccess, empleadoEditar }) {
   const [form, setForm] = useState({
     documento: "",
     nombre: "",
@@ -105,6 +105,7 @@ function EmpleadoModal({ onEmpleadoCreado, empleadoEditar }) {
 
     setError(null);
     setSuccess(res.message || (isEditing ? "Actualizado correctamente" : "Empleado creado correctamente"));
+    onSuccess?.(res.message || (isEditing ? "Empleado actualizado correctamente" : "Empleado registrado correctamente"));
     setTimeout(() => {
       setSuccess(null);
       setForm({
@@ -131,50 +132,59 @@ function EmpleadoModal({ onEmpleadoCreado, empleadoEditar }) {
           </div>
           <div className="modal-body">
             <div className="modal-form-brand">
-              <img src={logo} alt="InnHub Logo" className="modal-brand-logo" />
+              <img src={logo} alt="Hotel Valencia Logo" className="modal-brand-logo" />
               <div className="modal-form-brand-copy">
-                <span>InnHub</span>
+                <span>Hotel Valencia</span>
                 <small>{isEditing ? "Actualizar empleado" : "Nuevo empleado"}</small>
               </div>
             </div>
             {error && <div className="alert alert-danger">{error}</div>}
             {success && <div className="alert alert-success">{success}</div>}
             <div className="form-section">
-              <div className="form-group-icon">
-              <i className="fas fa-id-card"></i>
-              <input className="form-control mb-2" placeholder="Documento" name="documento" value={form.documento} onChange={handleChange} disabled={isEditing} />
+              <div className="row g-2">
+                <div className="col-md-6">
+                  <h6 className="mb-2"><strong>Información Básica</strong></h6>
+                  <div className="form-group-icon">
+                    <i className="fas fa-id-card"></i>
+                    <input className="form-control" placeholder="Documento" name="documento" value={form.documento} onChange={handleChange} disabled={isEditing} />
+                  </div>
+                  <div className="form-group-icon">
+                    <i className="fas fa-user"></i>
+                    <input className="form-control" placeholder="Nombre" name="nombre" value={form.nombre} onChange={handleChange} />
+                  </div>
+                  <div className="form-group-icon">
+                    <i className="fas fa-user"></i>
+                    <input className="form-control" placeholder="Apellidos" name="apellido" value={form.apellido} onChange={handleChange} />
+                  </div>
+                  <div className="form-group-icon">
+                    <i className="fas fa-briefcase"></i>
+                    <input className="form-control" placeholder="Cargo" name="cargo" value={form.cargo} onChange={handleChange} />
+                  </div>
+                </div>
+
+                <div className="col-md-6">
+                  <h6 className="mb-2"><strong>Información de Contacto</strong></h6>
+                  <div className="form-group-icon">
+                    <i className="fas fa-phone"></i>
+                    <input className="form-control" placeholder="Teléfono" name="telefono" value={form.telefono} onChange={handleChange} />
+                  </div>
+                  <div className="form-group-icon">
+                    <i className="fas fa-envelope"></i>
+                    <input className="form-control" placeholder="Email" name="email" value={form.email} onChange={handleChange} />
+                  </div>
+                  <div className="form-group-icon">
+                    <i className="fas fa-camera"></i>
+                    <input
+                      type="file"
+                      className="form-control"
+                      name="foto_perifl"
+                      accept="image/*"
+                      onChange={handleChange}
+                    />
+                  </div>
+                </div>
+              </div>
             </div>
-            <div className="form-group-icon">
-              <i className="fas fa-user"></i>
-              <input className="form-control mb-2" placeholder="Nombre" name="nombre" value={form.nombre} onChange={handleChange} />
-            </div>
-            <div className="form-group-icon">
-              <i className="fas fa-user"></i>
-              <input className="form-control mb-2" placeholder="Apellidos" name="apellido" value={form.apellido} onChange={handleChange} />
-            </div>
-            <div className="form-group-icon">
-              <i className="fas fa-briefcase"></i>
-              <input className="form-control mb-2" placeholder="Cargo" name="cargo" value={form.cargo} onChange={handleChange} />
-            </div>
-            <div className="form-group-icon">
-              <i className="fas fa-phone"></i>
-              <input className="form-control mb-2" placeholder="Teléfono" name="telefono" value={form.telefono} onChange={handleChange} />
-            </div>
-            <div className="form-group-icon">
-              <i className="fas fa-envelope"></i>
-              <input className="form-control mb-2" placeholder="Email" name="email" value={form.email} onChange={handleChange} />
-            </div>
-            <div className="form-group-icon">
-              <i className="fas fa-camera"></i>
-              <input
-                type="file"
-                className="form-control mb-2"
-                name="foto_perifl"
-                accept="image/*"
-                onChange={handleChange}
-              />
-            </div>
-          </div>
           </div>
           <div className="modal-footer">
             <button className="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>

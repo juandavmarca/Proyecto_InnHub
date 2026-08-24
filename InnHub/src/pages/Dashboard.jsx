@@ -74,25 +74,29 @@ function Dashboard() {
 
   return (
     <div className="dashboard-page">
-      <div className="d-flex flex-column flex-md-row justify-content-between align-items-start gap-3 mb-4">
-        <div>
-          <h1>Dashboard</h1>
-          <p className="text-muted mb-0">
-            Vista general de las estadísticas del panel administrativo con los clientes,
-            empleados y habitaciones.
-          </p>
+      {/* <div className="dashboard-admin-header mb-4">
+        <h1>Dashboard</h1>
+      </div> */}
+
+      <div className="dashboard-panel-shell">
+        <div className="d-flex flex-column flex-md-row justify-content-between align-items-start gap-3 mb-4">
+          <div>
+            {/* <p className="text-muted mb-0">
+              Vista general de las estadísticas del panel administrativo con los clientes,
+              empleados y habitaciones.
+            </p> */}
+          </div>
         </div>
-      </div>
 
-      {loading && (
-        <div className="alert alert-info">Cargando estadísticas...</div>
-      )}
+        {loading && (
+          <div className="alert alert-info">Cargando estadísticas...</div>
+        )}
 
-      {error && <div className="alert alert-danger">{error}</div>}
+        {error && <div className="alert alert-danger">{error}</div>}
 
-      {!loading && stats && (
-        <>
-          <div className="dashboard-tabs mb-4">
+        {!loading && stats && (
+          <>
+            <div className="dashboard-tabs mb-4">
             <button
               type="button"
               className={`dashboard-tab-btn ${selectedSection === "clientes" ? "active" : ""}`}
@@ -120,9 +124,7 @@ function Dashboard() {
             <section className="dashboard-section mb-5">
               <div className="section-header">
                 <h2>Clientes</h2>
-                <p className="text-muted mb-4">
-                  Control y métricas de clientes registrados y clientes inactivos.
-                </p>
+                
               </div>
               <div className="dashboard-grid">
                 <article className="dashboard-card primary">
@@ -164,9 +166,7 @@ function Dashboard() {
             <section className="dashboard-section mb-5">
               <div className="section-header">
                 <h2>Empleados</h2>
-                <p className="text-muted mb-4">
-                  Seguimiento de empleados activos y empleados deshabilitados.
-                </p>
+               
               </div>
               <div className="dashboard-grid">
                 <article className="dashboard-card info">
@@ -208,9 +208,7 @@ function Dashboard() {
             <section className="dashboard-section">
               <div className="section-header">
                 <h2>Habitaciones</h2>
-                <p className="text-muted mb-4">
-                  Control de disponibilidad de habitaciones para un mejor control.
-                </p>
+               
               </div>
               <div className="dashboard-grid">
                 <article className="dashboard-card success">
@@ -281,6 +279,7 @@ function Dashboard() {
           )}
         </>
       )}
+      </div>
     </div>
   );
 }
