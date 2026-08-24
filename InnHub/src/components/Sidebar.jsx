@@ -1,15 +1,15 @@
 import { NavLink } from "react-router-dom";
 
-const logo = "http://localhost/ERPInnHub/backend/uploads/logos.png";
+const logo = "http://localhost/ERPInnHub/backend/uploads/logodash.png";
 
 function Sidebar() {
   return (
     <div className="sidebar text-white">
       <div className="sidebar-brand">
-        <img src={logo} alt="InnHub Logo" className="sidebar-brand-logo" />
+        <img src={logo} alt="Logo del panel administrativo" className="sidebar-brand-logo" />
         <div className="sidebar-brand-content">
-          <span className="brand-name">InnHub</span>
-          <small className="brand-subtitle">Panel administrativo</small>
+          {/* <span className="brand-name">Valencia</span> */}
+          {/* <small className="brand-subtitle">Administración</small> */}
         </div>
       </div>
 

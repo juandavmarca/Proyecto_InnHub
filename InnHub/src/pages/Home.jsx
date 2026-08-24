@@ -115,8 +115,8 @@ function Home() {
     <div className="home-page">
       <header className="home-header">
         <div className="home-brand">
-          <img src={homeLogo} alt="InnHub logo" className="home-logo-image" />
-          <span className="home-subtitle">Hotel Ejecutivo</span>
+          <img src={homeLogo} alt="Hotel Valencia logo" className="home-logo-image" />
+          <span className="home-subtitle">Hotel Valencia</span>
         </div>
         <nav className="home-nav">
           <a href="#hero">Inicio</a>
@@ -411,7 +411,7 @@ function Home() {
       <footer className="home-footer" id="contact">
         <div className="footer-grid">
           <div>
-            <h3>InnHub Hotel</h3>
+            <h3>Hotel Valencia</h3>
             <p>Un hotel boutique que combina confort moderno con la belleza natural del entorno.</p>
           </div>
           <div>
@@ -427,11 +427,11 @@ function Home() {
             <h4>Contacto</h4>
             <p>Av. Principal 123, Ciudad</p>
             <p>Teléfono: +57 300 123 4567</p>
-            <p>Email: info@innhub.com</p>
+            <p>Email: info@hotelvalencia.com</p>
           </div>
         </div>
         <div className="footer-copy">
-          © 2025 InnHub. Todos los derechos reservados.
+          © 2026 Hotel Valencia. Todos los derechos reservados.
         </div>
       </footer>
     </div>

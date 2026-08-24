@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
 import { crearCliente, editarCliente } from "../services/api";
 
-const logo = "http://localhost/ERPInnHub/backend/uploads/logos.png";
+const logo = "http://localhost/ERPInnHub/backend/uploads/logovs.png";
 
-function ClienteModal({ onClienteCreado, clienteEditar }) {
+function ClienteModal({ onClienteCreado, onSuccess, clienteEditar }) {
   const [form, setForm] = useState({
     documento: "",
     nombre: "",
@@ -94,6 +94,7 @@ function ClienteModal({ onClienteCreado, clienteEditar }) {
 
     setError(null);
     setSuccess(res.message || (isEditing ? "Actualizado correctamente" : "Cliente creado correctamente"));
+    onSuccess?.(res.message || (isEditing ? "Cliente actualizado correctamente" : "Cliente registrado correctamente"));
     setTimeout(() => {
       setSuccess(null);
       onClienteCreado();
@@ -111,9 +112,9 @@ function ClienteModal({ onClienteCreado, clienteEditar }) {
           </div>
           <div className="modal-body">
             <div className="modal-form-brand">
-              <img src={logo} alt="InnHub Logo" className="modal-brand-logo" />
+              <img src={logo} alt="Hotel Valencia Logo" className="modal-brand-logo" />
               <div className="modal-form-brand-copy">
-                <span>InnHub</span>
+                <span>Hotel Valencia</span>
                 <small>{isEditing ? "Actualiza los datos del cliente" : "Registra clientes con estilo"}</small>
               </div>
             </div>

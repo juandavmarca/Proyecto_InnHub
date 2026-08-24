@@ -104,14 +104,14 @@ function Clientes() {
   }
 
   return (
-    <>
-      <div className="d-flex justify-content-between align-items-center">
-        <h2>Clientes</h2>
-        <div>
+    <div className="dashboard-page">
+      <div className="dashboard-page-header">
+        <h1>Clientes</h1>
+        <div className="dashboard-actions">
           <button className="btn btn-success" data-bs-toggle="modal" data-bs-target="#clienteModal" onClick={handleNuevoCliente}>
             + Nuevo Cliente
           </button>
-          <button type="button" className="btn btn-secondary ms-2" onClick={handleVerDeshabilitados}>
+          <button type="button" className="btn btn-secondary" onClick={handleVerDeshabilitados}>
             Deshabilitados
           </button>
         </div>
@@ -119,6 +119,7 @@ function Clientes() {
 
       <ClienteModal
         clienteEditar={clienteEditar}
+        onSuccess={(message) => setToast({ show: true, message, type: "success" })}
         onClienteCreado={() => {
           setLoading(true);
           obtenerClientes().then((data) => {
@@ -135,7 +136,8 @@ function Clientes() {
         }}
       />
       {/* tabla de clientes */}
-      <table className="table table-striped mt-3 table-innhub">
+      <div className="dashboard-table-card mt-3">
+        <table className="table table-striped table-innhub">
         <thead>
           <tr>
             <th>Documento</th>
@@ -161,15 +163,15 @@ function Clientes() {
               <td>{cliente.ciudad_re}</td>
               <td>
                 <div className="d-flex gap-2">
-                  <button className="btn btn-sm" style={{backgroundColor: '#1b6b4f', color: 'white', border: 'none'}} data-bs-toggle="modal" data-bs-target="#clienteModal" onClick={() => handleEditarCliente(cliente)} title="Editar">
+                  <button className="btn btn-sm" style={{backgroundColor: '#c89629', color: '#090808', border: 'none'}} data-bs-toggle="modal" data-bs-target="#clienteModal" onClick={() => handleEditarCliente(cliente)} title="Editar">
                     <i className="fa-solid fa-pen"></i>
                   </button>
                   {mostrarDeshabilitados ? (
-                    <button className="btn btn-sm" style={{backgroundColor: '#198754', color: 'white', border: 'none'}} onClick={() => handleHabilitarCliente(cliente)} title="Habilitar">
+                    <button className="btn btn-sm" style={{backgroundColor: '#1f1a17', color: '#c89629', border: '1px solid rgba(255,255,255,0.1)'}} onClick={() => handleHabilitarCliente(cliente)} title="Habilitar">
                       <i className="fa-solid fa-check"></i>
                     </button>
                   ) : (
-                    <button className="btn btn-sm" style={{backgroundColor: '#c82333', color: 'white', border: 'none'}} onClick={() => handleDeshabilitarCliente(cliente)} title="Deshabilitar">
+                    <button className="btn btn-sm" style={{backgroundColor: '#8c1f1f', color: 'white', border: 'none'}} onClick={() => handleDeshabilitarCliente(cliente)} title="Deshabilitar">
                       <i className="fa-solid fa-ban"></i>
                     </button>
                   )}
@@ -178,28 +180,30 @@ function Clientes() {
             </tr>
           ))}
         </tbody>
-      </table>
-      {mostrarDeshabilitados && (
-        <div className="mt-3">
-          <button className="btn btn-secondary" onClick={() => setMostrarDeshabilitados(false)}>
-            Regresar a tabla clientes
-          </button>
+        </table>
         </div>
-      )}
-      <ConfirmDialog
-        show={confirm.show}
-        title={confirm.title}
-        message={confirm.message}
-        onConfirm={() => confirm.onConfirm && confirm.onConfirm()}
-        onCancel={() => setConfirm((c) => ({ ...c, show: false }))}
-      />
-      <CenteredToast
-        show={toast.show}
-        message={toast.message}
-        type={toast.type}
-        onClose={() => setToast((t) => ({ ...t, show: false }))}
-      />
-    </>
+        {mostrarDeshabilitados && (
+          <div className="mt-3">
+            <button className="btn btn-secondary" onClick={() => setMostrarDeshabilitados(false)}>
+              Regresar a tabla clientes
+            </button>
+          </div>
+        )}
+
+        <ConfirmDialog
+          show={confirm.show}
+          title={confirm.title}
+          message={confirm.message}
+          onConfirm={() => confirm.onConfirm && confirm.onConfirm()}
+          onCancel={() => setConfirm((c) => ({ ...c, show: false }))}
+        />
+        <CenteredToast
+          show={toast.show}
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast((t) => ({ ...t, show: false }))}
+        />
+      </div>
   );
 }
 
