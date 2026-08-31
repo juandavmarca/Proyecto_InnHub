@@ -1,7 +1,10 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 /* eslint-disable no-unused-vars */
-import homeLogo from "../assets/home-logo.png";
+
+import ConfirmDialog from "../components/ConfirmDialog";
+
+const homeLogo = "http://localhost/ERPInnHub/backend/uploads/logo.png";
 
 const galleryImages = [
   "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=1200&q=80",
@@ -67,6 +70,7 @@ const _testimonials = [
 ];
 
 function Home() {
+  const navigate = useNavigate();
   const [checkIn, setCheckIn] = useState("");
   const [checkOut, setCheckOut] = useState("");
   const [adults, setAdults] = useState(2);
@@ -75,6 +79,7 @@ function Home() {
   const [activeSlide, setActiveSlide] = useState(0);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [showRooms, setShowRooms] = useState(false);
+  const [showAdminAlert, setShowAdminAlert] = useState(false);
 
   const updateAdults = (value) => {
     setAdults((current) => Math.max(1, current + value));
@@ -116,7 +121,7 @@ function Home() {
       <header className="home-header">
         <div className="home-brand">
           <img src={homeLogo} alt="Hotel Valencia logo" className="home-logo-image" />
-          <span className="home-subtitle">Hotel Valencia</span>
+          <span className="home-subtitle">Hotel Ejecutivo</span>
         </div>
         <nav className="home-nav">
           <a href="#hero">Inicio</a>
@@ -126,9 +131,13 @@ function Home() {
           <a href="#contact">Contacto</a>
         </nav>
         <div className="home-actions">
-          <Link to="/login" className="btn btn-register">
+          <button
+            type="button"
+            className="btn btn-register"
+            onClick={() => setShowAdminAlert(true)}
+          >
             Administración
-          </Link>
+          </button>
           <button className="btn btn-lang">ES</button>
         </div>
       </header>
@@ -194,31 +203,55 @@ function Home() {
         </div>
       </section>
 
-      <section className="home-highlights home-section">
-        <a
-          className="highlight-card"
-          href="https://www.google.com/maps?q=Sons%C3%B3n,+Antioquia"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <strong>Ubicación estratégica</strong>
+      <section className="feature-strip" aria-label="Ventajas del hotel">
+        <div className="feature-strip-grid">
+          <article className="feature-card">
+            <div className="feature-icon" aria-hidden="true">🔔</div>
+            <div className="feature-copy">
+              <h3>Servicio 24/7</h3>
+              <p>Estamos siempre disponibles para ti.</p>
+            </div>
+          </article>
+
+          <article className="feature-card">
+            <div className="feature-icon" aria-hidden="true">🛏️</div>
+            <div className="feature-copy">
+              <h3>Comodidad</h3>
+              <p>Habitaciones diseñadas para tu descanso.</p>
+            </div>
+          </article>
+
+          <article className="feature-card">
+            <div className="feature-icon" aria-hidden="true">🛡️</div>
+            <div className="feature-copy">
+              <h3>Seguridad</h3>
+              <p>Tu tranquilidad es nuestra prioridad.</p>
+            </div>
+          </article>
+
+          <article className="feature-card">
+            <div className="feature-icon" aria-hidden="true">📍</div>
+            <div className="feature-copy">
+              <h3>Ubicación</h3>
+              <p>En el corazón de la ciudad, cerca de todo.</p>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section className="value-cards" aria-label="Beneficios del hotel">
+        <article className="value-card">
+          <h3>Ubicación estratégica</h3>
           <p>Acceso fácil a sitios turísticos, restaurantes y transporte local.</p>
-        </a>
-        <a
-          className="highlight-card"
-          href="https://www.instagram.com/hotelelvalenciasonson?igsh=MWJjajJ3Y3M4YjR0dA=="
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <strong>Atención 24/7</strong>
+        </article>
+
+        <article className="value-card">
+          <h3>Atención 24/7</h3>
           <p>Soporte para reservas, consultas y servicios personalizados.</p>
-        </a>
-        <button
-          type="button"
-          className="highlight-card highlight-card-button"
-          onClick={handleOpenExperienceModal}
-        >
-          <strong>Experiencias únicas</strong>
+        </article>
+
+        <button type="button" className="value-card value-card-button" onClick={handleOpenExperienceModal}>
+          <h3>Experiencias únicas</h3>
           <p>Planes especiales, cenas temáticas y actividades de bienestar.</p>
         </button>
       </section>
@@ -408,30 +441,52 @@ function Home() {
         </div>
       )}
 
+      <ConfirmDialog
+        show={showAdminAlert}
+        title="Espacio administrativo"
+        message="¿Deseas continuar? Este espacio es solo para personal administrativo."
+        confirmText="Continuar"
+        cancelText="Cancelar"
+        onConfirm={() => {
+          setShowAdminAlert(false);
+          navigate("/login");
+        }}
+        onCancel={() => setShowAdminAlert(false)}
+      />
+
       <footer className="home-footer" id="contact">
-        <div className="footer-grid">
-          <div>
-            <h3>Hotel Valencia</h3>
-            <p>Un hotel boutique que combina confort moderno con la belleza natural del entorno.</p>
+        <div className="footer-inner">
+          <div className="footer-brand">
+            <img src={homeLogo} alt="Hotel Valencia logo" className="footer-logo" />
+            <div>
+              <span className="footer-brand-name">Hotel Valencia</span>
+              <p>Hospitalidad elegante en Sonsón, donde cada detalle está pensado para tu descanso.</p>
+            </div>
           </div>
-          <div>
-            <h4>Enlaces rápidos</h4>
+
+          <div className="footer-links">
+            <h4>Explora</h4>
             <ul>
               <li><a href="#hero">Inicio</a></li>
-              <li><a href="#services">Servicios</a></li>
               <li><a href="#rooms">Habitaciones</a></li>
-              <li><a href="#reviews">Reseñas</a></li>
+              <li><a href="#contact">Contacto</a></li>
             </ul>
           </div>
-          <div>
+
+          <div className="footer-contact">
             <h4>Contacto</h4>
-            <p>Av. Principal 123, Ciudad</p>
-            <p>Teléfono: +57 300 123 4567</p>
-            <p>Email: info@hotelvalencia.com</p>
+            <p>📍 Sonsón, Antioquia</p>
+            <p>📞 +57 300 123 4567</p>
+            <p>✉️ info@hotelvalencia.com</p>
+            <p>🕒 Recepción 24/7</p>
           </div>
         </div>
+
+        <div className="footer-divider" />
+
         <div className="footer-copy">
-          © 2026 Hotel Valencia. Todos los derechos reservados.
+          <span>© 2026 Hotel Valencia.</span>
+          <span>Todos los derechos reservados.</span>
         </div>
       </footer>
     </div>

@@ -1,6 +1,7 @@
 import HabitacionModal from "../components/HabitacionModal";
 import { obtenerHabitaciones, actualizarEstadoHabitacion } from "../services/api";
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import ConfirmDialog from "../components/ConfirmDialog";
 import CenteredToast from "../components/CenteredToast";
 
@@ -17,7 +18,6 @@ function Habitaciones() {
   const [habitaciones, setHabitaciones] = useState([]);
   const [loading, setLoading] = useState(true);
   const [habitacionEditar, setHabitacionEditar] = useState(null);
-  const [mostrarDeshabilitados, setMostrarDeshabilitados] = useState(false);
   const [confirm, setConfirm] = useState({ show: false, title: "", message: "", onConfirm: null });
   const [toast, setToast] = useState({ show: false, message: "", type: "info" });
 
@@ -38,11 +38,6 @@ function Habitaciones() {
 
   const handleNuevaHabitacion = () => {
     setHabitacionEditar(null);
-    setMostrarDeshabilitados(false);
-  };
-
-  const handleVerDeshabilitados = () => {
-    setMostrarDeshabilitados(true);
   };
 
   const handleDeshabilitarHabitacion = async (habitacion) => {
@@ -103,11 +98,7 @@ function Habitaciones() {
     });
   };
 
-  const habitacionesFiltradas = habitaciones.filter((habitacion) =>
-    mostrarDeshabilitados
-      ? habitacion.statusCategory === "no-disponible"
-      : habitacion.statusCategory !== "no-disponible"
-  );
+  const habitacionesFiltradas = habitaciones.filter((habitacion) => habitacion.statusCategory !== "no-disponible");
 
   if (loading) {
     return <div className="alert alert-info">Cargando habitaciones...</div>;
@@ -115,14 +106,11 @@ function Habitaciones() {
 
   return (
     <>
-      <div className="d-flex justify-content-between align-items-center">
-        <h2>Habitaciones</h2>
+      <div className="d-flex justify-content-between align-items-center dashboard-page-header">
+        <h2 className="dashboard-title-gold">Habitaciones</h2>
         <div>
           <button className="btn btn-success" data-bs-toggle="modal" data-bs-target="#habitacionModal" onClick={handleNuevaHabitacion}>
             + Nueva Habitacion
-          </button>
-          <button type="button" className="btn btn-secondary ms-2" onClick={handleVerDeshabilitados}>
-            Deshabilitados
           </button>
         </div>
       </div>
@@ -148,10 +136,11 @@ function Habitaciones() {
         <table className="table table-striped table-innhub habitaciones-table">
         <thead>
           <tr>
-            
             <th>Número</th>
             <th>Tipo</th>
             <th>Precio Noche</th>
+            <th>Camas</th>
+            <th>Ver</th>
             <th>Estado</th>
             <th>Acciones</th>
           </tr>
@@ -160,12 +149,25 @@ function Habitaciones() {
           {habitacionesFiltradas.map((habitacion) => {
             const statusText = habitacion.estado || "Sin estado";
             const statusClass = habitacion.statusCategory || "sin-estado";
+            const camas = Number(habitacion.camas ?? 0) || 0;
+
             return (
               <tr key={habitacion.id_habitacion} className={`habitacion-row ${statusClass}`}>
-                
                 <td>{habitacion.numero}</td>
                 <td>{habitacion.tipo}</td>
                 <td>{habitacion.precio_noche}</td>
+                <td>
+                  <div className="habitacion-meta-cell habitacion-meta-counter" title="Número de camas">
+                    <i className="fas fa-bed habitacion-meta-icon"></i>
+                    <span>{camas}</span>
+                  </div>
+                </td>
+                <td>
+                  <button type="button" className="habitacion-meta-cell habitacion-meta-link" title="Ver detalles">
+                    <i className="fas fa-eye habitacion-meta-icon"></i>
+                    <span>Ver</span>
+                  </button>
+                </td>
                 <td>
                   <span className={`estado-badge ${statusClass}`}>
                     <span className="estado-dot" />
@@ -177,15 +179,9 @@ function Habitaciones() {
                     <button className="btn btn-sm" style={{backgroundColor: '#c89629', color: '#090808', border: 'none'}} data-bs-toggle="modal" data-bs-target="#habitacionModal" onClick={() => handleEditarHabitacion(habitacion)} title="Editar">
                       <i className="fa-solid fa-pen"></i>
                     </button>
-                    {mostrarDeshabilitados ? (
-                      <button className="btn btn-sm" style={{backgroundColor: '#1f1a17', color: '#c89629', border: '1px solid rgba(255,255,255,0.1)'}} onClick={() => handleHabilitarHabitacion(habitacion)} title="Habilitar">
-                        <i className="fa-solid fa-check"></i>
-                      </button>
-                    ) : (
-                      <button className="btn btn-sm" style={{backgroundColor: '#8c1f1f', color: 'white', border: 'none'}} onClick={() => handleDeshabilitarHabitacion(habitacion)} title="Deshabilitar">
-                        <i className="fa-solid fa-ban"></i>
-                      </button>
-                    )}
+                    <button className="btn btn-sm" style={{backgroundColor: '#8c1f1f', color: 'white', border: 'none'}} onClick={() => handleDeshabilitarHabitacion(habitacion)} title="Deshabilitar">
+                      <i className="fa-solid fa-ban"></i>
+                    </button>
                   </div>
                 </td>
               </tr>
@@ -194,13 +190,6 @@ function Habitaciones() {
         </tbody>
         </table>
       </div>
-      {mostrarDeshabilitados && (
-        <div className="mt-3">
-          <button className="btn btn-secondary" onClick={() => setMostrarDeshabilitados(false)}>
-            Regresar a tabla habitaciones
-          </button>
-        </div>
-      )}
       <ConfirmDialog
         show={confirm.show}
         title={confirm.title}

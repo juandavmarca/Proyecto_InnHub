@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { crearHabitacion, editarHabitacion } from "../services/api";
 
-const logo = "http://localhost/ERPInnHub/backend/uploads/logovs.png";
+const logo = "http://localhost/ERPInnHub/backend/uploads/logo.png";
 const ESTADO_HABITACION_OPTIONS = [
   "Disponible",
   "No disponible",

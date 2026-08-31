@@ -64,6 +64,18 @@ function Sidebar() {
           </li>
         </ul>
       </div>
+
+      <div className="sidebar-footer">
+        <NavLink
+          className={({ isActive }) =>
+            `nav-link sidebar-action ${isActive ? "active" : "text-white"}`
+          }
+          to="/Deshabilitados"
+        >
+          <i className="fas fa-gear"></i>
+          <span className="sidebar-label">Deshabilitados</span>
+        </NavLink>
+      </div>
     </div>
   );
  }
