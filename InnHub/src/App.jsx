@@ -4,6 +4,10 @@ import Login from "./pages/Login";
 import Clientes from "./pages/Clientes";
 import Empleados from "./pages/Empleados";
 import Habitaciones from "./pages/Habitaciones";
+import HabitacionCamas from "./pages/HabitacionCamas";
+import HabitacionCaracteristicas from "./pages/HabitacionCaracteristicas";
+import HabitacionImagenes from "./pages/HabitacionImagenes";
+import Deshabilitados from "./pages/Deshabilitados";
 import Dashboard from "./pages/Dashboard";
 import DashboardLayout from "./layouts/DashboardLayout";
 
@@ -44,6 +48,38 @@ function App() {
  element={
  <DashboardLayout>
  <Habitaciones />
+ </DashboardLayout>
+ }
+ />
+ <Route
+ path="/Deshabilitados"
+ element={
+ <DashboardLayout>
+ <Deshabilitados />
+ </DashboardLayout>
+ }
+ />
+ <Route
+ path="/HabitacionCamas"
+ element={
+ <DashboardLayout>
+ <HabitacionCamas />
+ </DashboardLayout>
+ }
+ />
+ <Route
+ path="/HabitacionCaracteristicas"
+ element={
+ <DashboardLayout>
+ <HabitacionCaracteristicas />
+ </DashboardLayout>
+ }
+ />
+ <Route
+ path="/HabitacionImagenes"
+ element={
+ <DashboardLayout>
+ <HabitacionImagenes />
  </DashboardLayout>
  }
  />

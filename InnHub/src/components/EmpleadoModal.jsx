@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { crearEmpleado, editarEmpleado } from "../services/api";
 
-const logo = "http://localhost/ERPInnHub/backend/uploads/logovs.png";
+const logo = "http://localhost/ERPInnHub/backend/uploads/logo.png";
 
 function EmpleadoModal({ onEmpleadoCreado, onSuccess, empleadoEditar }) {
   const [form, setForm] = useState({

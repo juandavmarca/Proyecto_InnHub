@@ -7,7 +7,6 @@ function Empleados() {
   const [empleados, setEmpleados] = useState([]);
   const [loading, setLoading] = useState(true);
   const [empleadoEditar, setEmpleadoEditar] = useState(null);
-  const [mostrarDeshabilitados, setMostrarDeshabilitados] = useState(false);
   const [confirm, setConfirm] = useState({ show: false, title: "", message: "", onConfirm: null });
   const [toast, setToast] = useState({ show: false, message: "", type: "info" });
 
@@ -30,11 +29,6 @@ function Empleados() {
 
   const handleNuevoEmpleado = () => {
     setEmpleadoEditar(null);
-    setMostrarDeshabilitados(false);
-  };
-
-  const handleVerDeshabilitados = () => {
-    setMostrarDeshabilitados(true);
   };
 
   const handleDeshabilitarEmpleado = async (empleado) => {
@@ -95,9 +89,7 @@ function Empleados() {
     });
   };
 
-  const empleadosFiltrados = empleados.filter((empleado) =>
-    mostrarDeshabilitados ? empleado.deshabilitado : !empleado.deshabilitado
-  );
+  const empleadosFiltrados = empleados.filter((empleado) => !empleado.deshabilitado);
 
   if (loading) {
     return <div className="alert alert-info">Cargando empleados...</div>;
@@ -110,9 +102,6 @@ function Empleados() {
         <div className="dashboard-actions">
           <button className="btn btn-success" data-bs-toggle="modal" data-bs-target="#empleadoModal" onClick={handleNuevoEmpleado}>
             + Nuevo Empleado
-          </button>
-          <button type="button" className="btn btn-secondary" onClick={handleVerDeshabilitados}>
-            Deshabilitados
           </button>
         </div>
       </div>
@@ -171,15 +160,9 @@ function Empleados() {
                   <button className="btn btn-sm" style={{backgroundColor: '#c89629', color: '#090808', border: 'none'}} data-bs-toggle="modal" data-bs-target="#empleadoModal" onClick={() => handleEditarEmpleado(empleado)} title="Editar">
                     <i className="fa-solid fa-pen"></i>
                   </button>
-                  {mostrarDeshabilitados ? (
-                    <button className="btn btn-sm" style={{backgroundColor: '#1f1a17', color: '#c89629', border: '1px solid rgba(255,255,255,0.1)'}} onClick={() => handleHabilitarEmpleado(empleado)} title="Habilitar">
-                      <i className="fa-solid fa-check"></i>
-                    </button>
-                  ) : (
-                    <button className="btn btn-sm" style={{backgroundColor: '#8c1f1f', color: 'white', border: 'none'}} onClick={() => handleDeshabilitarEmpleado(empleado)} title="Deshabilitar">
-                      <i className="fa-solid fa-ban"></i>
-                    </button>
-                  )}
+                  <button className="btn btn-sm" style={{backgroundColor: '#8c1f1f', color: 'white', border: 'none'}} onClick={() => handleDeshabilitarEmpleado(empleado)} title="Deshabilitar">
+                    <i className="fa-solid fa-ban"></i>
+                  </button>
                 </div>
               </td>
             </tr>
@@ -187,13 +170,6 @@ function Empleados() {
         </tbody>
         </table>
       </div>
-      {mostrarDeshabilitados && (
-        <div className="mt-3">
-          <button className="btn btn-secondary" onClick={() => setMostrarDeshabilitados(false)}>
-            Regresar a tabla empleados
-          </button>
-        </div>
-      )}
       <ConfirmDialog
         show={confirm.show}
         title={confirm.title}

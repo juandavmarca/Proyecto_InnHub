@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { crearCliente, editarCliente } from "../services/api";
 
-const logo = "http://localhost/ERPInnHub/backend/uploads/logovs.png";
+const logo = "http://localhost/ERPInnHub/backend/uploads/logo.png";
 
 function ClienteModal({ onClienteCreado, onSuccess, clienteEditar }) {
   const [form, setForm] = useState({

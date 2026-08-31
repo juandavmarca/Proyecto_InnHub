@@ -7,7 +7,6 @@ function Clientes() {
   const [clientes, setClientes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [clienteEditar, setClienteEditar] = useState(null);
-  const [mostrarDeshabilitados, setMostrarDeshabilitados] = useState(false);
   const [confirm, setConfirm] = useState({ show: false, title: "", message: "", onConfirm: null });
   const [toast, setToast] = useState({ show: false, message: "", type: "info" });
 
@@ -30,11 +29,6 @@ function Clientes() {
 
   const handleNuevoCliente = () => {
     setClienteEditar(null);
-    setMostrarDeshabilitados(false);
-  };
-
-  const handleVerDeshabilitados = () => {
-    setMostrarDeshabilitados(true);
   };
 
   const handleDeshabilitarCliente = async (cliente) => {
@@ -95,9 +89,7 @@ function Clientes() {
     });
   };
 
-  const clientesFiltrados = clientes.filter((cliente) =>
-    mostrarDeshabilitados ? cliente.deshabilitado : !cliente.deshabilitado
-  );
+  const clientesFiltrados = clientes.filter((cliente) => !cliente.deshabilitado);
 
   if (loading) {
     return <div className="alert alert-info">Cargando clientes...</div>;
@@ -110,9 +102,6 @@ function Clientes() {
         <div className="dashboard-actions">
           <button className="btn btn-success" data-bs-toggle="modal" data-bs-target="#clienteModal" onClick={handleNuevoCliente}>
             + Nuevo Cliente
-          </button>
-          <button type="button" className="btn btn-secondary" onClick={handleVerDeshabilitados}>
-            Deshabilitados
           </button>
         </div>
       </div>
@@ -166,15 +155,9 @@ function Clientes() {
                   <button className="btn btn-sm" style={{backgroundColor: '#c89629', color: '#090808', border: 'none'}} data-bs-toggle="modal" data-bs-target="#clienteModal" onClick={() => handleEditarCliente(cliente)} title="Editar">
                     <i className="fa-solid fa-pen"></i>
                   </button>
-                  {mostrarDeshabilitados ? (
-                    <button className="btn btn-sm" style={{backgroundColor: '#1f1a17', color: '#c89629', border: '1px solid rgba(255,255,255,0.1)'}} onClick={() => handleHabilitarCliente(cliente)} title="Habilitar">
-                      <i className="fa-solid fa-check"></i>
-                    </button>
-                  ) : (
-                    <button className="btn btn-sm" style={{backgroundColor: '#8c1f1f', color: 'white', border: 'none'}} onClick={() => handleDeshabilitarCliente(cliente)} title="Deshabilitar">
-                      <i className="fa-solid fa-ban"></i>
-                    </button>
-                  )}
+                  <button className="btn btn-sm" style={{backgroundColor: '#8c1f1f', color: 'white', border: 'none'}} onClick={() => handleDeshabilitarCliente(cliente)} title="Deshabilitar">
+                    <i className="fa-solid fa-ban"></i>
+                  </button>
                 </div>
               </td>
             </tr>
@@ -182,14 +165,6 @@ function Clientes() {
         </tbody>
         </table>
         </div>
-        {mostrarDeshabilitados && (
-          <div className="mt-3">
-            <button className="btn btn-secondary" onClick={() => setMostrarDeshabilitados(false)}>
-              Regresar a tabla clientes
-            </button>
-          </div>
-        )}
-
         <ConfirmDialog
           show={confirm.show}
           title={confirm.title}
