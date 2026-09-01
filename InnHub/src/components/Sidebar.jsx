@@ -14,30 +14,30 @@ function Sidebar() {
       </div>
 
       <div className="nav-group">
-         <div className="nav-group-title">Panel</div>
-         <ul className="nav nav-pills flex-column gap-2">
-           <li className="nav-item">
-             <NavLink
-               className={({ isActive }) =>
-                 `nav-link ${isActive ? "active" : "text-white"}`
-               }
-               to="/dashboard"
-             >
-               <i className="fas fa-chart-line"></i>
-               <span className="sidebar-label">Dashboard</span>
-             </NavLink>
-           </li>
-           <li className="nav-item">
-             <NavLink
-               className={({ isActive }) =>
-                 `nav-link ${isActive ? "active" : "text-white"}`
-               }
-               to="/Clientes"
-             >
-               <i className="fas fa-users"></i>
-               <span className="sidebar-label">Clientes</span>
-             </NavLink>
-           </li>
+        <div className="nav-group-title">Panel</div>
+        <ul className="nav nav-pills flex-column gap-2">
+          <li className="nav-item">
+            <NavLink
+              className={({ isActive }) =>
+                `nav-link ${isActive ? "active" : "text-white"}`
+              }
+              to="/dashboard"
+            >
+              <i className="fas fa-chart-line"></i>
+              <span className="sidebar-label">Dashboard</span>
+            </NavLink>
+          </li>
+          <li className="nav-item">
+            <NavLink
+              className={({ isActive }) =>
+                `nav-link ${isActive ? "active" : "text-white"}`
+              }
+              to="/Clientes"
+            >
+              <i className="fas fa-users"></i>
+              <span className="sidebar-label">Clientes</span>
+            </NavLink>
+          </li>
 
           <li className="nav-item">
             <NavLink
@@ -78,6 +78,6 @@ function Sidebar() {
       </div>
     </div>
   );
- }
+}
 
- export default Sidebar;
+export default Sidebar;
