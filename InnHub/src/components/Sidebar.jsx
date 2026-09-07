@@ -1,8 +1,10 @@
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 
 const logo = "http://localhost/ERPInnHub/backend/uploads/logodash.png";
 
 function Sidebar() {
+  const navigate = useNavigate();
+
   return (
     <div className="sidebar text-white">
       <div className="sidebar-brand">
@@ -62,19 +64,25 @@ function Sidebar() {
               <span className="sidebar-label">Habitaciones</span>
             </NavLink>
           </li>
+          <li className="nav-item">
+            <NavLink
+              className={({ isActive }) =>
+                `nav-link ${isActive ? "active" : "text-white"}`
+              }
+              to="/Deshabilitados"
+            >
+              <i className="fas fa-gear"></i>
+              <span className="sidebar-label">Deshabilitados</span>
+            </NavLink>
+          </li>
         </ul>
       </div>
 
       <div className="sidebar-footer">
-        <NavLink
-          className={({ isActive }) =>
-            `nav-link sidebar-action ${isActive ? "active" : "text-white"}`
-          }
-          to="/Deshabilitados"
-        >
-          <i className="fas fa-gear"></i>
-          <span className="sidebar-label">Deshabilitados</span>
-        </NavLink>
+        <button type="button" className="nav-link sidebar-action sidebar-logout" onClick={() => navigate("/login")}>
+          <i className="fas fa-right-from-bracket"></i>
+          <span className="sidebar-label">Cerrar sesión</span>
+        </button>
       </div>
     </div>
   );
