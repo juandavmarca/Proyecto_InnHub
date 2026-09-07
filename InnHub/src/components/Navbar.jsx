@@ -4,7 +4,6 @@ function Navbar() {
       <div className="navbar-brand">
         <h1 className="navbar-brand-title">Panel administrativo</h1>
       </div>
-      <button className="btn btn-sm btn-logout">Cerrar sesión</button>
     </nav>
   );
 }
