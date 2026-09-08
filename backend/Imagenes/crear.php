@@ -54,12 +54,15 @@ if (empty($url)) {
     exit;
 }
 
+$urlVideo = !empty($data['url_video']) ? trim($data['url_video']) : null;
+
 try {
-    $sql = 'INSERT INTO imagenes (url, habitaciones_id_habitacion) VALUES (:url, :habitaciones_id_habitacion)';
+    $sql = 'INSERT INTO imagenes (url, url_video, habitaciones_id_habitacion) VALUES (:url, :url_video, :habitaciones_id_habitacion)';
 
     $stmt = $pdo->prepare($sql);
     $stmt->execute([
         ':url' => $url,
+        ':url_video' => $urlVideo,
         ':habitaciones_id_habitacion' => (int) $data['habitaciones_id_habitacion'],
     ]);
 

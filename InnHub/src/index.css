@@ -2034,7 +2034,7 @@ html body .dashboard-page .table.table-innhub.table-striped tbody tr td,
 .btn-register,
 .btn-book,
 .btn-secondary {
-  color: #fafafa;
+  color: #ffffff;
   background: rgba(60, 244, 217, 0.88);
   border-radius: 999px;
   font-weight: 700;
@@ -2413,7 +2413,7 @@ html body .dashboard-page .table.table-innhub.table-striped tbody tr td,
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(4, 59, 51, 0.6);
+  background: transparent !important;
   z-index: 9999;
 }
 
@@ -2455,7 +2455,8 @@ html body .dashboard-page .table.table-innhub.table-striped tbody tr td,
 }
 
 .category-card.image {
-  width: min(520px, 46%);
+  width: min(380px, 32%);
+  flex: 1 1 0;
   height: 260px;
   background-size: cover;
   background-position: center;
@@ -2550,49 +2551,275 @@ html body .dashboard-page .table.table-innhub.table-striped tbody tr td,
 }
 
 .room-modal {
-  width: min(960px, 94vw);
-  max-width: 1000px;
-  border-radius: 2rem;
-  background: #ffffff;
-  padding: 2rem;
+  width: min(1180px, 94vw);
+  max-width: 1180px;
+  max-height: 92vh;
+  overflow-y: auto;
+  border-radius: 0.65rem;
+  background: #1c2025;
+  padding: 0.8rem;
   position: relative;
-  box-shadow: 0 36px 100px rgba(4, 59, 51, 0.2);
+  box-shadow: none;
 }
 
 .room-modal-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 2rem;
-  align-items: start;
+  grid-template-columns: minmax(0, 1.55fr) minmax(330px, 0.9fr);
+  gap: 0.8rem;
+  align-items: stretch;
 }
 
-.room-modal-video {
+.room-modal-gallery {
+  width: 100%;
+  min-width: 0;
+}
+
+.room-modal-gallery-main {
+  position: relative;
+  aspect-ratio: 1.58 / 1;
+  overflow: hidden;
+  border-radius: 0.2rem;
+  background: #080808;
+  border: 0;
+}
+
+.room-modal-gallery-main video,
+.room-modal-gallery-main iframe,
+.room-modal-gallery-main img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  object-fit: contain;
+}
+
+.room-modal-gallery-controls {
+  position: absolute;
+  right: 0.9rem;
+  bottom: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.25rem 0.35rem;
+  border-radius: 0.3rem;
+  background: rgba(10, 12, 14, 0.72);
+  color: #f1f1f1;
+  font-size: 0.76rem;
+}
+
+.room-modal-gallery-controls button {
+  width: 1.45rem;
+  height: 1.45rem;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #f1f1f1;
+  font-size: 1.2rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.room-modal-gallery-thumbs {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.65rem;
+  margin-top: 0.65rem;
+}
+
+.room-modal-gallery-thumb {
+  position: relative;
+  min-width: 0;
+  height: 82px;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 0.2rem;
+  background: #272c32;
+  color: rgba(246, 240, 226, 0.8);
+  cursor: pointer;
+  transition: border-color 0.2s ease, opacity 0.2s ease;
+}
+
+.room-modal-gallery-thumb:hover,
+.room-modal-gallery-thumb.active {
+  border-color: var(--brand-medium);
+  opacity: 1;
+}
+
+.room-modal-gallery-thumb:not(.active) {
+  opacity: 0.72;
+}
+
+.room-modal-gallery-thumb img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.room-modal-video-thumb {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  flex-direction: column;
+  font-size: 0.7rem;
+}
+
+.room-modal-play-icon {
+  color: var(--brand-medium);
+  font-size: 1.2rem;
+}
+
+.room-modal-carousel {
   border-radius: 1.6rem;
   overflow: hidden;
   min-height: 340px;
 }
 
-.room-modal-video video {
+.room-modal-image {
+  position: relative;
   width: 100%;
-  height: 100%;
   min-height: 340px;
-  object-fit: cover;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+}
+
+.room-modal-carousel-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 2.5rem;
+  height: 2.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.46);
+  color: #ffffff;
+  font-size: 1.8rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.room-modal-carousel-arrow-left {
+  left: 1rem;
+}
+
+.room-modal-carousel-arrow-right {
+  right: 1rem;
+}
+
+.room-modal-carousel-indicators {
+  display: flex;
+  justify-content: center;
+  gap: 0.45rem;
+  padding: 0.8rem;
+  background: rgba(4, 59, 51, 0.08);
+}
+
+.room-modal-carousel-indicator {
+  width: 0.65rem;
+  height: 0.65rem;
+  padding: 0;
+  border: 1px solid rgba(4, 59, 51, 0.35);
+  border-radius: 50%;
+  background: transparent;
+  cursor: pointer;
+}
+
+.room-modal-carousel-indicator.active {
+  background: var(--brand-dark);
+  border-color: var(--brand-dark);
 }
 
 .room-modal-details h2 {
-  margin-top: 0;
+  margin: 0;
+  font-size: clamp(1.55rem, 2.2vw, 2.2rem);
+  line-height: 1.08;
+}
+
+.room-modal-details {
+  min-width: 0;
+  padding: 1.35rem 1.25rem 1.1rem;
+  border-radius: 0.2rem;
+  background: #171b20;
+  color: #e8e8e8;
+}
+
+.room-modal-type {
+  color: #b7bdc3;
+  margin: 0.35rem 0 1.2rem;
+  text-transform: uppercase;
+  font-size: 0.68rem;
+  letter-spacing: 0.14em;
+}
+
+.room-modal-real-data {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.55rem;
+  color: #e8e8e8;
+}
+
+.room-modal-real-data p {
+  margin: 0;
+}
+
+.room-modal-features {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem 1rem;
+  margin-top: 1.25rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  color: #b7bdc3;
+}
+
+.room-modal-features h3 {
+  grid-column: 1 / -1;
+  margin: 0;
+  color: #d7a83b;
+  font-size: 1rem;
+}
+
+.room-modal-feature {
+  display: grid;
+  gap: 0.15rem;
+  padding-left: 0.65rem;
+  border-left: 2px solid #d7a83b;
+}
+
+.room-modal-feature strong {
+  color: #ececec;
+}
+
+.room-modal-feature span {
+  font-size: 0.88rem;
+  line-height: 1.35;
 }
 
 .room-modal-price {
-  margin: 1.5rem 0;
-  font-size: 2rem;
+  margin: 1.5rem 0 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  font-size: 1.75rem;
   font-weight: 800;
-  color: var(--brand-dark);
+  color: #d7a83b;
 }
 
 .room-modal-details .btn-secondary {
   width: 100%;
+  min-height: 3rem;
   justify-content: center;
+  border: 0;
+  background: #e3b54e;
+  color: #1d1d1d;
+  font-weight: 700;
+}
+
+.room-modal-details .btn-secondary:hover {
+  background: #f0c765;
+  color: #1d1d1d;
 }
 
 .room-detail-modal {
@@ -2787,14 +3014,30 @@ html body .dashboard-page .table.table-innhub.table-striped tbody tr td,
 
 .room-detail-chip {
   display: inline-flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 0.5rem;
-  padding: 0.52rem 0.8rem;
-  border-radius: 999px;
+  padding: 0.65rem 0.8rem;
+  border-radius: 0.8rem;
   background: rgba(200, 150, 41, 0.1);
   border: 1px solid rgba(200, 150, 41, 0.35);
   color: #f5f0df;
   font-size: 0.88rem;
+}
+
+.room-detail-feature-name,
+.room-detail-feature-description {
+  display: block;
+}
+
+.room-detail-feature-name {
+  color: #f6f0e2;
+}
+
+.room-detail-feature-description {
+  margin-top: 0.2rem;
+  color: rgba(246, 240, 226, 0.72);
+  font-size: 0.82rem;
+  line-height: 1.35;
 }
 
 .room-detail-bed-list {
@@ -2943,9 +3186,17 @@ html body .dashboard-page .table.table-innhub.table-striped tbody tr td,
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
+.room-availability-message {
+  padding: 1.5rem;
+  border: 1px solid rgba(200, 150, 41, 0.35);
+  border-radius: 0.8rem;
+  color: var(--text-muted);
+  text-align: center;
+}
+
 .room-card {
   display: grid;
-  grid-template-columns: 1fr 1.2fr;
+  grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
   overflow: hidden;
   border-radius: 2rem;
   background: white;
@@ -2961,6 +3212,53 @@ html body .dashboard-page .table.table-innhub.table-striped tbody tr td,
   border: none;
   cursor: pointer;
 }
+
+.room-image-carousel {
+  min-height: 380px;
+  cursor: default;
+}
+
+.room-image-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 2rem;
+  height: 2rem;
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.45);
+  color: #ffffff;
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+  z-index: 2;
+}
+
+.room-image-arrow-left { left: 0.75rem; }
+.room-image-arrow-right { right: 0.75rem; }
+
+.room-image-indicators {
+  position: absolute;
+  bottom: 0.75rem;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  gap: 0.35rem;
+  z-index: 2;
+}
+
+.room-image-indicator {
+  width: 0.55rem;
+  height: 0.55rem;
+  padding: 0;
+  border: 1px solid #ffffff;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.35);
+  cursor: pointer;
+}
+
+.room-image-indicator.active { background: #ffffff; }
 
 .room-image-overlay {
   position: absolute;
@@ -2998,8 +3296,50 @@ html body .dashboard-page .table.table-innhub.table-striped tbody tr td,
   justify-content: space-between;
 }
 
+.room-card-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.room-video-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.7rem;
+  height: 2.7rem;
+  flex: 0 0 2.7rem;
+  border: 1px solid rgba(200, 150, 41, 0.55);
+  border-radius: 0.55rem;
+  background: transparent;
+  color: var(--brand-medium);
+  cursor: pointer;
+}
+
+.room-video-button:hover,
+.room-video-button:focus-visible {
+  background: var(--brand-medium);
+  color: #090808;
+}
+
 .room-content h3 {
   margin-top: 0;
+}
+
+.room-real-data {
+  display: grid;
+  gap: 0.45rem;
+  margin: 0.8rem 0 1.2rem;
+  color: var(--text-muted);
+  line-height: 1.45;
+}
+
+.room-real-data p {
+  margin: 0;
+}
+
+.room-real-data strong {
+  color: var(--text-strong);
 }
 
 .room-meta {
@@ -3232,7 +3572,26 @@ html body .dashboard-page .table.table-innhub.table-striped tbody tr td,
 }
 
 .modal-backdrop.show {
-  background: rgba(0, 0, 0, 0.72);
+  background: transparent !important;
+}
+
+@media (max-width: 800px) {
+  .room-modal {
+    width: min(94vw, 620px);
+    padding: 0.55rem;
+  }
+
+  .room-modal-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .room-modal-gallery-main {
+    aspect-ratio: 1.5 / 1;
+  }
+
+  .room-modal-details {
+    padding: 1rem;
+  }
 }
 
 /* Public site theme: match the administrative black and gold interface. */
@@ -3543,7 +3902,7 @@ html body .dashboard-page .table.table-innhub.table-striped tbody tr td,
 
 .experience-modal,
 .room-modal {
-  background: #0e0d0b;
+  background: #252a30;
   border: 1px solid rgba(200, 150, 41, 0.48);
   border-radius: 0.5rem;
 }

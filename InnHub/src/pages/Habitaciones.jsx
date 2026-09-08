@@ -378,10 +378,13 @@ function Habitaciones() {
                   <div className="room-detail-chip-list">
                     {detalleCaracteristicas.length > 0 ? (
                       detalleCaracteristicas.map((caracteristica, index) => (
-                        <span key={`${caracteristica.idcarac || index}`} className="room-detail-chip">
+                        <div key={`${caracteristica.idcarac || index}`} className="room-detail-chip">
                           <i className="fa-regular fa-circle-check"></i>
-                          {caracteristica.nombre}
-                        </span>
+                          <div>
+                            <strong className="room-detail-feature-name">{caracteristica.nombre}</strong>
+                            <span className="room-detail-feature-description">{caracteristica.descripcion}</span>
+                          </div>
+                        </div>
                       ))
                     ) : (
                       <span className="room-detail-empty">Aún no hay características registradas.</span>

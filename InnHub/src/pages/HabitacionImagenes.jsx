@@ -12,7 +12,7 @@ function HabitacionImagenes() {
   const [mensaje, setMensaje] = useState({ type: "", text: "" });
   const [habitacionSeleccionada, setHabitacionSeleccionada] = useState(null);
   const [imagenAEliminar, setImagenAEliminar] = useState(null);
-  const [form, setForm] = useState({ imagenArchivo: null, habitaciones_id_habitacion: idHabitacion || "" });
+  const [form, setForm] = useState({ imagenArchivo: null, url_video: "", habitaciones_id_habitacion: idHabitacion || "" });
 
   useEffect(() => {
     if (!idHabitacion) {
@@ -53,7 +53,7 @@ function HabitacionImagenes() {
   };
 
   const resetForm = () => {
-    setForm({ imagenArchivo: null, habitaciones_id_habitacion: idHabitacion || "" });
+    setForm({ imagenArchivo: null, url_video: "", habitaciones_id_habitacion: idHabitacion || "" });
   };
 
   const handleSubmit = async (e) => {
@@ -76,6 +76,9 @@ function HabitacionImagenes() {
       const formData = new FormData();
       formData.append("habitaciones_id_habitacion", String(Number(idHabitacion)));
       formData.append("imagen", form.imagenArchivo);
+      if (form.url_video.trim()) {
+        formData.append("url_video", form.url_video.trim());
+      }
 
       const res = await crearImagen(formData);
 
@@ -148,6 +151,18 @@ function HabitacionImagenes() {
                 className="form-control camas-input"
                 name="imagenArchivo"
                 accept="image/*"
+                onChange={handleChange}
+              />
+            </div>
+
+            <div className="col-md-8 camas-field">
+              <label className="form-label text-light">URL del video (opcional)</label>
+              <input
+                type="url"
+                className="form-control camas-input"
+                name="url_video"
+                value={form.url_video}
+                placeholder="https://..."
                 onChange={handleChange}
               />
             </div>
