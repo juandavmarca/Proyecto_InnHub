@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 /* eslint-disable no-unused-vars */
 
 import ConfirmDialog from "../components/ConfirmDialog";
+import { obtenerCamas, obtenerCaracteristicas, obtenerHabitaciones, obtenerImagenes } from "../services/api";
 
 const homeLogo = "http://localhost/ERPInnHub/backend/uploads/logo.png";
 
@@ -12,62 +13,82 @@ const galleryImages = [
   "https://images.unsplash.com/photo-1501117716987-c8e5d6f35a0e?auto=format&fit=crop&w=1200&q=80",
 ];
 
-const _services = [
-  { name: "WiFi Premium", icon: "📶", description: "Conexión rápida en todas las áreas del hotel." },
-  { name: "Spa & Relax", icon: "🌿", description: "Zona de spa para desconectar y recargar energías." },
-  { name: "Parqueadero", icon: "🚗", description: "Estacionamiento seguro y cómodo para tu vehículo." },
-  { name: "Gimnasio", icon: "🏋️", description: "Espacio equipado para mantener tu rutina fitness." },
-  { name: "Comedor", icon: "🍽️", description: "Desayunos y cenas con sabores locales e internacionales." },
-  { name: "Zona Pet", icon: "🐾", description: "Ambiente acogedor para huéspedes con mascotas." },
-];
+// const _services = [
+//   { name: "WiFi Premium", icon: "📶", description: "Conexión rápida en todas las áreas del hotel." },
+//   { name: "Spa & Relax", icon: "🌿", description: "Zona de spa para desconectar y recargar energías." },
+//   { name: "Parqueadero", icon: "🚗", description: "Estacionamiento seguro y cómodo para tu vehículo." },
+//   { name: "Gimnasio", icon: "🏋️", description: "Espacio equipado para mantener tu rutina fitness." },
+//   { name: "Comedor", icon: "🍽️", description: "Desayunos y cenas con sabores locales e internacionales." },
+//   { name: "Zona Pet", icon: "🐾", description: "Ambiente acogedor para huéspedes con mascotas." },
+// ];
 
 const rooms = [
   {
-    title: "Habitación Económica",
-    category: "economica",
-    price: "$180.000 COP / noche",
-    description: "Perfecta para viajeros prácticos que buscan confort y ahorro.",
+    title: "Habitación Individual",
+    category: "individual",
+    price: "$180.000 COP / persona",
+    description: "Un espacio confortable para una estadía tranquila y práctica.",
     image: "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=1200&q=80",
     video: "https://www.w3schools.com/html/mov_bbb.mp4",
     button: "Reservar ahora",
   },
   {
-    title: "Habitación Premium",
-    category: "premium",
-    price: "$280.000 COP / noche",
-    description: "Espacios amplios con diseño elegante y atención personalizada.",
+    title: "Habitación Doble",
+    category: "doble",
+    price: "$200.000 COP / persona",
+    description: "Una opción cómoda para parejas o amigos.",
     image: "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=1200&q=80",
     video: "https://www.w3schools.com/html/mov_bbb.mp4",
     button: "Ver detalles",
   },
   {
-    title: "Habitación Económica - Doble",
-    category: "economica",
-    price: "$200.000 COP / noche",
-    description: "Opción económica con dos camas, ideal para parejas o amigos.",
+    title: "Habitación Familiar",
+    category: "familiar",
+    price: "$280.000 COP / persona",
+    description: "Más espacio y comodidad para compartir en familia.",
     image: "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=1200&q=80",
     video: "https://www.w3schools.com/html/mov_bbb.mp4",
     button: "Reservar ahora",
   },
 ];
 
-const _testimonials = [
-  {
-    name: "María González",
-    location: "Madrid, España",
-    quote: "Una experiencia increíble. El personal es muy amable y las instalaciones impecables.",
-  },
-  {
-    name: "John Smith",
-    location: "New York, USA",
-    quote: "El mejor hotel en el que me he hospedado. La habitación era espaciosa y la vista espectacular.",
-  },
-  {
-    name: "Sophie Laurent",
-    location: "Paris, France",
-    quote: "Perfecto para unas vacaciones relajantes. El spa es maravilloso y la comida excelente.",
-  },
-];
+const obtenerUrlYoutubeEmbed = (url) => {
+  if (!url) return null;
+
+  try {
+    const parsedUrl = new URL(url);
+    let videoId = "";
+
+    if (parsedUrl.hostname === "youtu.be") {
+      videoId = parsedUrl.pathname.slice(1);
+    } else if (parsedUrl.hostname.includes("youtube.com")) {
+      videoId = parsedUrl.searchParams.get("v") || parsedUrl.pathname.split("/").pop();
+    }
+
+    return videoId ? `https://www.youtube.com/embed/${videoId}` : null;
+  } catch {
+    return null;
+  }
+};
+
+// tarjetas de reseña
+// const _testimonials = [
+//   {
+//     name: "María González",
+//     location: "Madrid, España",
+//     quote: "Una experiencia increíble. El personal es muy amable y las instalaciones impecables.",
+//   },
+//   {
+//     name: "John Smith",
+//     location: "New York, USA",
+//     quote: "El mejor hotel en el que me he hospedado. La habitación era espaciosa y la vista espectacular.",
+//   },
+//   {
+//     name: "Sophie Laurent",
+//     location: "Paris, France",
+//     quote: "Perfecto para unas vacaciones relajantes. El spa es maravilloso y la comida excelente.",
+//   },
+// ];
 
 function Home() {
   const navigate = useNavigate();
@@ -77,9 +98,8 @@ function Home() {
   const [children, setChildren] = useState(0);
   const [showExperienceModal, setShowExperienceModal] = useState(false);
   const [activeSlide, setActiveSlide] = useState(0);
-  const [selectedCategory, setSelectedCategory] = useState(null);
-  const [showRooms, setShowRooms] = useState(false);
   const [showAdminAlert, setShowAdminAlert] = useState(false);
+  const [publicRooms, setPublicRooms] = useState([]);
 
   const updateAdults = (value) => {
     setAdults((current) => Math.max(1, current + value));
@@ -107,13 +127,97 @@ function Home() {
   };
 
   const [activeRoom, setActiveRoom] = useState(null);
+  const [activeRoomGalleryIndex, setActiveRoomGalleryIndex] = useState(0);
+
+  useEffect(() => {
+    const cargarHabitacionesPublicas = async () => {
+      try {
+        const habitaciones = await obtenerHabitaciones();
+        const habitacionesPublicas = rooms.map((room) => {
+          const habitacion = habitaciones.find(
+            (item) => String(item.tipo || "").trim().toLowerCase() === room.category
+              && String(item.estado || "").trim().toLowerCase() === "disponible"
+          );
+
+          if (!habitacion) return null;
+
+          const tipo = String(habitacion.tipo || room.category).trim();
+          const numero = String(habitacion.numero || "").trim();
+          const precio = Number(habitacion.precio_noche || 0).toLocaleString("es-CO");
+
+          return {
+            ...room,
+            id_habitacion: habitacion.id_habitacion,
+            tipo,
+            numero,
+            title: `Habitación ${tipo}`,
+            price: `$${precio} COP / persona`,
+          };
+        }).filter(Boolean);
+        const habitacionesConVideo = await Promise.all(habitacionesPublicas.map(async (room) => {
+          try {
+            const [imagenes, camas, caracteristicas] = await Promise.all([
+              obtenerImagenes(room.id_habitacion),
+              obtenerCamas(room.id_habitacion),
+              obtenerCaracteristicas(room.id_habitacion),
+            ]);
+            const imagenesValidas = Array.isArray(imagenes) ? imagenes.filter((imagen) => imagen && imagen.url) : [];
+            const video = imagenesValidas.find((imagen) => imagen.url_video)?.url_video;
+            const imagenesReales = imagenesValidas.slice(0, 3).map((imagen) => imagen.url);
+            const numeroCamas = Array.isArray(camas)
+              ? camas.reduce((total, cama) => total + Number(cama.cantidad || 0), 0)
+              : 0;
+            const caracteristicasReales = Array.isArray(caracteristicas)
+              ? caracteristicas.filter((caracteristica) => caracteristica && caracteristica.nombre)
+              : [];
+
+            return {
+              ...room,
+              ...(video ? { video } : {}),
+              imagenesReales,
+              numeroCamas,
+              caracteristicasReales,
+            };
+          } catch (error) {
+            console.error("Error cargando imágenes públicas:", error);
+            return {
+              ...room,
+              numeroCamas: 0,
+              caracteristicasReales: [],
+              imagenesReales: [],
+            };
+          }
+        }));
+
+        setPublicRooms(habitacionesConVideo);
+      } catch (error) {
+        console.error("Error cargando habitaciones públicas:", error);
+      }
+    };
+
+    cargarHabitacionesPublicas();
+  }, []);
 
   const handleOpenRoomModal = (room) => {
     setActiveRoom(room);
+    setActiveRoomGalleryIndex(0);
+  };
+
+  const handleOpenCategory = (category) => {
+    const room = publicRooms.find((item) => item.category === category);
+    if (room) handleOpenRoomModal(room);
   };
 
   const handleCloseRoomModal = () => {
     setActiveRoom(null);
+    setActiveRoomGalleryIndex(0);
+  };
+
+  const videoYoutubeEmbed = obtenerUrlYoutubeEmbed(activeRoom?.video);
+
+  const cambiarGaleria = (cantidad) => {
+    const total = 1 + (activeRoom?.imagenesReales?.length || 0);
+    setActiveRoomGalleryIndex((current) => (current + cantidad + total) % total);
   };
 
   return (
@@ -280,95 +384,41 @@ function Home() {
         <div className="room-categories">
           <button
             type="button"
-            className={`category-card image ${selectedCategory === 'economica' ? 'active' : ''}`}
-            onClick={() => {
-              setSelectedCategory('economica');
-              setShowRooms(true);
-              const el = document.getElementById('rooms');
-              if (el) el.scrollIntoView({ behavior: 'smooth' });
-            }}
-            style={{ backgroundImage: `url(${rooms.find(r => r.category === 'economica')?.image})` }}
+            className="category-card image"
+            onClick={() => handleOpenCategory("individual")}
+            style={{ backgroundImage: `url(${publicRooms.find(r => r.category === "individual")?.image || rooms.find(r => r.category === "individual")?.image})` }}
           >
             <div className="category-overlay">
-              <h3>Habitaciones Económicas</h3>
-              <p>Opciones cómodas y accesibles.</p>
+              <h3>Habitaciones Individuales</h3>
+              <p>Confort y privacidad para una persona.</p>
             </div>
           </button>
 
           <button
             type="button"
-            className={`category-card image ${selectedCategory === 'premium' ? 'active' : ''}`}
-            onClick={() => {
-              setSelectedCategory('premium');
-              setShowRooms(true);
-              const el = document.getElementById('rooms');
-              if (el) el.scrollIntoView({ behavior: 'smooth' });
-            }}
-            style={{ backgroundImage: `url(${rooms.find(r => r.category === 'premium')?.image})` }}
+            className="category-card image"
+            onClick={() => handleOpenCategory("doble")}
+            style={{ backgroundImage: `url(${publicRooms.find(r => r.category === "doble")?.image || rooms.find(r => r.category === "doble")?.image})` }}
           >
             <div className="category-overlay">
-              <h3>Habitaciones Premium</h3>
-              <p>Confort superior y servicios exclusivos.</p>
+              <h3>Habitaciones Dobles</h3>
+              <p>El espacio ideal para compartir.</p>
+            </div>
+          </button>
+
+          <button
+            type="button"
+            className="category-card image"
+            onClick={() => handleOpenCategory("familiar")}
+            style={{ backgroundImage: `url(${publicRooms.find(r => r.category === "familiar")?.image || rooms.find(r => r.category === "familiar")?.image})` }}
+          >
+            <div className="category-overlay">
+              <h3>Habitaciones Familiares</h3>
+              <p>Amplitud y comodidad para toda la familia.</p>
             </div>
           </button>
         </div>
 
-        {showRooms && (
-          <>
-            <div className="rooms-controls" style={{display:'flex',gap:'0.8rem',justifyContent:'flex-end',marginBottom:'1rem'}}>
-              <button
-                type="button"
-                className="btn btn-secondary"
-                onClick={() => { setSelectedCategory(null); }}
-              >
-                Ver todas
-              </button>
-              <button
-                type="button"
-                className="btn btn-outline"
-                onClick={() => {
-                  setSelectedCategory(null);
-                  setShowRooms(false);
-                  const el = document.getElementById('hero');
-                  if (el) el.scrollIntoView({ behavior: 'smooth' });
-                  else window.scrollTo({ top: 0, behavior: 'smooth' });
-                }}
-              >
-                Regresar al inicio
-              </button>
-            </div>
-
-            <div className="rooms-grid">
-              {(selectedCategory ? rooms.filter(r => r.category === selectedCategory) : rooms).map((room) => (
-              <article key={room.title} className="room-card">
-                <button
-                  type="button"
-                  className="room-image"
-                  style={{ backgroundImage: `url(${room.image})` }}
-                  onClick={() => handleOpenRoomModal(room)}
-                >
-                  <span className="room-image-overlay">
-                    <span className="room-image-icon">
-                      <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-                        <circle cx="12" cy="12" r="3" />
-                      </svg>
-                    </span>
-                  </span>
-                </button>
-                <div className="room-content">
-                  <h3>{room.title}</h3>
-                  <p>{room.description}</p>
-                  <div className="room-meta">
-                    <span>{room.price}</span>
-                    <button className="btn btn-secondary">{room.button}</button>
-                  </div>
-                </div>
-              </article>
-            ))}
-            </div>
-          </>
-        )}
       </section>
 
       {/* <section className="reviews-section home-section" id="reviews">
@@ -427,12 +477,75 @@ function Home() {
               ×
             </button>
             <div className="room-modal-grid">
-              <div className="room-modal-video">
-                <video controls src={activeRoom.video} />
+              <div className="room-modal-gallery">
+                <div className="room-modal-gallery-main">
+                  {activeRoomGalleryIndex === 0 ? (
+                    videoYoutubeEmbed ? (
+                      <iframe
+                        src={videoYoutubeEmbed}
+                        title={`Video de ${activeRoom.title}`}
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        allowFullScreen
+                      />
+                    ) : (
+                      <video controls autoPlay={false} src={activeRoom.video} />
+                    )
+                  ) : (
+                    <img
+                      src={activeRoom.imagenesReales[activeRoomGalleryIndex - 1]}
+                      alt={`${activeRoom.title} imagen ${activeRoomGalleryIndex}`}
+                    />
+                  )}
+                  {(activeRoom.imagenesReales?.length || 0) > 0 && (
+                    <div className="room-modal-gallery-controls">
+                      <button type="button" onClick={() => cambiarGaleria(-1)} aria-label="Elemento anterior">‹</button>
+                      <span>{activeRoomGalleryIndex + 1} / {1 + activeRoom.imagenesReales.length}</span>
+                      <button type="button" onClick={() => cambiarGaleria(1)} aria-label="Siguiente elemento">›</button>
+                    </div>
+                  )}
+                </div>
+                <div className="room-modal-gallery-thumbs">
+                  <button
+                    type="button"
+                    className={`room-modal-gallery-thumb room-modal-video-thumb ${activeRoomGalleryIndex === 0 ? "active" : ""}`}
+                    onClick={() => setActiveRoomGalleryIndex(0)}
+                    aria-label="Ver video de la habitación"
+                  >
+                    <span className="room-modal-play-icon">▶</span>
+                    <span>Video</span>
+                  </button>
+                  {activeRoom.imagenesReales.map((image, index) => (
+                    <button
+                      key={`${image}-${index}`}
+                      type="button"
+                      className={`room-modal-gallery-thumb ${activeRoomGalleryIndex === index + 1 ? "active" : ""}`}
+                      onClick={() => setActiveRoomGalleryIndex(index + 1)}
+                      aria-label={`Ver imagen ${index + 1}`}
+                    >
+                      <img src={image} alt={`${activeRoom.title} miniatura ${index + 1}`} />
+                    </button>
+                  ))}
+                </div>
               </div>
               <div className="room-modal-details">
                 <h2>{activeRoom.title}</h2>
-                <p>{activeRoom.description}</p>
+                <p className="room-modal-type">Tipo: {activeRoom.tipo || activeRoom.category}</p>
+                <div className="room-modal-real-data">
+                  <p><strong>Camas:</strong> {activeRoom.numeroCamas || 0}</p>
+                </div>
+                <div className="room-modal-features">
+                  <h3>Características</h3>
+                  {activeRoom.caracteristicasReales?.length > 0 ? (
+                    activeRoom.caracteristicasReales.map((caracteristica, index) => (
+                      <div key={`${caracteristica.idcarac || index}`} className="room-modal-feature">
+                        <strong>{caracteristica.nombre}</strong>
+                        <span>{caracteristica.descripcion || "Sin descripción registrada."}</span>
+                      </div>
+                    ))
+                  ) : (
+                    <span>Sin características registradas.</span>
+                  )}
+                </div>
                 <p className="room-modal-price">{activeRoom.price}</p>
                 <button className="btn btn-secondary">{activeRoom.button}</button>
               </div>

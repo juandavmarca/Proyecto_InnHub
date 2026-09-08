@@ -8,6 +8,26 @@ const ESTADO_HABITACION_OPTIONS = [
   "Ocupada",
   "Mantenimiento",
 ];
+const TIPO_HABITACION_OPTIONS = [
+  "Individual",
+  "Doble",
+  "Familiar",
+];
+
+const normalizarTipoHabitacion = (tipo) => {
+  const valor = String(tipo || "").trim().toLowerCase();
+  const tipoEncontrado = TIPO_HABITACION_OPTIONS.find((option) => option.toLowerCase() === valor);
+
+  if (tipoEncontrado) return tipoEncontrado;
+  if (valor === "economica") return "Individual";
+  if (valor === "premium") return "Familiar";
+  return "";
+};
+
+const prepararHabitacion = (habitacion) => ({
+  ...habitacion,
+  tipo: normalizarTipoHabitacion(habitacion.tipo),
+});
 
 function HabitacionModal({ onHabitacionCreado, onSuccess, habitacionEditar }) {
   const [form, setForm] = useState({
@@ -29,8 +49,9 @@ function HabitacionModal({ onHabitacionCreado, onSuccess, habitacionEditar }) {
   useEffect(() => {
     /* eslint-disable react-hooks/set-state-in-effect */
     if (habitacionEditar) {
-      setForm(habitacionEditar);
-      setFormOriginal(habitacionEditar);
+      const habitacionPreparada = prepararHabitacion(habitacionEditar);
+      setForm(habitacionPreparada);
+      setFormOriginal(habitacionPreparada);
       setIsEditing(true);
     } else {
       setForm({
@@ -64,6 +85,11 @@ function HabitacionModal({ onHabitacionCreado, onSuccess, habitacionEditar }) {
     // Validaciones frontend
     if (!form.numero.trim()) {
       setError("El numero es obligatorio");
+      return;
+    }
+
+    if (!form.tipo) {
+      setError("El tipo de habitación es obligatorio");
       return;
     }
 
@@ -121,7 +147,14 @@ function HabitacionModal({ onHabitacionCreado, onSuccess, habitacionEditar }) {
             </div>
             <div className="form-group-icon">
               <i className="fas fa-star"></i>
-              <input className="form-control mb-2" placeholder="Tipo" name="tipo" value={form.tipo} onChange={handleChange} />
+              <select className="form-select mb-2" name="tipo" value={form.tipo} onChange={handleChange}>
+                <option value="" disabled>Selecciona el tipo de habitación</option>
+                {TIPO_HABITACION_OPTIONS.map((option) => (
+                  <option key={option} value={option}>
+                    {option}
+                  </option>
+                ))}
+              </select>
             </div>
             <div className="form-group-icon">
               <i className="fas fa-money-bill-wave"></i>
