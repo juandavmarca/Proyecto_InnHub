@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import  UbicacionModal from "../components/UbicacionModal";
+
 /* eslint-disable no-unused-vars */
 
 import ConfirmDialog from "../components/ConfirmDialog";
@@ -100,6 +102,7 @@ function Home() {
   const [activeSlide, setActiveSlide] = useState(0);
   const [showAdminAlert, setShowAdminAlert] = useState(false);
   const [publicRooms, setPublicRooms] = useState([]);
+  const [mostrarUbicacion, setMostrarUbicacion] = useState(false);
 
   const updateAdults = (value) => {
     setAdults((current) => Math.max(1, current + value));
@@ -344,10 +347,10 @@ function Home() {
       </section>
 
       <section className="value-cards" aria-label="Beneficios del hotel">
-        <article className="value-card">
-          <h3>Ubicación estratégica</h3>
+        <button type="button" className="value-card value-card-button" onClick={() => setMostrarUbicacion(true)}>
+          <h3>Ubicación estratégica</h3> 
           <p>Acceso fácil a sitios turísticos, restaurantes y transporte local.</p>
-        </article>
+        </button>
 
         <article className="value-card">
           <h3>Atención 24/7</h3>
@@ -468,6 +471,10 @@ function Home() {
             </div>
           </div>
         </div>
+      )}
+
+      {mostrarUbicacion && (
+        <UbicacionModal onCerrar={() => setMostrarUbicacion(false)} />
       )}
 
       {activeRoom && (

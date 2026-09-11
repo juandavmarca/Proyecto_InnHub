@@ -232,7 +232,7 @@ function Dashboard() {
 
           <div className="revenue-content">
             <div className="empty-state">
-              <p>No hay datos de ingresos disponibles</p>
+              <p></p>
             </div>
           </div>
         </section>
@@ -242,30 +242,13 @@ function Dashboard() {
             <h2>Reservas próximas</h2>
           </div>
 
-          <div className="reservation-list">
-            {stats.nextReservations && stats.nextReservations.length > 0 ? (
-              stats.nextReservations.map((reservation) => (
-                <div key={`${reservation.nombre}-${reservation.fecha}`} className="reservation-item">
-                  <div className="reservation-avatar">{reservation.initials}</div>
-                  <div className="reservation-main">
-                    <div className="reservation-topline">
-                      <strong>{reservation.nombre}</strong>
-                      <span>{reservation.fecha}</span>
-                    </div>
-                    <div className="reservation-details">
-                      <span>{reservation.tipo}</span>
-                      <span>{reservation.detalle}</span>
-                    </div>
-                  </div>
-                  <span className={`reservation-state ${reservation.estado === "Pendiente" ? "pending" : "confirmed"}`}>
-                    {reservation.estado}
-                  </span>
-                </div>
-              ))
-            ) : (
-              <div className="empty-state">No hay reservas próximas</div>
-            )}
+         
+          <div className="revenue-content">
+            <div className="empty-state">
+              <p></p>
+            </div>
           </div>
+        
 
           <button type="button" className="panel-link" onClick={() => navigate("/habitaciones")}>Ver todas las reservas <i className="fa-solid fa-chevron-right" /></button>
         </section>
