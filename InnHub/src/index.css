@@ -2417,6 +2417,69 @@ html body .dashboard-page .table.table-innhub.table-striped tbody tr td,
   z-index: 9999;
 }
 
+.ubicacion-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background: rgba(0, 0, 0, 0.58);
+  backdrop-filter: blur(2px);
+}
+
+.modal-ubicacion {
+  width: min(760px, 92vw);
+  max-height: 92vh;
+  overflow: hidden;
+  border: 1px solid #d3a83d;
+  border-radius: 1rem;
+  background: #0c0d0e;
+  box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.55);
+}
+
+.modal-ubicacion .modal-header,
+.modal-ubicacion .modal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+}
+
+.modal-ubicacion .modal-header {
+  border-bottom: 1px solid rgba(211, 168, 61, 0.35);
+  background: #000000 ;
+}
+
+.modal-ubicacion .modal-header h2 {
+  margin: 0;
+}
+
+.modal-ubicacion .modal-header button,
+.modal-ubicacion .modal-footer button {
+  border: 1px solid #d3a83d;
+  border-radius: 0.5rem;
+  background: transparent;
+  color: #fff;
+  cursor: pointer;
+  padding: 0.45rem 0.8rem;
+}
+
+.modal-ubicacion .modal-footer {
+  border-top: 1px solid rgba(211, 168, 61, 0.35);
+  background: #000000 !important;
+  justify-content: flex-end;
+}
+
+.modal-ubicacion iframe {
+  display: block;
+  width: 100%;
+  height: min(450px, 58vh);
+  border: 0;
+}
+
 .experience-modal {
   width: min(920px, 92vw);
   max-width: 980px;
@@ -3788,9 +3851,10 @@ html body .dashboard-page .table.table-innhub.table-striped tbody tr td,
   color: var(--brand-soft);
 }
 
-.btn-book {
-  background: var(--brand-medium);
+.hero-booking-card .btn-book {
+  background: rgba(12, 11, 9, 0.9);
   color: #f3eeee;
+  border: 1px solid rgba(200, 150, 41, 0.4);;
 }
 
 .home-section {
