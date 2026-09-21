@@ -380,10 +380,7 @@ function Habitaciones() {
                       detalleCaracteristicas.map((caracteristica, index) => (
                         <div key={`${caracteristica.idcarac || index}`} className="room-detail-chip">
                           <i className="fa-regular fa-circle-check"></i>
-                          <div>
-                            <strong className="room-detail-feature-name">{caracteristica.nombre}</strong>
-                            <span className="room-detail-feature-description">{caracteristica.descripcion}</span>
-                          </div>
+                          <strong className="room-detail-feature-name">{caracteristica.nombre}</strong>
                         </div>
                       ))
                     ) : (
