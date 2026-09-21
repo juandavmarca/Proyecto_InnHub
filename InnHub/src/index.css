@@ -2817,6 +2817,13 @@ html body .dashboard-page .table.table-innhub.table-striped tbody tr td,
   letter-spacing: 0.14em;
 }
 
+.room-modal-registered-count {
+  margin: 0 0 0.8rem;
+  color: var(--brand-medium);
+  font-weight: 700;
+  animation: availability-pulse 1.8s ease-in-out infinite;
+}
+
 .room-modal-real-data {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -3854,7 +3861,7 @@ html body .dashboard-page .table.table-innhub.table-striped tbody tr td,
 .hero-booking-card .btn-book {
   background: rgba(12, 11, 9, 0.9);
   color: #f3eeee;
-  border: 1px solid rgba(200, 150, 41, 0.4);;
+  border: none;
 }
 
 .home-section {
@@ -3936,6 +3943,33 @@ html body .dashboard-page .table.table-innhub.table-striped tbody tr td,
 
 .category-overlay h3 {
   color: var(--text-strong);
+}
+
+.category-availability {
+  display: grid;
+  gap: 0.2rem;
+  margin-top: 0.7rem;
+  color: rgba(255, 255, 255, 0.92);
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.category-availability strong {
+  color: var(--brand-soft);
+  font-size: 1rem;
+  animation: availability-pulse 1.8s ease-in-out infinite;
+}
+
+@keyframes availability-pulse {
+  0%,
+  100% {
+    color: var(--brand-soft);
+    text-shadow: 0 0 0 rgba(243, 210, 105, 0);
+  }
+  50% {
+    color: #fff2a8;
+    text-shadow: 0 0 12px rgba(243, 210, 105, 0.9);
+  }
 }
 
 .category-card.image.active {

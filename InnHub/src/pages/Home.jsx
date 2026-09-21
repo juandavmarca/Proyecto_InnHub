@@ -136,13 +136,25 @@ function Home() {
     const cargarHabitacionesPublicas = async () => {
       try {
         const habitaciones = await obtenerHabitaciones();
+        const camas = await obtenerCamas();
         const habitacionesPublicas = rooms.map((room) => {
-          const habitacion = habitaciones.find(
+          const habitacionesDeCategoria = habitaciones.filter(
             (item) => String(item.tipo || "").trim().toLowerCase() === room.category
-              && String(item.estado || "").trim().toLowerCase() === "disponible"
           );
+          const habitacion = habitacionesDeCategoria.find(
+            (item) => String(item.estado || "").trim().toLowerCase() === "disponible"
+          ) || habitacionesDeCategoria.find(
+            (item) => String(item.estado || "").trim().toLowerCase() !== "no disponible"
+          ) || habitacionesDeCategoria[0];
 
           if (!habitacion) return null;
+
+          const habitacionesDisponibles = habitacionesDeCategoria.filter(
+            (item) => String(item.estado || "").trim().toLowerCase() === "disponible"
+          );
+          const obtenerCamasDeHabitacion = (idHabitacion) => camas
+            .filter((cama) => String(cama.habitaciones_id_habitacion) === String(idHabitacion))
+            .reduce((total, cama) => total + Number(cama.cantidad || 0), 0);
 
           const tipo = String(habitacion.tipo || room.category).trim();
           const numero = String(habitacion.numero || "").trim();
@@ -155,6 +167,16 @@ function Home() {
             numero,
             title: `Habitación ${tipo}`,
             price: `$${precio} COP / persona`,
+            totalHabitaciones: habitacionesDeCategoria.length,
+            habitacionesDisponibles: habitacionesDisponibles.length,
+            totalCamas: habitacionesDeCategoria.reduce(
+              (total, item) => total + obtenerCamasDeHabitacion(item.id_habitacion),
+              0
+            ),
+            camasDisponibles: habitacionesDisponibles.reduce(
+              (total, item) => total + obtenerCamasDeHabitacion(item.id_habitacion),
+              0
+            ),
           };
         }).filter(Boolean);
         const habitacionesConVideo = await Promise.all(habitacionesPublicas.map(async (room) => {
@@ -217,6 +239,8 @@ function Home() {
   };
 
   const videoYoutubeEmbed = obtenerUrlYoutubeEmbed(activeRoom?.video);
+
+  const obtenerDatosCategoria = (category) => publicRooms.find((room) => room.category === category);
 
   const cambiarGaleria = (cantidad) => {
     const total = 1 + (activeRoom?.imagenesReales?.length || 0);
@@ -394,6 +418,9 @@ function Home() {
             <div className="category-overlay">
               <h3>Habitaciones Individuales</h3>
               <p>Confort y privacidad para una persona.</p>
+              <div className="category-availability">
+                <strong>{obtenerDatosCategoria("individual")?.habitacionesDisponibles || 0}/{obtenerDatosCategoria("individual")?.totalHabitaciones || 0} habitaciones disponibles</strong>
+              </div>
             </div>
           </button>
 
@@ -406,6 +433,9 @@ function Home() {
             <div className="category-overlay">
               <h3>Habitaciones Dobles</h3>
               <p>El espacio ideal para compartir.</p>
+              <div className="category-availability">
+                <strong>{obtenerDatosCategoria("doble")?.habitacionesDisponibles || 0}/{obtenerDatosCategoria("doble")?.totalHabitaciones || 0} habitaciones disponibles</strong>
+              </div>
             </div>
           </button>
 
@@ -418,6 +448,9 @@ function Home() {
             <div className="category-overlay">
               <h3>Habitaciones Familiares</h3>
               <p>Amplitud y comodidad para toda la familia.</p>
+              <div className="category-availability">
+                <strong>{obtenerDatosCategoria("familiar")?.habitacionesDisponibles || 0}/{obtenerDatosCategoria("familiar")?.totalHabitaciones || 0} habitaciones disponibles</strong>
+              </div>
             </div>
           </button>
         </div>
@@ -537,6 +570,9 @@ function Home() {
               <div className="room-modal-details">
                 <h2>{activeRoom.title}</h2>
                 <p className="room-modal-type">Tipo: {activeRoom.tipo || activeRoom.category}</p>
+                <p className="room-modal-registered-count">
+                  {activeRoom.habitacionesDisponibles || 0}/{activeRoom.totalHabitaciones || 0} habitaciones disponibles
+                </p>
                 <div className="room-modal-real-data">
                   <p><strong>Camas:</strong> {activeRoom.numeroCamas || 0}</p>
                 </div>
