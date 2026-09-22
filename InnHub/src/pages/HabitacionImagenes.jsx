@@ -12,7 +12,7 @@ function HabitacionImagenes() {
   const [mensaje, setMensaje] = useState({ type: "", text: "" });
   const [habitacionSeleccionada, setHabitacionSeleccionada] = useState(null);
   const [imagenAEliminar, setImagenAEliminar] = useState(null);
-  const [form, setForm] = useState({ imagenArchivo: null, url_video: "", habitaciones_id_habitacion: idHabitacion || "" });
+  const [form, setForm] = useState({ imagenArchivo: null, videoArchivo: null, url_video: "", habitaciones_id_habitacion: idHabitacion || "" });
 
   useEffect(() => {
     if (!idHabitacion) {
@@ -45,15 +45,15 @@ function HabitacionImagenes() {
 
   const handleChange = (e) => {
     const { name, value, files } = e.target;
-    if (name === "imagenArchivo") {
-      setForm((prev) => ({ ...prev, imagenArchivo: files && files[0] ? files[0] : null }));
+    if (name === "imagenArchivo" || name === "videoArchivo") {
+      setForm((prev) => ({ ...prev, [name]: files && files[0] ? files[0] : null }));
       return;
     }
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
   const resetForm = () => {
-    setForm({ imagenArchivo: null, url_video: "", habitaciones_id_habitacion: idHabitacion || "" });
+    setForm({ imagenArchivo: null, videoArchivo: null, url_video: "", habitaciones_id_habitacion: idHabitacion || "" });
   };
 
   const handleSubmit = async (e) => {
@@ -76,6 +76,9 @@ function HabitacionImagenes() {
       const formData = new FormData();
       formData.append("habitaciones_id_habitacion", String(Number(idHabitacion)));
       formData.append("imagen", form.imagenArchivo);
+      if (form.videoArchivo) {
+        formData.append("video", form.videoArchivo);
+      }
       if (form.url_video.trim()) {
         formData.append("url_video", form.url_video.trim());
       }
@@ -151,6 +154,17 @@ function HabitacionImagenes() {
                 className="form-control camas-input"
                 name="imagenArchivo"
                 accept="image/*"
+                onChange={handleChange}
+              />
+            </div>
+
+            <div className="col-md-8 camas-field">
+              <label className="form-label text-light">Archivo del video (opcional)</label>
+              <input
+                type="file"
+                className="form-control camas-input"
+                name="videoArchivo"
+                accept="video/*"
                 onChange={handleChange}
               />
             </div>

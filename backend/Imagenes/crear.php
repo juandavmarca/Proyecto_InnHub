@@ -27,12 +27,12 @@ if (empty($data['habitaciones_id_habitacion'])) {
 }
 
 $url = null;
-if (!empty($_FILES['imagen']) && $_FILES['imagen']['error'] === UPLOAD_ERR_OK) {
-    $uploadDir = __DIR__ . '/../uploads/';
-    if (!is_dir($uploadDir)) {
-        mkdir($uploadDir, 0755, true);
-    }
+$uploadDir = __DIR__ . '/../uploads/';
+if (!is_dir($uploadDir)) {
+    mkdir($uploadDir, 0755, true);
+}
 
+if (!empty($_FILES['imagen']) && $_FILES['imagen']['error'] === UPLOAD_ERR_OK) {
     $extension = pathinfo($_FILES['imagen']['name'], PATHINFO_EXTENSION);
     $filename = uniqid('habitacion_', true) . ($extension ? '.' . $extension : '');
     $targetPath = $uploadDir . $filename;
@@ -54,7 +54,20 @@ if (empty($url)) {
     exit;
 }
 
-$urlVideo = !empty($data['url_video']) ? trim($data['url_video']) : null;
+$urlVideo = null;
+if (!empty($_FILES['video']) && $_FILES['video']['error'] === UPLOAD_ERR_OK) {
+    $extension = pathinfo($_FILES['video']['name'], PATHINFO_EXTENSION);
+    $filename = uniqid('habitacion_video_', true) . ($extension ? '.' . $extension : '');
+    $targetPath = $uploadDir . $filename;
+
+    if (move_uploaded_file($_FILES['video']['tmp_name'], $targetPath)) {
+        $urlVideo = 'http://localhost/ERPInnHub/backend/uploads/' . $filename;
+    }
+}
+
+if (empty($urlVideo) && !empty($data['url_video'])) {
+    $urlVideo = trim($data['url_video']);
+}
 
 try {
     $sql = 'INSERT INTO imagenes (url, url_video, habitaciones_id_habitacion) VALUES (:url, :url_video, :habitaciones_id_habitacion)';

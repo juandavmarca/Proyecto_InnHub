@@ -7,12 +7,20 @@ import  UbicacionModal from "../components/UbicacionModal";
 import ConfirmDialog from "../components/ConfirmDialog";
 import { obtenerCamas, obtenerCaracteristicas, obtenerHabitaciones, obtenerImagenes } from "../services/api";
 
-const homeLogo = "http://localhost/ERPInnHub/backend/uploads/logo.png";
+const homeLogo = "http://localhost/ERPInnHub/backend/uploads/logodash.png";
 
+//arreglo para almacenar las imágenes de la galería de experiencias
 const galleryImages = [
-  "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=1200&q=80",
-  "https://images.unsplash.com/photo-1512915921949-053ae66b30b4?auto=format&fit=crop&w=1200&q=80",
-  "https://images.unsplash.com/photo-1501117716987-c8e5d6f35a0e?auto=format&fit=crop&w=1200&q=80",
+  "http://localhost/ERPInnHub/backend/ImgHabitaciones/espacio_1.JPG",
+  "http://localhost/ERPInnHub/backend/ImgHabitaciones/espacio_2.JPG",
+  "http://localhost/ERPInnHub/backend/ImgHabitaciones/espacio_3.JPG",
+  "http://localhost/ERPInnHub/backend/ImgHabitaciones/espacio_4.JPG",
+  "http://localhost/ERPInnHub/backend/ImgHabitaciones/espacio_5.JPG",
+  "http://localhost/ERPInnHub/backend/ImgHabitaciones/espacio_6.JPG",
+  "http://localhost/ERPInnHub/backend/ImgHabitaciones/espacio_7.JPG",
+  "http://localhost/ERPInnHub/backend/ImgHabitaciones/espacio_8.JPG",
+  "http://localhost/ERPInnHub/backend/ImgHabitaciones/espacio_9.JPG",
+  "http://localhost/ERPInnHub/backend/ImgHabitaciones/toalla.JPG",
 ];
 
 // const _services = [
@@ -24,13 +32,14 @@ const galleryImages = [
 //   { name: "Zona Pet", icon: "🐾", description: "Ambiente acogedor para huéspedes con mascotas." },
 // ];
 
+//imagenes de habitaciones y videos 
 const rooms = [
   {
     title: "Habitación Individual",
     category: "individual",
     price: "$180.000 COP / persona",
     description: "Un espacio confortable para una estadía tranquila y práctica.",
-    image: "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=1200&q=80",
+    image: "http://localhost/ERPInnHub/backend/ImgHabitaciones/individual_1.jpg",
     video: "https://www.w3schools.com/html/mov_bbb.mp4",
     button: "Reservar ahora",
   },
@@ -39,7 +48,7 @@ const rooms = [
     category: "doble",
     price: "$200.000 COP / persona",
     description: "Una opción cómoda para parejas o amigos.",
-    image: "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=1200&q=80",
+    image: "http://localhost/ERPInnHub/backend/ImgHabitaciones/familiar_3.jpg",
     video: "https://www.w3schools.com/html/mov_bbb.mp4",
     button: "Ver detalles",
   },
@@ -48,7 +57,7 @@ const rooms = [
     category: "familiar",
     price: "$280.000 COP / persona",
     description: "Más espacio y comodidad para compartir en familia.",
-    image: "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=1200&q=80",
+    image: "http://localhost/ERPInnHub/backend/ImgHabitaciones/familiar_1.jpg",
     video: "https://www.w3schools.com/html/mov_bbb.mp4",
     button: "Reservar ahora",
   },
@@ -129,6 +138,16 @@ function Home() {
     setActiveSlide((current) => (current - 1 + galleryImages.length) % galleryImages.length);
   };
 
+  useEffect(() => {
+    if (!showExperienceModal) return undefined;
+
+    const slideTimer = setTimeout(() => {
+      setActiveSlide((current) => (current + 1) % galleryImages.length);
+    }, 3000);
+
+    return () => clearTimeout(slideTimer);
+  }, [showExperienceModal, activeSlide]);
+
   const [activeRoom, setActiveRoom] = useState(null);
   const [activeRoomGalleryIndex, setActiveRoomGalleryIndex] = useState(0);
 
@@ -186,8 +205,9 @@ function Home() {
               obtenerCamas(room.id_habitacion),
               obtenerCaracteristicas(room.id_habitacion),
             ]);
-            const imagenesValidas = Array.isArray(imagenes) ? imagenes.filter((imagen) => imagen && imagen.url) : [];
-            const video = imagenesValidas.find((imagen) => imagen.url_video)?.url_video;
+            const imagenesRegistradas = Array.isArray(imagenes) ? imagenes.filter(Boolean) : [];
+            const imagenesValidas = imagenesRegistradas.filter((imagen) => imagen.url);
+            const video = imagenesRegistradas.find((imagen) => imagen.url_video)?.url_video;
             const imagenesReales = imagenesValidas.slice(0, 3).map((imagen) => imagen.url);
             const numeroCamas = Array.isArray(camas)
               ? camas.reduce((total, cama) => total + Number(cama.cantidad || 0), 0)
@@ -417,7 +437,7 @@ function Home() {
           >
             <div className="category-overlay">
               <h3>Habitaciones Individuales</h3>
-              <p>Confort y privacidad para una persona.</p>
+              {/* <p>Confort y privacidad para una persona.</p> */}
               <div className="category-availability">
                 <strong>{obtenerDatosCategoria("individual")?.habitacionesDisponibles || 0}/{obtenerDatosCategoria("individual")?.totalHabitaciones || 0} habitaciones disponibles</strong>
               </div>
@@ -432,7 +452,7 @@ function Home() {
           >
             <div className="category-overlay">
               <h3>Habitaciones Dobles</h3>
-              <p>El espacio ideal para compartir.</p>
+              {/* <p>El espacio ideal para compartir.</p> */}
               <div className="category-availability">
                 <strong>{obtenerDatosCategoria("doble")?.habitacionesDisponibles || 0}/{obtenerDatosCategoria("doble")?.totalHabitaciones || 0} habitaciones disponibles</strong>
               </div>
@@ -447,7 +467,7 @@ function Home() {
           >
             <div className="category-overlay">
               <h3>Habitaciones Familiares</h3>
-              <p>Amplitud y comodidad para toda la familia.</p>
+              {/* <p>Amplitud y comodidad para toda la familia.</p> */}
               <div className="category-availability">
                 <strong>{obtenerDatosCategoria("familiar")?.habitacionesDisponibles || 0}/{obtenerDatosCategoria("familiar")?.totalHabitaciones || 0} habitaciones disponibles</strong>
               </div>
@@ -484,23 +504,34 @@ function Home() {
               ×
             </button>
             <div className="experience-carousel">
-              <button className="carousel-control prev" type="button" onClick={handlePrevSlide}>
+              <button className="carousel-control prev" type="button" onClick={handlePrevSlide} aria-label="Imagen anterior">
                 ‹
               </button>
-              <div className="carousel-slide" style={{ backgroundImage: `url(${galleryImages[activeSlide]})` }} />
-              <button className="carousel-control next" type="button" onClick={handleNextSlide}>
+              <div className="carousel-slide">
+                <img src={galleryImages[activeSlide]} alt={`Imagen ${activeSlide + 1} de la experiencia`} />
+              </div>
+              <button className="carousel-control next" type="button" onClick={handleNextSlide} aria-label="Imagen siguiente">
                 ›
               </button>
             </div>
-            <div className="carousel-indicators">
-              {galleryImages.map((_, index) => (
-                <button
-                  key={index}
-                  type="button"
-                  className={`carousel-indicator ${index === activeSlide ? "active" : ""}`}
-                  onClick={() => setActiveSlide(index)}
-                />
-              ))}
+            <div className="experience-gallery-footer">
+              <div className="experience-progress" aria-hidden="true">
+                <span style={{ width: `${((activeSlide + 1) / galleryImages.length) * 100}%` }} />
+              </div>
+              <div className="experience-thumbnails" aria-label="Seleccionar imagen">
+                {galleryImages.map((image, index) => (
+                  <button
+                    key={image}
+                    type="button"
+                    className={`experience-thumbnail ${index === activeSlide ? "active" : ""}`}
+                    onClick={() => setActiveSlide(index)}
+                    aria-label={`Ver imagen ${index + 1}`}
+                    aria-pressed={index === activeSlide}
+                  >
+                    <img src={image} alt="" />
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
         </div>
