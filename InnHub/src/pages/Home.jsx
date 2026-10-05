@@ -7,7 +7,7 @@ import  UbicacionModal from "../components/UbicacionModal";
 import ConfirmDialog from "../components/ConfirmDialog";
 import { obtenerCamas, obtenerCaracteristicas, obtenerHabitaciones, obtenerImagenes } from "../services/api";
 
-const homeLogo = "http://localhost/ERPInnHub/backend/uploads/logodash.png";
+const homeLogo = "http://localhost/ERPInnHub/backend/uploads/logo.png";
 
 //arreglo para almacenar las imágenes de la galería de experiencias
 const galleryImages = [
@@ -76,7 +76,16 @@ const obtenerUrlYoutubeEmbed = (url) => {
       videoId = parsedUrl.searchParams.get("v") || parsedUrl.pathname.split("/").pop();
     }
 
-    return videoId ? `https://www.youtube.com/embed/${videoId}` : null;
+    if (!videoId) return null;
+
+    const embedUrl = new URL(`https://www.youtube.com/embed/${videoId}`);
+    embedUrl.searchParams.set("autoplay", "1");
+    embedUrl.searchParams.set("mute", "1");
+    embedUrl.searchParams.set("loop", "1");
+    embedUrl.searchParams.set("playlist", videoId);
+    embedUrl.searchParams.set("playsinline", "1");
+
+    return embedUrl.toString();
   } catch {
     return null;
   }
@@ -559,7 +568,7 @@ function Home() {
                         allowFullScreen
                       />
                     ) : (
-                      <video controls autoPlay={false} src={activeRoom.video} />
+                      <video controls autoPlay loop muted playsInline src={activeRoom.video} />
                     )
                   ) : (
                     <img
@@ -582,8 +591,7 @@ function Home() {
                     onClick={() => setActiveRoomGalleryIndex(0)}
                     aria-label="Ver video de la habitación"
                   >
-                    <span className="room-modal-play-icon">▶</span>
-                    <span>Video</span>
+                    <img src={homeLogo} alt="Hotel Valencia" />
                   </button>
                   {activeRoom.imagenesReales.map((image, index) => (
                     <button
