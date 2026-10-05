@@ -2430,11 +2430,11 @@ html body .dashboard-page .table.table-innhub.table-striped tbody tr td,
 }
 
 .modal-ubicacion {
-  width: min(760px, 92vw);
+  width: min(920px, 92vw);
   max-height: 92vh;
   overflow: hidden;
   border: 1px solid #d3a83d;
-  border-radius: 1rem;
+  border-radius: 1.2rem;
   background: #0c0d0e;
   box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.55);
 }
@@ -2476,7 +2476,7 @@ html body .dashboard-page .table.table-innhub.table-striped tbody tr td,
 .modal-ubicacion iframe {
   display: block;
   width: 100%;
-  height: min(450px, 58vh);
+  height: min(560px, 68vh);
   border: 0;
 }
 
@@ -2499,6 +2499,26 @@ html body .dashboard-page .table.table-innhub.table-striped tbody tr td,
   color: #102f25;
   font-size: 2rem;
   cursor: pointer;
+}
+
+.experience-modal .modal-close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  z-index: 6;
+  width: 2.6rem;
+  height: 2.6rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: 1px solid rgba(211, 168, 61, 0.8);
+  background: rgba(0, 0, 0, 0.68);
+  color: #f2ca5d;
+  font-size: 1.8rem;
+  line-height: 1;
+  cursor: pointer;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.08);
 }
 
 .experience-carousel {
@@ -2734,9 +2754,9 @@ html body .dashboard-page .table.table-innhub.table-striped tbody tr td,
   font-size: 0.7rem;
 }
 
-.room-modal-play-icon {
-  color: var(--brand-medium);
-  font-size: 1.2rem;
+.room-modal-video-thumb img {
+  object-fit: contain;
+  padding: 0.5rem;
 }
 
 .room-modal-carousel {
@@ -4578,4 +4598,3 @@ html body .dashboard-page .table.table-innhub.table-striped tbody tr td,
   border-left: 6px solid #dc3545;
   box-shadow: 0 18px 48px rgba(0,0,0,0.45), 0 0 0 1px rgba(220,53,69,0.18), 0 0 22px rgba(200,150,41,0.18);
 }
-
