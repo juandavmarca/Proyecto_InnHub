@@ -6,7 +6,7 @@ header("Content-Type: application/json");
  header('Access-Control-Allow-Headers: Content-Type, Authorization');  
  require_once "../config/database.php";
 
- $stmt = $pdo->query("SELECT * FROM clientes ORDER BY documento ");
+ $stmt = $pdo->query("SELECT * FROM clientes ORDER BY id_cliente ");
  $clientes = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
  echo json_encode($clientes);

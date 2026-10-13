@@ -83,12 +83,12 @@ function Deshabilitados() {
       onConfirm: async () => {
         setConfirm((c) => ({ ...c, show: false }));
         try {
-          const res = await actualizarEstadoCliente(cliente.documento, "Activo");
+          const res = await actualizarEstadoCliente(cliente.id_cliente, "Activo");
           if (!res.success) {
             setToast({ show: true, message: res.message || "No se pudo habilitar el cliente", type: "error" });
             return;
           }
-          setClientes((prev) => prev.filter((item) => item.documento !== cliente.documento));
+          setClientes((prev) => prev.filter((item) => item.id_cliente !== cliente.id_cliente));
           setToast({ show: true, message: `Cliente ${cliente.nombre} ${cliente.apellido} habilitado correctamente`, type: "success" });
         } catch (error) {
           console.error(error);
@@ -157,10 +157,10 @@ function Deshabilitados() {
       return (
         <div className="disabled-list">
           {items.map((item) => (
-            <div key={item.documento} className="disabled-row">
+            <div key={item.id_cliente} className="disabled-row">
               <div>
                 <strong>{item.nombre} {item.apellido}</strong>
-                <span>{item.documento}</span>
+                <span>{item.documento || "Documento pendiente"}</span>
               </div>
               <button className="btn btn-warning btn-sm disabled-action-btn" onClick={() => confirmHabilitarCliente(item)}>
                 Habilitar
