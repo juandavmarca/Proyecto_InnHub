@@ -12,7 +12,7 @@ import Dashboard from "./pages/Dashboard";
 import DashboardLayout from "./layouts/DashboardLayout";
 
 function App() {
- return (
+ return (   
  <BrowserRouter>
  <Routes>
  <Route path="/" element={<Home />} />

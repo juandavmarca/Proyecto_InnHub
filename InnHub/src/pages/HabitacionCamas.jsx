@@ -15,7 +15,6 @@ function HabitacionCamas() {
   const [form, setForm] = useState({
     tipo: "",
     precio_noche: "",
-    tamano: "",
     cantidad: "",
     habitaciones_id_habitacion: idHabitacion || "",
   });
@@ -64,7 +63,6 @@ function HabitacionCamas() {
     setForm({
       tipo: habitacionSeleccionada?.tipo || "",
       precio_noche: habitacionSeleccionada?.precio_noche ?? "",
-      tamano: "",
       cantidad: "",
       habitaciones_id_habitacion: idHabitacion || "",
     });
@@ -78,8 +76,8 @@ function HabitacionCamas() {
       return;
     }
 
-    if (!form.tipo.trim() || !form.tamano.trim() || !form.cantidad) {
-      setMensaje({ type: "error", text: "Completa tipo, tamaño y cantidad." });
+    if (!form.tipo.trim() || !form.cantidad) {
+      setMensaje({ type: "error", text: "Completa tipo y cantidad." });
       return;
     }
 
@@ -184,7 +182,7 @@ function HabitacionCamas() {
               />
             </div>
 
-            <div className="col-md-2 camas-field">
+            {/* <div className="col-md-2 camas-field">
               <label className="form-label text-light">Tamaño</label>
               <input
                 type="text"
@@ -194,7 +192,7 @@ function HabitacionCamas() {
                 onChange={handleChange}
                 placeholder="Ej. King"
               />
-            </div>
+            </div> */}
 
             <div className="col-md-2 camas-field">
               <label className="form-label text-light">Cantidad</label>
@@ -254,7 +252,6 @@ function HabitacionCamas() {
                 <tr>
                   <th>#</th>
                   <th>Tipo</th>
-                  <th>Tamaño</th>
                   <th>Cantidad</th>
                   <th>Acción</th>
                 </tr>
@@ -264,7 +261,6 @@ function HabitacionCamas() {
                   <tr key={cama.idCamas}>
                     <td>{index + 1}</td>
                     <td>{cama.tipo}</td>
-                    <td>{cama.tamano}</td>
                     <td>{cama.cantidad}</td>
                     <td>
                       <button
