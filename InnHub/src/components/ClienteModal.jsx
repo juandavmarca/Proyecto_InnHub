@@ -3,6 +3,14 @@ import { crearCliente, editarCliente } from "../services/api";
 
 const logo = "http://localhost/ERPInnHub/backend/uploads/logo.png";
 
+const TIPO_DOCUMENTO_OPTIONS = [
+  "Cédula de ciudadanía",
+  "tarjeta de identidad",
+  "cédula de extranjería",
+  "pasaporte",
+
+];
+
 function ClienteModal({ onClienteCreado, onSuccess, clienteEditar }) {
   const [form, setForm] = useState({
     documento: "",
@@ -128,19 +136,26 @@ function ClienteModal({ onClienteCreado, onSuccess, clienteEditar }) {
                   <h6 className="mb-3"><strong>Información Básica</strong></h6>
                   <div className="form-group-icon">
                     <i className="fas fa-file"></i>
-                    <input className="form-control mb-2" placeholder="Tipo Documento" name="tipo_documento" value={form.tipo_documento} onChange={handleChange} />
+                    <select className="form-control mb-2" placeholder="Tipo Documento" name="tipo_documento" value={form.tipo_documento} onChange={handleChange}>
+                      <option value="">Seleccionar tipo de documento</option>
+                      {TIPO_DOCUMENTO_OPTIONS.map((option) => (
+                        <option key={option} value={option}>
+                          {option}
+                        </option>
+                      ))}
+                    </select>
                   </div>
                   <div className="form-group-icon">
                     <i className="fas fa-id-card"></i>
-                    <input className="form-control mb-2" placeholder="Documento" name="documento" value={form.documento} onChange={handleChange} disabled={isEditing} />
+                    <input type="number" className="form-control mb-2" placeholder="Documento" name="documento" value={form.documento} onChange={handleChange} disabled={isEditing} />
                   </div>
                   <div className="form-group-icon">
                     <i className="fas fa-user"></i>
-                    <input className="form-control mb-2" placeholder="Nombre" name="nombre" value={form.nombre} onChange={handleChange} />
+                    <input type="text" className="form-control mb-2" placeholder="Nombre" name="nombre" value={form.nombre} onChange={handleChange} />
                   </div>
                   <div className="form-group-icon">
                     <i className="fas fa-user"></i>
-                    <input className="form-control mb-2" placeholder="Apellidos" name="apellido" value={form.apellido} onChange={handleChange} />
+                    <input type="text" className="form-control mb-2" placeholder="Apellidos" name="apellido" value={form.apellido} onChange={handleChange} />
                   </div>
                 </div>
 
@@ -149,11 +164,11 @@ function ClienteModal({ onClienteCreado, onSuccess, clienteEditar }) {
                   <h6 className="mb-3"><strong>Información de Contacto</strong></h6>
                   <div className="form-group-icon">
                     <i className="fas fa-phone"></i>
-                    <input className="form-control mb-2" placeholder="Teléfono" name="telefono" value={form.telefono} onChange={handleChange} />
+                    <input type="number" className="form-control mb-2" placeholder="Teléfono" name="telefono" value={form.telefono} maxLength={10} onChange={handleChange} />
                   </div>
                   <div className="form-group-icon">
                     <i className="fas fa-envelope"></i>
-                    <input className="form-control mb-2" placeholder="Email" name="email" value={form.email} onChange={handleChange} />
+                    <input type="email" className="form-control mb-2" placeholder="Email" name="email" value={form.email} onChange={handleChange} />
                   </div>
                   <div className="form-group-icon">
                     <i className="fas fa-map-marker-alt"></i>

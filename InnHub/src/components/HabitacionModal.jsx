@@ -158,7 +158,7 @@ function HabitacionModal({ onHabitacionCreado, onSuccess, habitacionEditar }) {
             </div>
             <div className="form-group-icon">
               <i className="fas fa-money-bill-wave"></i>
-              <input className="form-control mb-2" placeholder="Precio Noche" name="precio_noche" value={form.precio_noche} onChange={handleChange} />
+              <input type="number" min="0" step="0.01" className="form-control mb-2" placeholder="Precio Noche" name="precio_noche" value={form.precio_noche} onChange={handleChange} />
             </div>
             <div className="form-group-icon">
               <i className="fas fa-check-circle"></i>

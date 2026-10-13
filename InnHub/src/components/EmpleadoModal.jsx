@@ -146,15 +146,15 @@ function EmpleadoModal({ onEmpleadoCreado, onSuccess, empleadoEditar }) {
                   <h6 className="mb-2"><strong>Información Básica</strong></h6>
                   <div className="form-group-icon">
                     <i className="fas fa-id-card"></i>
-                    <input className="form-control" placeholder="Documento" name="documento" value={form.documento} onChange={handleChange} disabled={isEditing} />
+                    <input type="number" className="form-control" placeholder="Documento" name="documento" value={form.documento} onChange={handleChange} disabled={isEditing} />
                   </div>
                   <div className="form-group-icon">
                     <i className="fas fa-user"></i>
-                    <input className="form-control" placeholder="Nombre" name="nombre" value={form.nombre} onChange={handleChange} />
+                    <input type="text" className="form-control" placeholder="Nombre" name="nombre" value={form.nombre} onChange={handleChange} />
                   </div>
                   <div className="form-group-icon">
                     <i className="fas fa-user"></i>
-                    <input className="form-control" placeholder="Apellidos" name="apellido" value={form.apellido} onChange={handleChange} />
+                    <input type="text" className="form-control" placeholder="Apellidos" name="apellido" value={form.apellido} onChange={handleChange} />
                   </div>
                   <div className="form-group-icon">
                     <i className="fas fa-briefcase"></i>
@@ -166,11 +166,11 @@ function EmpleadoModal({ onEmpleadoCreado, onSuccess, empleadoEditar }) {
                   <h6 className="mb-2"><strong>Información de Contacto</strong></h6>
                   <div className="form-group-icon">
                     <i className="fas fa-phone"></i>
-                    <input className="form-control" placeholder="Teléfono" name="telefono" value={form.telefono} onChange={handleChange} />
+                    <input type="tel" className="form-control" placeholder="Teléfono" name="telefono" value={form.telefono} onChange={handleChange} />
                   </div>
                   <div className="form-group-icon">
                     <i className="fas fa-envelope"></i>
-                    <input className="form-control" placeholder="Email" name="email" value={form.email} onChange={handleChange} />
+                    <input type="email" className="form-control" placeholder="Email" name="email" value={form.email} onChange={handleChange} />
                   </div>
                   <div className="form-group-icon">
                     <i className="fas fa-camera"></i>
