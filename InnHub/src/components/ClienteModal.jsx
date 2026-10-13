@@ -37,8 +37,14 @@ function ClienteModal({ onClienteCreado, onSuccess, clienteEditar }) {
   useEffect(() => {
     /* eslint-disable react-hooks/set-state-in-effect */
     if (clienteEditar) {
-      setForm(clienteEditar);
-      setFormOriginal(clienteEditar);
+      const clienteNormalizado = {
+        ...clienteEditar,
+        documento: clienteEditar.documento ?? "",
+        tipo_documento: clienteEditar.tipo_documento ?? "",
+        ciudad_re: clienteEditar.ciudad_re ?? "",
+      };
+      setForm(clienteNormalizado);
+      setFormOriginal(clienteNormalizado);
       setIsEditing(true);
     } else {
       setForm({

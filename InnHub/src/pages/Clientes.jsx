@@ -39,14 +39,14 @@ function Clientes() {
       onConfirm: async () => {
         setConfirm((c) => ({ ...c, show: false }));
         try {
-          const res = await actualizarEstadoCliente(cliente.documento, "Deshabilitado");
+          const res = await actualizarEstadoCliente(cliente.id_cliente, "Deshabilitado");
           if (!res.success) {
             setToast({ show: true, message: res.message || "No se pudo deshabilitar el cliente", type: "error" });
             return;
           }
           setClientes((prev) =>
             prev.map((item) =>
-              item.documento === cliente.documento
+              item.id_cliente === cliente.id_cliente
                 ? { ...item, estado: "Deshabilitado", deshabilitado: true }
                 : item
             )
@@ -68,14 +68,14 @@ function Clientes() {
       onConfirm: async () => {
         setConfirm((c) => ({ ...c, show: false }));
         try {
-          const res = await actualizarEstadoCliente(cliente.documento, "Activo");
+          const res = await actualizarEstadoCliente(cliente.id_cliente, "Activo");
           if (!res.success) {
             setToast({ show: true, message: res.message || "No se pudo habilitar el cliente", type: "error" });
             return;
           }
           setClientes((prev) =>
             prev.map((item) =>
-              item.documento === cliente.documento
+              item.id_cliente === cliente.id_cliente
                 ? { ...item, estado: "Activo", deshabilitado: false }
                 : item
             )
@@ -142,14 +142,14 @@ function Clientes() {
         </thead>
         <tbody>
           {clientesFiltrados.map((cliente) => (
-            <tr key={cliente.documento}>
-              <td>{cliente.documento}</td>
-              <td>{cliente.tipo_documento}</td>
+            <tr key={cliente.id_cliente}>
+              <td>{cliente.documento || "Pendiente"}</td>
+              <td>{cliente.tipo_documento || "Pendiente"}</td>
               <td>{cliente.nombre}</td>
               <td>{cliente.apellido}</td>
               <td>{cliente.telefono}</td>
               <td>{cliente.email}</td>
-              <td>{cliente.ciudad_re}</td>
+              <td>{cliente.ciudad_re || "Pendiente"}</td>
               <td>
                 <div className="d-flex gap-2">
                   <button className="btn btn-sm" style={{backgroundColor: '#c89629', color: '#090808', border: 'none'}} data-bs-toggle="modal" data-bs-target="#clienteModal" onClick={() => handleEditarCliente(cliente)} title="Editar">

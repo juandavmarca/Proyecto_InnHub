@@ -1,5 +1,31 @@
 const BASE_URL = "http://localhost/ERPInnHub/backend";
 
+async function solicitarVerificacion(endpoint, datos) {
+  const response = await fetch(`${BASE_URL}/Verificacion/${endpoint}.php`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    credentials: "include",
+    body: JSON.stringify(datos),
+  });
+  const resultado = await response.json();
+
+  if (!response.ok || !resultado.exito) {
+    throw new Error(resultado.mensaje || "No se pudo completar la verificación.");
+  }
+
+  return resultado;
+}
+
+export function solicitarCodigoWhatsapp(telefono, cliente) {
+  return solicitarVerificacion("solicitar", { telefono, cliente });
+}
+
+export function verificarCodigoWhatsapp(telefono, codigo) {
+  return solicitarVerificacion("verificar", { telefono, codigo });
+}
+
 export async function obtenerClientes() {
   try {
     const response = await fetch(`${BASE_URL}/Clientes/listar.php`);
@@ -35,13 +61,13 @@ export async function editarCliente(cliente) {
   return response.json();
 }
 
-export async function actualizarEstadoCliente(documento, estado) {
+export async function actualizarEstadoCliente(idCliente, estado) {
   const response = await fetch(`${BASE_URL}/Clientes/estado.php`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ documento, estado }),
+    body: JSON.stringify({ id_cliente: idCliente, estado }),
   });
   return response.json();
 }

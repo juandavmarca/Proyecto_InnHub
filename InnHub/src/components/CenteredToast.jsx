@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 
-function CenteredToast({ show, message, type = "info", duration = 2000, onClose }) {
+function CenteredToast({ show, message, type = "info", duration = 2000, onClose, className = "" }) {
   useEffect(() => {
     if (!show) return;
     const t = setTimeout(() => {
@@ -12,7 +12,7 @@ function CenteredToast({ show, message, type = "info", duration = 2000, onClose 
   if (!show) return null;
 
   return (
-    <div className={`toast-backdrop toast-${type}`}>
+    <div className={`toast-backdrop toast-${type} ${className}`.trim()}>
       <div className="toast-message">
         {message}
       </div>

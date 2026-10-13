@@ -15,19 +15,19 @@ if (json_last_error() !== JSON_ERROR_NONE) {
     exit;
 }
 
-if (empty($data['documento']) || !isset($data['estado'])) {
+if (empty($data['id_cliente']) || !isset($data['estado'])) {
     echo json_encode([
         "success" => false,
-        "message" => "Documento y estado son obligatorios"
+        "message" => "El identificador del cliente y el estado son obligatorios"
     ]);
     exit;
 }
 
 try {
-    $sql = "UPDATE clientes SET estado=:estado WHERE documento=:documento";
+    $sql = "UPDATE clientes SET estado=:estado WHERE id_cliente=:id_cliente";
     $stmt = $pdo->prepare($sql);
     $stmt->execute([
-        ":documento" => $data['documento'],
+        ":id_cliente" => $data['id_cliente'],
         ":estado" => $data['estado']
     ]);
 
