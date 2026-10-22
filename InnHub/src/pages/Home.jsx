@@ -9,11 +9,13 @@ import {
   obtenerCaracteristicas,
   obtenerHabitaciones,
   obtenerImagenes,
+  reenviarCorreoAceptacion,
   solicitarCodigoWhatsapp,
   verificarCodigoWhatsapp,
 } from "../services/api";
 
 const homeLogo = "http://localhost/ERPInnHub/backend/uploads/logo.png";
+const termsDocumentUrl = "http://localhost/ERPInnHub/backend/Verificacion/terminos.php";
 const nightlyRatesByGuestCount = {
   1: 65000,
   2: 120000,
@@ -446,6 +448,9 @@ function Home() {
   const [otpRemainingSeconds, setOtpRemainingSeconds] = useState(0);
   const [verificationLoading, setVerificationLoading] = useState(false);
   const [verificationSuccess, setVerificationSuccess] = useState(false);
+  const [verificationNotice, setVerificationNotice] = useState("");
+  const [verificationNoticeType, setVerificationNoticeType] = useState("");
+  const [retryingAcceptanceEmail, setRetryingAcceptanceEmail] = useState(false);
   const otpInputRefs = useRef([]);
   const [paymentMethod, setPaymentMethod] = useState("");
   const [phoneCountry, setPhoneCountry] = useState(
@@ -457,6 +462,8 @@ function Home() {
     email: "",
     phone: "",
   });
+  const [termsAccepted, setTermsAccepted] = useState(false);
+  const [privacyAccepted, setPrivacyAccepted] = useState(false);
 
   const getFullPhoneNumber = () => `${phoneCountry.code}${guestDetails.phone.replace(/\D/g, "")}`;
 
@@ -626,6 +633,10 @@ function Home() {
       setBookingStep(1);
       setBookingMessage("");
       setPaymentMethod("");
+      setTermsAccepted(false);
+      setPrivacyAccepted(false);
+      setVerificationNotice("");
+      setVerificationNoticeType("");
       return;
     }
     setShowSearchResults(true);
@@ -660,6 +671,10 @@ function Home() {
     setBookingStep(1);
     setBookingMessage("");
     setPaymentMethod("");
+    setTermsAccepted(false);
+    setPrivacyAccepted(false);
+    setVerificationNotice("");
+    setVerificationNoticeType("");
   };
 
   const handleCloseBooking = () => {
@@ -668,6 +683,10 @@ function Home() {
     setVerificationSuccess(false);
     setBookingMessage("");
     setBookingMessageType("");
+    setVerificationNotice("");
+    setVerificationNoticeType("");
+    setTermsAccepted(false);
+    setPrivacyAccepted(false);
     setWhatsappCode(["", "", "", ""]);
     setWhatsappCodeSent(false);
     setOtpExpiresAt(null);
@@ -681,6 +700,10 @@ function Home() {
     setBookingStep(1);
     setVerificationSuccess(false);
     setBookingMessage("");
+    setTermsAccepted(false);
+    setPrivacyAccepted(false);
+    setVerificationNotice("");
+    setVerificationNoticeType("");
     if (bookingOrigin === "catalog") {
       setShowSearchResults(false);
       document.getElementById("rooms")?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -706,6 +729,8 @@ function Home() {
 
     setBookingMessage("");
     setBookingMessageType("");
+    setVerificationNotice("");
+    setVerificationNoticeType("");
     setWhatsappCode(["", "", "", ""]);
     setWhatsappCodeSent(false);
     setOtpExpiresAt(null);
@@ -723,7 +748,12 @@ function Home() {
     setOtpRemainingSeconds(0);
 
     try {
-      const resultado = await solicitarCodigoWhatsapp(telefono, guestDetails);
+      const resultado = await solicitarCodigoWhatsapp(
+        telefono,
+        guestDetails,
+        termsAccepted,
+        privacyAccepted
+      );
       setWhatsappCodeSent(true);
       setWhatsappCode(["", "", "", ""]);
       setOtpExpiresAt(Date.parse(resultado.expiresAt));
@@ -744,9 +774,13 @@ function Home() {
     setBookingMessageType("");
 
     try {
-      await verificarCodigoWhatsapp(getFullPhoneNumber(), whatsappCode.join(""));
+      const resultado = await verificarCodigoWhatsapp(getFullPhoneNumber(), whatsappCode.join(""));
       setBookingMessage("");
       setBookingMessageType("");
+      setVerificationNotice(resultado.correoEnviado
+        ? `Enviamos la confirmación de aceptación y el PDF a ${guestDetails.email}.`
+        : "El teléfono quedó verificado, pero no pudimos enviar el correo de confirmación. Comunícate con el hotel para solicitarlo.");
+      setVerificationNoticeType(resultado.correoEnviado ? "success" : "warning");
       setVerificationSuccess(true);
     } catch (error) {
       if (/expir[oó]|vencid/i.test(error.message || "")) {
@@ -760,6 +794,20 @@ function Home() {
       setBookingMessageType("error");
     } finally {
       setVerificationLoading(false);
+    }
+  };
+
+  const handleRetryAcceptanceEmail = async () => {
+    setRetryingAcceptanceEmail(true);
+    try {
+      const resultado = await reenviarCorreoAceptacion();
+      setVerificationNotice(resultado.mensaje);
+      setVerificationNoticeType("success");
+    } catch (error) {
+      setVerificationNotice(error.message || "No se pudo reenviar el correo. Inténtalo nuevamente.");
+      setVerificationNoticeType("warning");
+    } finally {
+      setRetryingAcceptanceEmail(false);
     }
   };
 
@@ -1318,8 +1366,35 @@ function Home() {
                         </div>
                       </label>
                     </div>
+                    <label className="reservation-terms-consent">
+                      <input
+                        type="checkbox"
+                        checked={termsAccepted}
+                        onChange={(event) => setTermsAccepted(event.target.checked)}
+                        required
+                      />
+                      <span>
+                        He leído y acepto los{" "}
+                        <a href={termsDocumentUrl} target="_blank" rel="noreferrer">
+                          términos y condiciones del Hotel Valencia
+                        </a>
+                        . Recibiré una copia en el correo registrado.
+                      </span>
+                    </label>
+                    <label className="reservation-terms-consent">
+                      <input
+                        type="checkbox"
+                        checked={privacyAccepted}
+                        onChange={(event) => setPrivacyAccepted(event.target.checked)}
+                        required
+                      />
+                      <span>
+                        Autorizo el tratamiento de mis datos personales para gestionar mi solicitud, verificar mi contacto
+                        y enviarme esta constancia por correo electrónico.
+                      </span>
+                    </label>
                     {bookingMessage && <p className={`reservation-integration-note is-${bookingMessageType}`} role="alert">{bookingMessage}</p>}
-                    <button className="btn btn-book reservation-primary-action" type="submit" disabled={verificationLoading}>
+                    <button className="btn btn-book reservation-primary-action" type="submit" disabled={verificationLoading || !termsAccepted || !privacyAccepted}>
                       Continuar a la verificación
                     </button>
                   </form>
@@ -1386,6 +1461,8 @@ function Home() {
                       setBookingStep(1);
                       setBookingMessage("");
                       setBookingMessageType("");
+                      setTermsAccepted(false);
+                      setPrivacyAccepted(false);
                       setWhatsappCode(["", "", "", ""]);
                       setWhatsappCodeSent(false);
                       setOtpExpiresAt(null);
@@ -1406,6 +1483,17 @@ function Home() {
                     <span className="reservation-step-kicker">Paso 3 de 3</span>
                     <h3>Elige cómo quieres pagar</h3>
                     <p>Selecciona el método de pago para completar tu solicitud.</p>
+                    {verificationNotice && <p className={`reservation-integration-note is-${verificationNoticeType}`} role="status">{verificationNotice}</p>}
+                    {verificationNoticeType === "warning" && (
+                      <button
+                        className="reservation-text-action"
+                        type="button"
+                        onClick={handleRetryAcceptanceEmail}
+                        disabled={retryingAcceptanceEmail}
+                      >
+                        {retryingAcceptanceEmail ? "Reintentando envío..." : "Reintentar envío del correo"}
+                      </button>
+                    )}
                     <label className="reservation-payment-option">
                       <input
                         type="radio"

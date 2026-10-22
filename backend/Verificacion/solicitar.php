@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/common.php';
+require_once __DIR__ . '/terminos_contenido.php';
 
 if (($_SERVER['REQUEST_METHOD'] ?? '') !== 'POST') {
     responder(405, ['exito' => false, 'mensaje' => 'Método no permitido.']);
@@ -8,6 +9,13 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') !== 'POST') {
 $entrada = leerEntrada();
 $telefono = trim((string) ($entrada['telefono'] ?? ''));
 $cliente = $entrada['cliente'] ?? null;
+if (($entrada['termsAccepted'] ?? false) !== true || ($entrada['privacyAccepted'] ?? false) !== true) {
+    responder(400, [
+        'exito' => false,
+        'mensaje' => 'Debes aceptar los términos y autorizar el tratamiento de datos para continuar.'
+    ]);
+}
+
 if (!preg_match('/^\+[1-9]\d{7,14}$/', $telefono)) {
     responder(400, [
         'exito' => false,
@@ -124,7 +132,9 @@ $_SESSION[$claveOtp] = [
     'codigo' => $codigo,
     'expiracion' => $expiracion,
     'intentos' => 0,
-    'cliente' => $clientePendiente
+    'cliente' => $clientePendiente,
+    'version_terminos' => VERSION_TERMINOS,
+    'autorizacion_datos' => true
 ];
 $_SESSION['otp_ultimo_envio'][$claveTelefono] = time();
 

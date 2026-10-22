@@ -18,12 +18,16 @@ async function solicitarVerificacion(endpoint, datos) {
   return resultado;
 }
 
-export function solicitarCodigoWhatsapp(telefono, cliente) {
-  return solicitarVerificacion("solicitar", { telefono, cliente });
+export function solicitarCodigoWhatsapp(telefono, cliente, termsAccepted, privacyAccepted) {
+  return solicitarVerificacion("solicitar", { telefono, cliente, termsAccepted, privacyAccepted });
 }
 
 export function verificarCodigoWhatsapp(telefono, codigo) {
   return solicitarVerificacion("verificar", { telefono, codigo });
+}
+
+export function reenviarCorreoAceptacion() {
+  return solicitarVerificacion("reenviar_correo", {});
 }
 
 export async function obtenerClientes() {

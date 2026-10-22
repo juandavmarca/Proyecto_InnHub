@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/common.php';
+require_once __DIR__ . '/correo_aceptacion.php';
 
 if (($_SERVER['REQUEST_METHOD'] ?? '') !== 'POST') {
     responder(405, ['exito' => false, 'mensaje' => 'Método no permitido.']);
@@ -38,6 +39,14 @@ if (
     responder(400, ['exito' => false, 'mensaje' => 'Los datos de la reserva ya no están disponibles. Vuelve a solicitar un código.']);
 }
 
+if (
+    ($datosOtp['version_terminos'] ?? '') !== VERSION_TERMINOS
+    || ($datosOtp['autorizacion_datos'] ?? false) !== true
+) {
+    unset($_SESSION[$claveOtp]);
+    responder(400, ['exito' => false, 'mensaje' => 'La aceptación ya no está disponible. Vuelve a aceptar los términos y solicita un nuevo código.']);
+}
+
 if (!hash_equals((string) $datosOtp['codigo'], $codigo)) {
     $_SESSION[$claveOtp]['intentos']++;
     if ($_SESSION[$claveOtp]['intentos'] >= 5) {
@@ -48,6 +57,7 @@ if (!hash_equals((string) $datosOtp['codigo'], $codigo)) {
     responder(400, ['exito' => false, 'mensaje' => 'El código ingresado es incorrecto.']);
 }
 
+$fechaAceptacionUtc = gmdate('Y-m-d H:i:s');
 $clienteId = null;
 try {
     require_once __DIR__ . '/../config/database.php';
@@ -84,15 +94,35 @@ try {
         $clienteId = (int) $pdo->lastInsertId();
     }
 
+    $guardarAceptacion = $pdo->prepare(
+        'INSERT INTO aceptaciones_terminos
+            (id_cliente, nombre, email, telefono, version_terminos, autorizacion_datos, fecha_aceptacion_utc)
+         VALUES
+            (:id_cliente, :nombre, :email, :telefono, :version_terminos, :autorizacion_datos, :fecha_aceptacion_utc)'
+    );
+    $guardarAceptacion->execute([
+        ':id_cliente' => $clienteId,
+        ':nombre' => trim($cliente['nombre'] . ' ' . $cliente['apellido']),
+        ':email' => $cliente['email'],
+        ':telefono' => $telefono,
+        ':version_terminos' => $datosOtp['version_terminos'],
+        ':autorizacion_datos' => 1,
+        ':fecha_aceptacion_utc' => $fechaAceptacionUtc
+    ]);
+
     $pdo->commit();
 } catch (PDOException $error) {
     if (isset($pdo) && $pdo->inTransaction()) {
         $pdo->rollBack();
     }
-    error_log('No se pudo registrar el cliente después de verificar el teléfono: ' . $error->getCode());
+    error_log(
+        'No se pudo guardar el cliente y su aceptación después de verificar el teléfono. SQLSTATE '
+        . $error->getCode() . ': ' . $error->getMessage()
+    );
     responder(500, ['exito' => false, 'mensaje' => 'No se pudo guardar la información del cliente. Inténtalo nuevamente.']);
 }
 
+$correoEnviado = enviarCorreoAceptacion($cliente, $fechaAceptacionUtc);
 unset($_SESSION[$claveOtp]);
 $_SESSION['telefono_verificado'] = [
     'telefono' => $telefono,
@@ -102,6 +132,9 @@ $_SESSION['telefono_verificado'] = [
 
 responder(200, [
     'exito' => true,
-    'mensaje' => 'Número verificado y datos del cliente guardados correctamente.',
+    'mensaje' => $correoEnviado
+        ? 'Número verificado y correo de aceptación enviado.'
+        : 'Número verificado, pero no fue posible enviar el correo de aceptación.',
+    'correoEnviado' => $correoEnviado,
     'id_cliente' => $clienteId
 ]);
