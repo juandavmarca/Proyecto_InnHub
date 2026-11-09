@@ -4,18 +4,35 @@ import  UbicacionModal from "../components/UbicacionModal";
 
 import ConfirmDialog from "../components/ConfirmDialog";
 import CenteredToast from "../components/CenteredToast";
+import SolicitudAtencionModal from "../components/SolicitudAtencionModal";
 import {
   obtenerCamas,
   obtenerCaracteristicas,
   obtenerHabitaciones,
   obtenerImagenes,
   reenviarCorreoAceptacion,
+  consultarEstadoPago,
+  iniciarPagoWompi,
+  solicitarCodigoConsultaReserva,
   solicitarCodigoWhatsapp,
+  verificarCodigoConsultaReserva,
   verificarCodigoWhatsapp,
 } from "../services/api";
 
 const homeLogo = "http://localhost/ERPInnHub/backend/uploads/logo.png";
 const termsDocumentUrl = "http://localhost/ERPInnHub/backend/Verificacion/terminos.php";
+const formatLookupDate = (value) => {
+  if (!value) return "Pendiente";
+  const date = new Date(String(value).replace(" ", "T"));
+  return Number.isNaN(date.getTime())
+    ? String(value)
+    : date.toLocaleDateString("es-CO", { day: "numeric", month: "long", year: "numeric" });
+};
+const formatLookupMoney = (value) => new Intl.NumberFormat("es-CO", {
+  style: "currency",
+  currency: "COP",
+  maximumFractionDigits: 0,
+}).format(Number(value) || 0);
 const nightlyRatesByGuestCount = {
   1: 65000,
   2: 120000,
@@ -430,8 +447,20 @@ function Home() {
   const [showExperienceModal, setShowExperienceModal] = useState(false);
   const [activeSlide, setActiveSlide] = useState(0);
   const [showAdminAlert, setShowAdminAlert] = useState(false);
+  const [showReservationLookup, setShowReservationLookup] = useState(false);
+  const [lookupPhone, setLookupPhone] = useState("");
+  const [lookupCountry, setLookupCountry] = useState(
+    () => phoneCountryCodes.find(({ country }) => country === "Colombia")
+  );
+  const [lookupCode, setLookupCode] = useState("");
+  const [lookupCodeSent, setLookupCodeSent] = useState(false);
+  const [lookupReservations, setLookupReservations] = useState(null);
+  const [lookupLoading, setLookupLoading] = useState(false);
+  const [lookupError, setLookupError] = useState("");
+  const [lookupNotice, setLookupNotice] = useState("");
   const [publicRooms, setPublicRooms] = useState([]);
   const [mostrarUbicacion, setMostrarUbicacion] = useState(false);
+  const [mostrarAtencion, setMostrarAtencion] = useState(false);
   const [roomsLoading, setRoomsLoading] = useState(true);
   const [showSearchResults, setShowSearchResults] = useState(false);
   const [searchError, setSearchError] = useState("");
@@ -452,7 +481,14 @@ function Home() {
   const [verificationNoticeType, setVerificationNoticeType] = useState("");
   const [retryingAcceptanceEmail, setRetryingAcceptanceEmail] = useState(false);
   const otpInputRefs = useRef([]);
-  const [paymentMethod, setPaymentMethod] = useState("");
+  const [paymentPercentage, setPaymentPercentage] = useState("");
+  const [paymentLoading, setPaymentLoading] = useState(false);
+  const [paymentReturnToast, setPaymentReturnToast] = useState({
+    show: false,
+    message: "",
+    type: "info",
+    status: "pending",
+  });
   const [phoneCountry, setPhoneCountry] = useState(
     phoneCountryCodes.find(({ country }) => country === "Colombia")
   );
@@ -466,6 +502,76 @@ function Home() {
   const [privacyAccepted, setPrivacyAccepted] = useState(false);
 
   const getFullPhoneNumber = () => `${phoneCountry.code}${guestDetails.phone.replace(/\D/g, "")}`;
+
+  const resetReservationLookup = () => {
+    setShowReservationLookup(false);
+    setLookupPhone("");
+    setLookupCountry(phoneCountryCodes.find(({ country }) => country === "Colombia"));
+    setLookupCode("");
+    setLookupCodeSent(false);
+    setLookupReservations(null);
+    setLookupLoading(false);
+    setLookupError("");
+    setLookupNotice("");
+  };
+
+  const getLookupFullPhone = () =>
+    `${lookupCountry.code}${lookupPhone.replace(/\D/g, "")}`;
+
+  const handleRequestReservationCode = async (event) => {
+    event.preventDefault();
+    setLookupLoading(true);
+    setLookupError("");
+    setLookupNotice("");
+
+    try {
+      const resultado = await solicitarCodigoConsultaReserva(getLookupFullPhone());
+      setLookupCodeSent(true);
+      setLookupNotice(resultado.mensaje);
+    } catch (error) {
+      setLookupError(error.message || "No se pudo enviar el código.");
+    } finally {
+      setLookupLoading(false);
+    }
+  };
+
+  const handleVerifyReservationCode = async (event) => {
+    event.preventDefault();
+    setLookupLoading(true);
+    setLookupError("");
+    setLookupNotice("");
+
+    try {
+      const resultado = await verificarCodigoConsultaReserva(
+        getLookupFullPhone(),
+        lookupCode
+      );
+      setLookupReservations(resultado.reservas || []);
+      setLookupNotice(resultado.mensaje);
+    } catch (error) {
+      setLookupError(error.message || "No se pudo verificar el código.");
+    } finally {
+      setLookupLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (!showReservationLookup) return undefined;
+    const closeOnEscape = (event) => {
+      if (event.key === "Escape" && !lookupLoading) {
+        setShowReservationLookup(false);
+        setLookupPhone("");
+        setLookupCountry(phoneCountryCodes.find(({ country }) => country === "Colombia"));
+        setLookupCode("");
+        setLookupCodeSent(false);
+        setLookupReservations(null);
+        setLookupError("");
+        setLookupNotice("");
+      }
+    };
+    document.addEventListener("keydown", closeOnEscape);
+    return () => document.removeEventListener("keydown", closeOnEscape);
+  }, [showReservationLookup, lookupLoading]);
 
   const updateGuestCount = (value) => {
     setGuestCount((current) => Math.min(6, Math.max(1, current + value)));
@@ -632,7 +738,7 @@ function Home() {
       setBookingOrigin("catalog");
       setBookingStep(1);
       setBookingMessage("");
-      setPaymentMethod("");
+      setPaymentPercentage("");
       setTermsAccepted(false);
       setPrivacyAccepted(false);
       setVerificationNotice("");
@@ -670,11 +776,12 @@ function Home() {
     setRoomPreviewFromSearch(false);
     setBookingStep(1);
     setBookingMessage("");
-    setPaymentMethod("");
+    setPaymentPercentage("");
     setTermsAccepted(false);
     setPrivacyAccepted(false);
     setVerificationNotice("");
     setVerificationNoticeType("");
+    setPaymentLoading(false);
   };
 
   const handleCloseBooking = () => {
@@ -691,6 +798,8 @@ function Home() {
     setWhatsappCodeSent(false);
     setOtpExpiresAt(null);
     setOtpRemainingSeconds(0);
+    setPaymentPercentage("");
+    setPaymentLoading(false);
   };
 
   const handleBackToRoomResults = () => {
@@ -811,6 +920,122 @@ function Home() {
     }
   };
 
+  const handleStartWompiPayment = async () => {
+    if (!paymentPercentage) {
+      setBookingMessage("Selecciona si pagarás el 50% o el total de la estadía.");
+      setBookingMessageType("error");
+      return;
+    }
+
+    setPaymentLoading(true);
+    setBookingMessage("");
+    setBookingMessageType("");
+    try {
+      const resultado = await iniciarPagoWompi({
+        fecha_entrada: checkIn,
+        fecha_salida: checkOut,
+        id_habitacion: selectedRoom.id_habitacion,
+        numero_persona: guestCount,
+        porcentaje_pago: Number(paymentPercentage),
+      });
+      const parametros = new URLSearchParams({
+        "public-key": resultado.llavePublica,
+        currency: "COP",
+        "amount-in-cents": String(resultado.montoCentavos),
+        reference: resultado.referencia,
+        "signature:integrity": resultado.firmaIntegridad,
+        "expiration-time": resultado.expiracion,
+        "customer-data:email": resultado.cliente.email,
+        "customer-data:full-name": resultado.cliente.nombreCompleto,
+      });
+      if (resultado.urlRetorno) {
+        parametros.set("redirect-url", resultado.urlRetorno);
+      }
+      const codigoPais = phoneCountry.code.replace(/\D/g, "");
+      const telefonoCompleto = String(resultado.cliente.telefono || "").replace(/\D/g, "");
+      if (codigoPais && telefonoCompleto.startsWith(codigoPais)) {
+        parametros.set("customer-data:phone-number", telefonoCompleto.slice(codigoPais.length));
+        parametros.set("customer-data:phone-number-prefix", phoneCountry.code);
+      }
+      window.location.assign(`https://checkout.wompi.co/p/?${parametros.toString()}`);
+    } catch (error) {
+      setBookingMessage(error.message || "No se pudo iniciar el pago con Wompi.");
+      setBookingMessageType("error");
+      setPaymentLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    const parametros = new URLSearchParams(window.location.search);
+    const referencia = parametros.get("pago");
+    if (!referencia) return undefined;
+
+    parametros.delete("pago");
+    const query = parametros.toString();
+    window.history.replaceState(
+      window.history.state,
+      "",
+      `${window.location.pathname}${query ? `?${query}` : ""}${window.location.hash}`
+    );
+
+    let active = true;
+    let timeout;
+    let intentos = 0;
+    const revisarPago = async () => {
+      try {
+        const resultado = await consultarEstadoPago(referencia);
+        if (!active) return;
+
+        const estado = String(resultado.estado || "").toUpperCase();
+        if (estado === "APPROVED") {
+          setPaymentReturnToast({
+            show: true,
+            message: "¡Pago confirmado! Tu reserva quedó registrada.",
+            type: "success",
+            status: "approved",
+          });
+          return;
+        }
+        if (["DECLINED", "VOIDED", "ERROR"].includes(estado)) {
+          setPaymentReturnToast({
+            show: true,
+            message: "Wompi no aprobó el pago. Puedes volver a iniciar tu reserva.",
+            type: "error",
+            status: "rejected",
+          });
+          return;
+        }
+        if (intentos >= 14) {
+          setPaymentReturnToast({
+            show: true,
+            message: "Tu pago sigue en confirmación. Consulta el estado de tu reserva en unos minutos.",
+            type: "info",
+            status: "pending",
+          });
+          return;
+        }
+
+        intentos += 1;
+        timeout = window.setTimeout(revisarPago, 2000);
+      } catch {
+        if (active) {
+          setPaymentReturnToast({
+            show: true,
+            message: "No pudimos consultar el pago todavía. Revisa el estado de tu reserva más tarde.",
+            type: "error",
+            status: "unknown",
+          });
+        }
+      }
+    };
+
+    revisarPago();
+    return () => {
+      active = false;
+      window.clearTimeout(timeout);
+    };
+  }, []);
+
   useEffect(() => {
     if (!whatsappCodeSent || !otpExpiresAt) return undefined;
 
@@ -921,6 +1146,14 @@ function Home() {
           <a href="#contact">Contacto</a>
         </nav>
         <div className="home-actions">
+          <button
+            type="button"
+            className="home-reservation-lookup-button"
+            onClick={() => setShowReservationLookup(true)}
+          >
+            <i className="fa-solid fa-ticket" aria-hidden="true" />
+            Verificar mi reserva
+          </button>
           <button
             type="button"
             className="btn btn-register"
@@ -1137,10 +1370,14 @@ function Home() {
           <p>Acceso fácil a sitios turísticos, restaurantes y transporte local.</p>
         </button>
 
-        <article className="value-card">
+        <button
+          type="button"
+          className="value-card value-card-button"
+          onClick={() => setMostrarAtencion(true)}
+        >
           <h3>Atención 24/7</h3>
           <p>Soporte para reservas, consultas y servicios personalizados.</p>
-        </article>
+        </button>
 
         <button type="button" className="value-card value-card-button" onClick={handleOpenExperienceModal}>
           <h3>Experiencias únicas</h3>
@@ -1280,6 +1517,185 @@ function Home() {
 
       {mostrarUbicacion && (
         <UbicacionModal onCerrar={() => setMostrarUbicacion(false)} />
+      )}
+
+      {mostrarAtencion && (
+        <SolicitudAtencionModal onCerrar={() => setMostrarAtencion(false)} />
+      )}
+
+      {showReservationLookup && (
+        <div
+          className="reservation-lookup-backdrop"
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget && !lookupLoading) resetReservationLookup();
+          }}
+        >
+          <section
+            className="reservation-lookup-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="reservation-lookup-title"
+          >
+            <button
+              className="reservation-lookup-close"
+              type="button"
+              aria-label="Cerrar"
+              onClick={resetReservationLookup}
+              disabled={lookupLoading}
+            >
+              ×
+            </button>
+            <div className="reservation-lookup-heading">
+              <span className="reservation-lookup-icon">
+                <i className="fa-solid fa-shield-halved" aria-hidden="true" />
+              </span>
+              <span className="reservation-eyebrow">Hotel Valencia · Consulta segura</span>
+              <h2 id="reservation-lookup-title">Verificar mi reserva</h2>
+              <p>Confirma tu número para consultar el estado y los detalles de tus reservas.</p>
+            </div>
+
+            {lookupReservations === null && !lookupCodeSent && (
+              <form className="reservation-lookup-form" onSubmit={handleRequestReservationCode}>
+                <label htmlFor="reservation-lookup-phone">Número de teléfono</label>
+                <div className="reservation-lookup-phone-fields">
+                  <PhoneCountryPicker country={lookupCountry} onChange={setLookupCountry} />
+                  <div className="reservation-lookup-input-wrap">
+                    <i className="fa-solid fa-phone" aria-hidden="true" />
+                    <input
+                      id="reservation-lookup-phone"
+                      type="tel"
+                      autoComplete="tel-national"
+                      inputMode="numeric"
+                      maxLength={15}
+                      placeholder="300 123 4567"
+                      value={lookupPhone}
+                      onChange={(event) => setLookupPhone(event.target.value.replace(/\D/g, ""))}
+                      required
+                      disabled={lookupLoading}
+                    />
+                  </div>
+                </div>
+                <small>Selecciona el código de país e ingresa el número usado al hacer la reserva.</small>
+                {lookupError && <p className="reservation-lookup-message is-error" role="alert">{lookupError}</p>}
+                <button className="reservation-lookup-submit" type="submit" disabled={lookupLoading}>
+                  {lookupLoading ? "Verificando número…" : "Enviar código por WhatsApp"}
+                </button>
+              </form>
+            )}
+
+            {lookupReservations === null && lookupCodeSent && (
+              <form className="reservation-lookup-form" onSubmit={handleVerifyReservationCode}>
+                <p className="reservation-lookup-code-hint">
+                  Enviamos un código de 6 dígitos al WhatsApp asociado a <strong>{getLookupFullPhone()}</strong>.
+                </p>
+                <label htmlFor="reservation-lookup-code">Código de verificación</label>
+                <div className="reservation-lookup-input-wrap">
+                  <i className="fa-solid fa-key" aria-hidden="true" />
+                  <input
+                    id="reservation-lookup-code"
+                    type="text"
+                    inputMode="numeric"
+                    autoComplete="one-time-code"
+                    placeholder="000000"
+                    value={lookupCode}
+                    onChange={(event) => setLookupCode(event.target.value.replace(/\D/g, "").slice(0, 6))}
+                    minLength={6}
+                    maxLength={6}
+                    required
+                    disabled={lookupLoading}
+                  />
+                </div>
+                {lookupNotice && <p className="reservation-lookup-message is-success" role="status">{lookupNotice}</p>}
+                {lookupError && <p className="reservation-lookup-message is-error" role="alert">{lookupError}</p>}
+                <button className="reservation-lookup-submit" type="submit" disabled={lookupLoading || lookupCode.length !== 6}>
+                  {lookupLoading ? "Validando código…" : "Ver mis reservas"}
+                </button>
+                <button
+                  className="reservation-lookup-back"
+                  type="button"
+                  onClick={() => {
+                    setLookupCodeSent(false);
+                    setLookupCode("");
+                    setLookupError("");
+                    setLookupNotice("");
+                  }}
+                  disabled={lookupLoading}
+                >
+                  Cambiar número
+                </button>
+              </form>
+            )}
+
+            {lookupReservations !== null && (
+              <div className="reservation-lookup-results">
+                {lookupReservations.length ? (
+                  lookupReservations.map((reserva) => {
+                    const estado = String(reserva.estado || "Pendiente").trim();
+                    const estadoNormalizado = estado.toLowerCase();
+                    const estadoClase = estadoNormalizado.includes("cancel")
+                      ? "cancelada"
+                      : estadoNormalizado.includes("pago rechazado")
+                        ? "rechazada"
+                        : estadoNormalizado.includes("pago aprobado") || estadoNormalizado.includes("confirm")
+                        ? "confirmada"
+                        : "pendiente";
+                    const estadoPago = String(reserva.estado_pago || "Sin pago registrado").trim();
+                    const pagoAprobado = estadoPago.toUpperCase() === "APPROVED";
+                    const saldoPendiente = reserva.monto_total !== null && reserva.monto_total !== undefined
+                      ? Math.max(Number(reserva.monto_total) - (pagoAprobado ? Number(reserva.monto || 0) : 0), 0)
+                      : null;
+
+                    return (
+                      <article className="reservation-lookup-card" key={reserva.id_reserva}>
+                        <div className="reservation-lookup-card-heading">
+                          <div>
+                            <span>Reserva</span>
+                            <strong>#{reserva.id_reserva}</strong>
+                          </div>
+                          <span className={`reservation-lookup-status is-${estadoClase}`}>{estado}</span>
+                        </div>
+                        <dl>
+                          <div><dt>Entrada</dt><dd>{formatLookupDate(reserva.fecha_entrada)}</dd></div>
+                          <div><dt>Salida</dt><dd>{formatLookupDate(reserva.fecha_salida)}</dd></div>
+                          <div><dt>Creada</dt><dd>{formatLookupDate(reserva.fecha_reserva)}</dd></div>
+                          <div><dt>Habitación</dt><dd>{reserva.numero_habitacion ? `#${reserva.numero_habitacion} · ${reserva.tipo_habitacion || ""}` : "Pendiente de asignación"}</dd></div>
+                          <div><dt>Personas</dt><dd>{reserva.numero_persona || "—"}</dd></div>
+                          <div><dt>Pago</dt><dd>{estadoPago}</dd></div>
+                          {reserva.monto_total !== null && reserva.monto_total !== undefined && (
+                            <div><dt>Total de estadía</dt><dd>{formatLookupMoney(reserva.monto_total)}</dd></div>
+                          )}
+                          {reserva.monto && <div><dt>Valor del pago</dt><dd>{formatLookupMoney(reserva.monto)}</dd></div>}
+                          {pagoAprobado && saldoPendiente !== null && saldoPendiente > 0 && (
+                            <div><dt>Saldo por pagar en el hotel</dt><dd>{formatLookupMoney(saldoPendiente)}</dd></div>
+                          )}
+                          {reserva.metodo_pago && <div><dt>Medio de pago</dt><dd>{reserva.metodo_pago}</dd></div>}
+                          {reserva.fecha_pago && <div><dt>Fecha de pago</dt><dd>{formatLookupDate(reserva.fecha_pago)}</dd></div>}
+                        </dl>
+                        {reserva.observacion && (
+                          <p className="reservation-lookup-observation">
+                            <strong>Nota:</strong> {reserva.observacion}
+                          </p>
+                        )}
+                      </article>
+                    );
+                  })
+                ) : (
+                  <div className="reservation-lookup-no-results">
+                    <i className="fa-regular fa-calendar-xmark" aria-hidden="true" />
+                    <strong>No encontramos reservas para este número</strong>
+                    <span>Verifica que hayas ingresado el mismo teléfono usado al reservar.</span>
+                  </div>
+                )}
+                <p className="reservation-lookup-payment-note">
+                  Los pagos se reflejan cuando Wompi notifica y el servidor valida la transacción; una operación pendiente puede tardar unos minutos en actualizarse.
+                </p>
+                <button className="reservation-lookup-back" type="button" onClick={resetReservationLookup}>
+                  Cerrar consulta
+                </button>
+              </div>
+            )}
+          </section>
+        </div>
       )}
 
       {selectedRoom && (
@@ -1472,8 +1888,8 @@ function Home() {
                     </button>
                     <div className="reservation-payment-preview">
                       <span>Paso 3</span>
-                      <strong>Método de pago</strong>
-                      <p>Se habilitará después de verificar el teléfono.</p>
+                      <strong>Valor a pagar</strong>
+                      <p>Después de verificar el teléfono podrás elegir entre pagar el 50% o el total.</p>
                     </div>
                   </section>
                 )}
@@ -1481,8 +1897,8 @@ function Home() {
                 {bookingStep === 3 && (
                   <section className="reservation-payment">
                     <span className="reservation-step-kicker">Paso 3 de 3</span>
-                    <h3>Elige cómo quieres pagar</h3>
-                    <p>Selecciona el método de pago para completar tu solicitud.</p>
+                    <h3>Elige cuánto quieres pagar</h3>
+                    <p>Selecciona el valor de tu pago y continúa al checkout seguro de Wompi.</p>
                     {verificationNotice && <p className={`reservation-integration-note is-${verificationNoticeType}`} role="status">{verificationNotice}</p>}
                     {verificationNoticeType === "warning" && (
                       <button
@@ -1497,29 +1913,45 @@ function Home() {
                     <label className="reservation-payment-option">
                       <input
                         type="radio"
-                        name="payment-method"
-                        value="recepcion"
-                        checked={paymentMethod === "recepcion"}
-                        onChange={(event) => setPaymentMethod(event.target.value)}
+                        name="payment-percentage"
+                        value="50"
+                        checked={paymentPercentage === "50"}
+                        onChange={(event) => setPaymentPercentage(event.target.value)}
                       />
-                      <span><strong>Pago en recepción</strong><small>Paga directamente al llegar al hotel.</small></span>
+                      <span>
+                        <strong>Pagar el 50% ahora · {formatCurrency(Math.round(bookingTotal * 0.5))}</strong>
+                        <small>El saldo restante se paga en el hotel al llegar.</small>
+                      </span>
                     </label>
                     <label className="reservation-payment-option">
                       <input
                         type="radio"
-                        name="payment-method"
-                        value="transferencia"
-                        checked={paymentMethod === "transferencia"}
-                        onChange={(event) => setPaymentMethod(event.target.value)}
+                        name="payment-percentage"
+                        value="100"
+                        checked={paymentPercentage === "100"}
+                        onChange={(event) => setPaymentPercentage(event.target.value)}
                       />
-                      <span><strong>Transferencia bancaria</strong><small>Los datos de pago se compartirán al confirmar la reserva.</small></span>
+                      <span>
+                        <strong>Pagar el total · {formatCurrency(bookingTotal)}</strong>
+                        <small>Completa ahora el pago de toda la estadía.</small>
+                      </span>
                     </label>
-                    <p className="reservation-integration-note">
-                      La confirmación final y el registro de la reserva requieren conectar el servicio de reservas del hotel.
-                    </p>
-                    <button className="btn btn-book reservation-primary-action" type="button" disabled>
-                      Confirmar reserva
+                    {bookingMessage && (
+                      <p className={`reservation-integration-note is-${bookingMessageType}`} role="alert">
+                        {bookingMessage}
+                      </p>
+                    )}
+                    <button
+                      className="btn btn-book reservation-primary-action"
+                      type="button"
+                      onClick={handleStartWompiPayment}
+                      disabled={!paymentPercentage || paymentLoading}
+                    >
+                      {paymentLoading ? "Conectando con Wompi…" : "Continuar al pago"}
                     </button>
+                    <small className="reservation-payment-security">
+                      El pago se procesa de forma segura en Wompi. La reserva se confirma cuando Wompi aprueba la transacción.
+                    </small>
                   </section>
                 )}
               </div>
@@ -1543,6 +1975,18 @@ function Home() {
                   <span>Total de estadía</span>
                   <strong>{formatCurrency(bookingTotal)}</strong>
                 </div>
+                {bookingStep === 3 && paymentPercentage && (
+                  <div className="reservation-summary-payment">
+                    <span>{paymentPercentage === "50" ? "Pago ahora (50%)" : "Pago ahora (total)"}</span>
+                    <strong>
+                      {formatCurrency(
+                        paymentPercentage === "50"
+                          ? Math.round(bookingTotal * 0.5)
+                          : bookingTotal
+                      )}
+                    </strong>
+                  </div>
+                )}
                 <small>El total se calcula según el número de personas y las noches seleccionadas.</small>
               </aside>
             </div>
@@ -1679,6 +2123,44 @@ function Home() {
         duration={2000}
         className="toast-verification-success"
       />
+
+      {paymentReturnToast.show && (
+        <div className={`payment-return-backdrop is-${paymentReturnToast.type}`} role="presentation">
+          <section
+            className="payment-return-dialog"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="payment-return-title"
+          >
+            <span className="payment-return-icon" aria-hidden="true">
+              <i className={`fa-solid ${
+                paymentReturnToast.status === "approved"
+                  ? "fa-check"
+                  : paymentReturnToast.status === "rejected"
+                    ? "fa-xmark"
+                    : "fa-clock"
+              }`} />
+            </span>
+            <h2 id="payment-return-title">
+              {paymentReturnToast.status === "approved"
+                ? "¡Pago aprobado!"
+                : paymentReturnToast.status === "rejected"
+                  ? "Pago no aprobado"
+                  : paymentReturnToast.status === "pending"
+                    ? "Pago en confirmación"
+                    : "No pudimos confirmar el pago"}
+            </h2>
+            <p>{paymentReturnToast.message}</p>
+            <button type="button" onClick={() => {
+              setPaymentReturnToast((current) => ({ ...current, show: false }));
+              navigate("/", { replace: true });
+              window.scrollTo({ top: 0, behavior: "smooth" });
+            }}>
+              Volver al comercio
+            </button>
+          </section>
+        </div>
+      )}
 
       <footer className="home-footer" id="contact">
         <div className="footer-inner">

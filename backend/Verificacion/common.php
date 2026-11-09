@@ -3,8 +3,33 @@ declare(strict_types=1);
 
 header('Content-Type: application/json; charset=utf-8');
 
+$archivoEnv = __DIR__ . '/.env';
+if (is_file($archivoEnv)) {
+    if (!is_readable($archivoEnv)) {
+        error_log('No se puede leer la configuración local de la aplicación.');
+        http_response_code(500);
+        echo json_encode(['exito' => false, 'mensaje' => 'No se pudo leer la configuración del servidor.']);
+        exit;
+    }
+
+    foreach (file($archivoEnv, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) as $linea) {
+        $linea = trim($linea);
+        if ($linea === '' || str_starts_with($linea, '#')) {
+            continue;
+        }
+        $partes = explode('=', $linea, 2);
+        if (count($partes) === 2 && trim($partes[0]) === 'APP_FRONTEND_ORIGIN' && getenv('APP_FRONTEND_ORIGIN') === false) {
+            putenv('APP_FRONTEND_ORIGIN=' . trim(trim($partes[1]), "\"'"));
+        }
+    }
+}
+
 $origen = $_SERVER['HTTP_ORIGIN'] ?? '';
 $origenesPermitidos = ['http://localhost:5173', 'http://127.0.0.1:5173'];
+$origenConfigurado = rtrim(trim((string) (getenv('APP_FRONTEND_ORIGIN') ?: '')), '/');
+if ($origenConfigurado !== '' && !in_array($origenConfigurado, $origenesPermitidos, true)) {
+    $origenesPermitidos[] = $origenConfigurado;
+}
 
 if ($origen !== '' && !in_array($origen, $origenesPermitidos, true)) {
     http_response_code(403);

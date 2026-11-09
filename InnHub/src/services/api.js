@@ -1,5 +1,75 @@
 const BASE_URL = "http://localhost/ERPInnHub/backend";
 
+async function solicitarAuth(endpoint, options = {}) {
+  const response = await fetch(`${BASE_URL}/Auth/${endpoint}.php`, {
+    credentials: "include",
+    ...options,
+  });
+  const resultado = await response.json();
+
+  if (response.status === 401 && endpoint === "sesion") {
+    return null;
+  }
+
+  if (!response.ok || !resultado.success) {
+    throw new Error(resultado.message || "No se pudo completar la autenticación.");
+  }
+
+  return resultado;
+}
+
+export async function iniciarSesion(usuario, password) {
+  const resultado = await solicitarAuth("login", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ usuario, password }),
+  });
+  return resultado.usuario;
+}
+
+export function solicitarRecuperacionPassword(email) {
+  return solicitarAuth("solicitar_recuperacion", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email }),
+  });
+}
+
+export function confirmarRecuperacionPassword(email, codigo, passwordNueva) {
+  return solicitarAuth("confirmar_recuperacion", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, codigo, password_nueva: passwordNueva }),
+  });
+}
+
+export async function obtenerSesion() {
+  const resultado = await solicitarAuth("sesion");
+  return resultado?.usuario ?? null;
+}
+
+export function cerrarSesion() {
+  return solicitarAuth("logout", { method: "POST" });
+}
+
+export function cambiarPassword(passwordActual, passwordNueva) {
+  return solicitarAuth("cambiar_password", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      password_actual: passwordActual,
+      password_nueva: passwordNueva,
+    }),
+  });
+}
+
+export function actualizarPerfil(perfil) {
+  return solicitarAuth("actualizar_perfil", {
+    method: "POST",
+    body: perfil,
+  });
+}
+
 async function solicitarVerificacion(endpoint, datos) {
   const response = await fetch(`${BASE_URL}/Verificacion/${endpoint}.php`, {
     method: "POST",
@@ -9,7 +79,14 @@ async function solicitarVerificacion(endpoint, datos) {
     credentials: "include",
     body: JSON.stringify(datos),
   });
-  const resultado = await response.json();
+  let resultado;
+  try {
+    resultado = await response.json();
+  } catch {
+    throw new Error(
+      `El servidor no pudo completar la verificación (HTTP ${response.status}). Inténtalo de nuevo.`
+    );
+  }
 
   if (!response.ok || !resultado.exito) {
     throw new Error(resultado.mensaje || "No se pudo completar la verificación.");
@@ -24,6 +101,63 @@ export function solicitarCodigoWhatsapp(telefono, cliente, termsAccepted, privac
 
 export function verificarCodigoWhatsapp(telefono, codigo) {
   return solicitarVerificacion("verificar", { telefono, codigo });
+}
+
+export function solicitarCodigoConsultaReserva(telefono) {
+  return solicitarVerificacion("solicitar_codigo_reserva", { telefono });
+}
+
+export function verificarCodigoConsultaReserva(telefono, codigo) {
+  return solicitarVerificacion("verificar_reserva", { telefono, codigo });
+}
+
+async function solicitarPago(endpoint, datos) {
+  const response = await fetch(`${BASE_URL}/Pagos/${endpoint}.php`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    credentials: "include",
+    body: JSON.stringify(datos),
+  });
+  const resultado = await response.json();
+
+  if (!response.ok || !resultado.exito) {
+    throw new Error(resultado.mensaje || "No se pudo completar la operación de pago.");
+  }
+
+  return resultado;
+}
+
+export function iniciarPagoWompi(datos) {
+  return solicitarPago("iniciar", datos);
+}
+
+export function consultarEstadoPago(referencia) {
+  return solicitarPago("estado", { referencia });
+}
+
+export async function enviarSugerenciaAtencion(email, descripcion) {
+  const response = await fetch(`${BASE_URL}/Contacto/sugerencia.php`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+    body: JSON.stringify({ email, descripcion }),
+  });
+  let resultado;
+  try {
+    resultado = await response.json();
+  } catch {
+    throw new Error(
+      `El servidor no pudo completar el envío (HTTP ${response.status}). Inténtalo de nuevo.`
+    );
+  }
+
+  if (!response.ok || !resultado.exito) {
+    throw new Error(resultado.mensaje || "No se pudo enviar la sugerencia.");
+  }
+
+  return resultado;
 }
 
 export function reenviarCorreoAceptacion() {
@@ -51,7 +185,11 @@ export async function crearCliente(cliente) {
     },
     body: JSON.stringify(cliente),
   });
-  return response.json();
+  const resultado = await response.json();
+  if (!response.ok || !resultado.success) {
+    throw new Error(resultado.message || "No se pudo guardar el cliente.");
+  }
+  return resultado;
 }
 
 export async function editarCliente(cliente) {
@@ -62,7 +200,11 @@ export async function editarCliente(cliente) {
     },
     body: JSON.stringify(cliente),
   });
-  return response.json();
+  const resultado = await response.json();
+  if (!response.ok || !resultado.success) {
+    throw new Error(resultado.message || "No se pudo actualizar el cliente.");
+  }
+  return resultado;
 }
 
 export async function actualizarEstadoCliente(idCliente, estado) {

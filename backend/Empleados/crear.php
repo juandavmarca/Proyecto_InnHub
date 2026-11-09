@@ -20,10 +20,18 @@ if (!empty($_POST)) {
 }
 
 // Validaciones backend
-if (empty($data['nombre'])) {
+if (empty($data['documento']) || empty($data['nombre'])) {
     echo json_encode([
         "success" => false,
-        "message" => "El nombre es obligatorio"
+        "message" => "El documento y el nombre son obligatorios"
+    ]);
+    exit;
+}
+
+if (!in_array($data['cargo'] ?? '', ['Administrador', 'Recepcionista'], true)) {
+    echo json_encode([
+        "success" => false,
+        "message" => "Selecciona un cargo válido: Administrador o Recepcionista"
     ]);
     exit;
 }
@@ -53,25 +61,43 @@ if (!empty($_FILES['foto_perifl']) && $_FILES['foto_perifl']['error'] === UPLOAD
 }
 
 try {
-    $sql = "INSERT INTO empleados (documento,nombre,apellido,cargo,telefono,email,foto_perifl) 
+    $pdo->beginTransaction();
+
+    $sql = "INSERT INTO empleados (documento,nombre,apellido,cargo,telefono,email,foto_perifl)
             VALUES (:documento,:nombre,:apellido,:cargo,:telefono,:email,:foto_perifl)";
 
     $stmt = $pdo->prepare($sql);
     $stmt->execute([
         ":documento" => $data['documento'],
         ":nombre" => $data['nombre'],
-        ":apellido" => $data['apellido'],
-        ":cargo" => $data['cargo'],
-        ":telefono" => $data['telefono'],
-        ":email" => $data['email'],
+        ":apellido" => $data['apellido'] ?? "",
+        ":cargo" => $data['cargo'] ?? "",
+        ":telefono" => $data['telefono'] ?? "",
+        ":email" => $data['email'] ?? "",
         ":foto_perifl" => $fotoPerfilUrl
     ]);
 
+    $sqlUsuario = "INSERT INTO usuarios (documento,email,password,estado,rol,fecha_registro)
+                   VALUES (:documento,:email,:password,'Activo',:rol,NOW())";
+    $stmtUsuario = $pdo->prepare($sqlUsuario);
+    $stmtUsuario->execute([
+        ":documento" => $data['documento'],
+        ":email" => $data['email'] ?? "",
+        ":password" => password_hash((string) $data['documento'], PASSWORD_DEFAULT),
+        ":rol" => strtolower($data['cargo'])
+    ]);
+
+    $pdo->commit();
+
     echo json_encode([
         "success" => true,
-        "message" => "Empleado creado correctamente"
+        "message" => "Empleado y usuario creados correctamente"
     ]);
 } catch (PDOException $e) {
+    if ($pdo->inTransaction()) {
+        $pdo->rollBack();
+    }
+
     echo json_encode([
         "success" => false,
         "message" => "Error de base de datos: " . $e->getMessage()

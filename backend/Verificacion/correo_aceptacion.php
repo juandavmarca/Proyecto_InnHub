@@ -2,6 +2,7 @@
 declare(strict_types=1);
 
 use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception as PHPMailerException;
 
 require_once __DIR__ . '/terminos_contenido.php';
 
@@ -64,6 +65,7 @@ function configuracionCorreo(): array
 
 function enviarCorreoAceptacion(array $cliente, string $fechaAceptacion): bool
 {
+    $mensaje = null;
     try {
         $configuracion = configuracionCorreo();
         $autoload = __DIR__ . '/vendor/autoload.php';
@@ -167,8 +169,25 @@ HTML;
         );
         $mensaje->send();
         return true;
-    } catch (PHPMailer\PHPMailer\Exception | Dompdf\Exception | RuntimeException | DateTimeException $error) {
-        error_log('No se pudo enviar la confirmación de aceptación: ' . $error->getMessage());
+    } catch (PHPMailerException | Dompdf\Exception | RuntimeException | DateTimeException $error) {
+        $detalle = $error->getMessage();
+        if ($mensaje instanceof PHPMailer) {
+            $respuestaSmtp = $mensaje->getSMTPInstance()->getError();
+            $codigoSmtp = preg_replace('/[^0-9]/', '', (string) ($respuestaSmtp['smtp_code'] ?? ''));
+            $detalleSmtp = trim((string) ($respuestaSmtp['detail'] ?? ''));
+            $detalleSmtp = preg_replace('/\s+/', ' ', $detalleSmtp);
+            $detalleSmtp = preg_replace(
+                '/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i',
+                '[correo oculto]',
+                (string) $detalleSmtp
+            );
+            if ($codigoSmtp !== '' || $detalleSmtp !== '') {
+                $detalle .= ' Respuesta SMTP'
+                    . ($codigoSmtp !== '' ? ' ' . $codigoSmtp : '')
+                    . ($detalleSmtp !== '' ? ': ' . substr((string) $detalleSmtp, 0, 500) : '');
+            }
+        }
+        error_log('No se pudo enviar la confirmación de aceptación: ' . $detalle);
         return false;
     }
 }

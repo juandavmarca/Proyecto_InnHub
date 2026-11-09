@@ -78,6 +78,11 @@ function EmpleadoModal({ onEmpleadoCreado, onSuccess, empleadoEditar }) {
       return;
     }
 
+    if (!["Administrador", "Recepcionista"].includes(form.cargo)) {
+      setError("Selecciona el cargo del empleado");
+      return;
+    }
+
     if (isEditing && !verificarCambios()) {
       setError("No hiciste ningún cambio");
       setSuccess(null);
@@ -124,7 +129,7 @@ function EmpleadoModal({ onEmpleadoCreado, onSuccess, empleadoEditar }) {
 
   return (
     <div className="modal fade" id="empleadoModal">
-      <div className="modal-dialog">
+      <div className="modal-dialog modal-dialog-centered empleado-modal-dialog">
         <div className="modal-content">
           <div className="modal-header">
             <h5 className="modal-title">{isEditing ? "Editar Empleado" : "Nuevo Empleado"}</h5>
@@ -158,7 +163,11 @@ function EmpleadoModal({ onEmpleadoCreado, onSuccess, empleadoEditar }) {
                   </div>
                   <div className="form-group-icon">
                     <i className="fas fa-briefcase"></i>
-                    <input className="form-control" placeholder="Cargo" name="cargo" value={form.cargo} onChange={handleChange} />
+                    <select className="form-select" name="cargo" value={form.cargo} onChange={handleChange} required>
+                      <option value="">Selecciona un cargo</option>
+                      <option value="Administrador">Administrador</option>
+                      <option value="Recepcionista">Recepcionista</option>
+                    </select>
                   </div>
                 </div>
 

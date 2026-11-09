@@ -28,6 +28,14 @@ if (empty($data['nombre'])) {
     exit;
 }
 
+if (!in_array($data['cargo'] ?? '', ['Administrador', 'Recepcionista'], true)) {
+    echo json_encode([
+        "success" => false,
+        "message" => "Selecciona un cargo válido: Administrador o Recepcionista"
+    ]);
+    exit;
+}
+
 if (!empty($data['email']) && !filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
     echo json_encode([
         "success" => false,
@@ -60,6 +68,8 @@ if (!empty($_FILES['foto_perifl']) && $_FILES['foto_perifl']['error'] === UPLOAD
 }
 
 try {
+    $pdo->beginTransaction();
+
     $sql = "UPDATE empleados SET nombre=:nombre, apellido=:apellido, cargo=:cargo, 
             telefono=:telefono, email=:email, foto_perifl=:foto_perifl 
             WHERE documento=:documento";
@@ -75,11 +85,25 @@ try {
         ":foto_perifl" => $fotoPerfilUrl
     ]);
 
+    $sqlUsuario = "UPDATE usuarios SET email=:email, rol=:rol WHERE documento=:documento";
+    $stmtUsuario = $pdo->prepare($sqlUsuario);
+    $stmtUsuario->execute([
+        ":documento" => $data['documento'],
+        ":email" => $data['email'] ?? "",
+        ":rol" => strtolower($data['cargo'])
+    ]);
+
+    $pdo->commit();
+
     echo json_encode([
         "success" => true,
         "message" => "Empleado actualizado correctamente"
     ]);
 } catch (PDOException $e) {
+    if ($pdo->inTransaction()) {
+        $pdo->rollBack();
+    }
+
     echo json_encode([
         "success" => false,
         "message" => "Error de base de datos: " . $e->getMessage()

@@ -267,6 +267,12 @@ p, label, .sidebar-label, .nav-group-title {
   cursor: pointer;
 }
 
+.sidebar-logout-error {
+  color: #ffb4a9;
+  font-size: 0.75rem;
+  text-align: center;
+}
+
 .sidebar-logout:hover,
 .sidebar-logout:focus-visible {
   color: var(--text-strong);
@@ -316,6 +322,572 @@ p, label, .sidebar-label, .nav-group-title {
   display: flex;
   align-items: center;
   gap: 1rem;
+}
+
+.navbar-profile {
+  position: absolute;
+  top: 50%;
+  right: 2rem;
+  z-index: 20;
+  transform: translateY(-50%);
+}
+
+.navbar-profile-trigger {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.3rem 0.45rem 0.3rem 0.8rem;
+  border: 1px solid rgba(200, 150, 41, 0.28);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.04);
+  color: #fff;
+  cursor: pointer;
+  text-align: right;
+}
+
+.navbar-profile-trigger:hover,
+.navbar-profile:focus-within .navbar-profile-trigger {
+  border-color: rgba(200, 150, 41, 0.65);
+  background: rgba(200, 150, 41, 0.09);
+}
+
+.navbar-profile-copy {
+  display: grid;
+  gap: 0.05rem;
+  max-width: 13rem;
+}
+
+.navbar-profile-copy strong,
+.navbar-profile-menu-heading strong {
+  overflow: hidden;
+  color: #fff5dc;
+  font-size: 0.83rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.navbar-profile-copy small,
+.navbar-profile-menu-heading small {
+  overflow: hidden;
+  color: rgba(245, 238, 223, 0.65);
+  font-size: 0.7rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.navbar-profile-avatar {
+  display: grid;
+  width: 2.7rem;
+  height: 2.7rem;
+  flex: 0 0 auto;
+  place-items: center;
+  overflow: hidden;
+  border: 2px solid var(--brand-medium);
+  border-radius: 50%;
+  background: linear-gradient(145deg, #d7ad4c, #76500e);
+  color: #171007;
+  font-size: 0.9rem;
+  font-weight: 800;
+}
+
+.navbar-profile-avatar img,
+.perfil-modal-avatar img {
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  object-fit: cover;
+}
+
+.navbar-profile-chevron {
+  color: var(--brand-soft);
+  font-size: 0.68rem;
+}
+
+.navbar-profile-menu {
+  position: absolute;
+  top: calc(100% + 0.45rem);
+  right: 0;
+  width: 17rem;
+  padding: 0.55rem;
+  border: 1px solid rgba(200, 150, 41, 0.38);
+  border-radius: 0.9rem;
+  background: #11100e;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.48);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-0.3rem);
+  transition: opacity 0.16s ease, transform 0.16s ease;
+}
+
+.navbar-profile:hover .navbar-profile-menu,
+.navbar-profile:focus-within .navbar-profile-menu {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+.navbar-profile-menu-heading {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.55rem 0.55rem 0.8rem;
+  border-bottom: 1px solid rgba(200, 150, 41, 0.2);
+}
+
+.navbar-profile-menu-heading > span:last-child {
+  display: grid;
+  min-width: 0;
+  gap: 0.12rem;
+}
+
+.navbar-profile-avatar-small {
+  width: 2.25rem;
+  height: 2.25rem;
+  font-size: 0.76rem;
+}
+
+.navbar-profile-menu-item {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.75rem 0.6rem;
+  border: 0;
+  border-radius: 0.55rem;
+  background: transparent;
+  color: #f5eedf;
+  cursor: pointer;
+  font: inherit;
+  text-align: left;
+}
+
+.navbar-profile-menu-item:hover,
+.navbar-profile-menu-item:focus-visible {
+  background: rgba(200, 150, 41, 0.13);
+  color: var(--brand-soft);
+}
+
+.navbar-profile-menu-item > i:first-child {
+  color: var(--brand-medium);
+}
+
+.navbar-profile-menu-item > i:last-child {
+  margin-left: auto;
+  font-size: 0.75rem;
+}
+
+.navbar-profile-error {
+  position: fixed;
+  top: 5rem;
+  right: 1.5rem;
+  z-index: 30;
+  max-width: 22rem;
+  padding: 0.7rem 0.9rem;
+  border: 1px solid rgba(220, 53, 69, 0.55);
+  border-radius: 0.6rem;
+  background: #251315;
+  color: #ffb4a9;
+  font-size: 0.85rem;
+}
+
+.perfil-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1080;
+  display: grid;
+  place-items: center;
+  padding: 1.5rem;
+  background: rgba(0, 0, 0, 0.72);
+  backdrop-filter: blur(7px);
+}
+
+.perfil-modal-dismiss {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  background: transparent;
+  cursor: default;
+}
+
+.perfil-modal {
+  position: relative;
+  z-index: 1;
+  width: min(1080px, 100%);
+  max-height: calc(100vh - 2rem);
+  overflow-y: auto;
+  border: 1px solid rgba(200, 150, 41, 0.46);
+  border-radius: 1.2rem;
+  background: #0b0b0a;
+  box-shadow: 0 28px 90px rgba(0, 0, 0, 0.72), 0 0 35px rgba(200, 150, 41, 0.08);
+}
+
+.perfil-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.25rem 1.6rem;
+  border-bottom: 1px solid rgba(200, 150, 41, 0.22);
+  background: linear-gradient(105deg, #13110d, #47320e);
+}
+
+.perfil-eyebrow {
+  color: var(--brand-soft);
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.17em;
+}
+
+.perfil-modal-header h2 {
+  margin: 0.15rem 0 0;
+  color: #fff4d8;
+  font-size: 1.5rem;
+}
+
+.perfil-close {
+  display: grid;
+  width: 2.4rem;
+  height: 2.4rem;
+  place-items: center;
+  border: 1px solid rgba(245, 238, 223, 0.2);
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.2);
+  color: #f5eedf;
+  cursor: pointer;
+}
+
+.perfil-close:hover {
+  border-color: var(--brand-medium);
+  color: var(--brand-soft);
+}
+
+.perfil-modal-content {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: start;
+  gap: 1.2rem;
+  padding: 1.2rem 1.4rem 1.4rem;
+}
+
+.perfil-identity {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  border: 1px solid rgba(200, 150, 41, 0.24);
+  border-radius: 0.9rem;
+  background: linear-gradient(120deg, rgba(200, 150, 41, 0.11), rgba(255, 255, 255, 0.015));
+}
+
+.perfil-modal-avatar {
+  display: grid;
+  width: 5rem;
+  height: 5rem;
+  flex: 0 0 auto;
+  place-items: center;
+  overflow: hidden;
+  border: 3px solid var(--brand-medium);
+  border-radius: 50%;
+  background: #1d1911;
+  color: var(--brand-soft);
+  font-size: 1.8rem;
+}
+
+.perfil-identity h3 {
+  margin: 0 0 0.3rem;
+  color: #fff4d8;
+  font-size: 1.2rem;
+}
+
+.perfil-role {
+  display: inline-flex;
+  padding: 0.22rem 0.65rem;
+  border: 1px solid rgba(200, 150, 41, 0.35);
+  border-radius: 999px;
+  background: rgba(200, 150, 41, 0.1);
+  color: var(--brand-soft);
+  font-size: 0.76rem;
+  font-weight: 700;
+  text-transform: capitalize;
+}
+
+.perfil-photo-control {
+  display: grid;
+  justify-items: center;
+  gap: 0.55rem;
+}
+
+.perfil-photo-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.4rem 0.65rem;
+  border: 1px solid rgba(200, 150, 41, 0.38);
+  border-radius: 999px;
+  background: rgba(200, 150, 41, 0.09);
+  color: var(--brand-soft);
+  cursor: pointer;
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+.perfil-photo-button:hover {
+  background: rgba(200, 150, 41, 0.18);
+}
+
+.perfil-photo-button input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  clip-path: inset(50%);
+}
+
+.perfil-photo-button:focus-within {
+  outline: 2px solid var(--brand-medium);
+  outline-offset: 3px;
+}
+
+.perfil-role-copy {
+  min-width: 0;
+}
+
+.perfil-role-copy h3 {
+  overflow-wrap: anywhere;
+}
+
+.perfil-edit-form {
+  display: grid;
+  min-width: 0;
+  gap: 0.85rem;
+  padding: 1rem;
+  border: 1px solid rgba(200, 150, 41, 0.22);
+  border-radius: 0.9rem;
+  background: rgba(255, 255, 255, 0.018);
+}
+
+.perfil-password-form {
+  display: grid;
+  min-width: 0;
+  gap: 0.8rem;
+  padding: 1.1rem;
+  border: 1px solid rgba(200, 150, 41, 0.22);
+  border-radius: 0.9rem;
+  background: rgba(255, 255, 255, 0.018);
+}
+
+@media (max-width: 900px) {
+  .perfil-modal-content {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-height: 720px) and (min-width: 901px) {
+  .perfil-edit-form,
+  .perfil-password-form {
+    gap: 0.65rem;
+    padding: 0.75rem;
+  }
+}
+
+.perfil-edit-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.perfil-edit-grid label {
+  display: grid;
+  min-width: 0;
+  gap: 0.35rem;
+  color: rgba(245, 238, 223, 0.82);
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.perfil-edit-grid input {
+  width: 100%;
+  min-height: 2.8rem;
+  padding: 0.65rem 0.8rem;
+  border: 1px solid rgba(200, 150, 41, 0.24);
+  border-radius: 0.55rem;
+  outline: none;
+  background: #10100f;
+  color: #fff;
+  font: inherit;
+  font-weight: 400;
+}
+
+.perfil-edit-grid input:focus {
+  border-color: var(--brand-medium);
+  box-shadow: 0 0 0 3px rgba(200, 150, 41, 0.12);
+}
+
+.perfil-document-detail {
+  width: fit-content;
+  min-width: min(100%, 13rem);
+}
+
+.perfil-details {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.7rem;
+}
+
+.perfil-detail {
+  display: flex;
+  min-width: 0;
+  align-items: flex-start;
+  gap: 0.65rem;
+  padding: 0.8rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 0.75rem;
+  background: rgba(255, 255, 255, 0.025);
+}
+
+.perfil-detail > i {
+  margin-top: 0.18rem;
+  color: var(--brand-medium);
+}
+
+.perfil-detail > div {
+  display: grid;
+  min-width: max-content;
+  gap: 0.15rem;
+}
+
+.perfil-detail small {
+  color: rgba(245, 238, 223, 0.58);
+  font-size: 0.68rem;
+}
+
+.perfil-detail strong {
+  white-space: nowrap;
+  color: #f5eedf;
+  font-size: 0.8rem;
+}
+
+.perfil-section-heading {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.15rem;
+}
+
+.perfil-section-icon {
+  display: grid;
+  width: 2.5rem;
+  height: 2.5rem;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: 0.7rem;
+  background: rgba(200, 150, 41, 0.14);
+  color: var(--brand-soft);
+}
+
+.perfil-section-heading h3 {
+  margin: 0;
+  color: #fff4d8;
+  font-size: 1rem;
+}
+
+.perfil-section-heading p {
+  margin: 0.1rem 0 0;
+  color: rgba(245, 238, 223, 0.58);
+  font-size: 0.75rem;
+}
+
+.perfil-password-form label {
+  display: grid;
+  gap: 0.35rem;
+  color: rgba(245, 238, 223, 0.82);
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.perfil-password-form input {
+  width: 100%;
+  min-height: 2.8rem;
+  padding: 0.65rem 0.8rem;
+  border: 1px solid rgba(200, 150, 41, 0.24);
+  border-radius: 0.55rem;
+  outline: none;
+  background: #10100f;
+  color: #fff;
+  font: inherit;
+  font-weight: 400;
+}
+
+.perfil-password-form input:focus {
+  border-color: var(--brand-medium);
+  box-shadow: 0 0 0 3px rgba(200, 150, 41, 0.12);
+}
+
+.perfil-password-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.perfil-feedback {
+  padding: 0.65rem 0.8rem;
+  border-radius: 0.5rem;
+  font-size: 0.82rem;
+}
+
+.perfil-feedback-error {
+  border: 1px solid rgba(220, 53, 69, 0.5);
+  background: rgba(220, 53, 69, 0.1);
+  color: #ffb4a9;
+}
+
+.perfil-feedback-success {
+  border: 1px solid rgba(25, 135, 84, 0.5);
+  background: rgba(25, 135, 84, 0.1);
+  color: #9de0b8;
+}
+
+.perfil-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.65rem;
+  margin-top: 0.2rem;
+}
+
+.perfil-modal-actions button {
+  min-height: 2.65rem;
+  padding: 0.6rem 0.9rem;
+  border-radius: 0.55rem;
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.perfil-cancel {
+  border: 1px solid rgba(245, 238, 223, 0.2);
+  background: transparent;
+  color: #f5eedf;
+}
+
+.perfil-save {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  border: 0;
+  background: linear-gradient(90deg, #d4a73f, #f1d97a);
+  color: #1a1308;
+}
+
+.perfil-cancel:hover {
+  border-color: var(--brand-medium);
+}
+
+.perfil-save:hover {
+  filter: brightness(1.07);
 }
 
 .btn-logout {
@@ -1787,6 +2359,223 @@ html body .dashboard-page .table.table-innhub.table-striped tbody tr td,
 
 .login-panel { padding: 3rem 3.3rem; border-left: 1px solid rgba(200, 150, 41, 0.17); background: #111; border-radius: 0 1.2rem 1.2rem 0; }
 
+.login-home-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1.4rem;
+  color: rgba(245, 238, 223, 0.72);
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: color 160ms ease, transform 160ms ease;
+}
+
+.login-home-link:hover,
+.login-home-link:focus-visible {
+  transform: translateX(-2px);
+  color: var(--brand-medium);
+}
+
+.login-recovery-link {
+  justify-self: center;
+  padding: 0.1rem 0.35rem;
+  border: 0;
+  background: transparent;
+  color: #e6bd5d;
+  font-size: 0.8rem;
+  font-weight: 650;
+  text-decoration: none;
+  transition: color 160ms ease;
+}
+
+.login-recovery-link:hover,
+.login-recovery-link:focus-visible {
+  color: #ffe6a1;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.password-recovery-backdrop {
+  position: fixed;
+  z-index: 11500;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  overflow-y: auto;
+  padding: 1rem;
+  background: rgba(0, 0, 0, 0.78);
+  backdrop-filter: blur(7px);
+}
+
+.password-recovery-modal {
+  position: relative;
+  width: min(100%, 470px);
+  max-height: min(92vh, 760px);
+  overflow-y: auto;
+  padding: clamp(1.4rem, 4vw, 2.2rem);
+  border: 1px solid rgba(211, 169, 64, 0.42);
+  border-radius: 22px;
+  background:
+    radial-gradient(ellipse at 50% 0, rgba(211, 169, 64, 0.15), transparent 42%),
+    #151514;
+  color: #fffaf0;
+  box-shadow: 0 28px 90px rgba(0, 0, 0, 0.66), 0 0 35px rgba(200, 150, 41, 0.1);
+}
+
+.password-recovery-close {
+  position: absolute;
+  top: 0.85rem;
+  right: 0.9rem;
+  display: grid;
+  width: 35px;
+  height: 35px;
+  place-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.04);
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 1.4rem;
+  line-height: 1;
+}
+
+.password-recovery-close:hover:not(:disabled) {
+  border-color: rgba(211, 169, 64, 0.55);
+  color: #f0cf77;
+}
+
+.password-recovery-icon {
+  display: grid;
+  width: 58px;
+  height: 58px;
+  place-items: center;
+  margin: 0 auto 0.85rem;
+  border: 1px solid rgba(211, 169, 64, 0.32);
+  border-radius: 18px;
+  background: rgba(211, 169, 64, 0.12);
+  color: #f0cf77;
+  font-size: 1.35rem;
+}
+
+.password-recovery-eyebrow {
+  display: block;
+  color: #e6bd5d;
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.password-recovery-modal h2 {
+  margin: 0.4rem 0 1.25rem;
+  color: #fffaf0;
+  font-size: 1.55rem;
+  text-align: center;
+}
+
+.password-recovery-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.password-recovery-form > p,
+.password-recovery-complete > p {
+  margin: 0 0 0.3rem;
+  color: rgba(255, 250, 240, 0.65);
+  font-size: 0.8rem;
+  line-height: 1.6;
+}
+
+.password-recovery-form > label {
+  margin-top: 0.25rem;
+  color: #f5eedf;
+  font-size: 0.79rem;
+  font-weight: 700;
+}
+
+.password-recovery-form > input {
+  width: 100%;
+  min-height: 46px;
+  padding: 0.7rem 0.8rem;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 9px;
+  outline: 0;
+  background: rgba(255, 255, 255, 0.045);
+  color: #fffaf0;
+  font: inherit;
+  font-size: 0.86rem;
+}
+
+.password-recovery-form > input:focus {
+  border-color: rgba(230, 189, 93, 0.75);
+  box-shadow: 0 0 0 3px rgba(211, 169, 64, 0.1);
+}
+
+.password-recovery-form > input:disabled {
+  opacity: 0.65;
+}
+
+.password-recovery-form > button[type="submit"],
+.password-recovery-complete > button {
+  display: inline-flex;
+  min-height: 46px;
+  align-items: center;
+  justify-content: center;
+  margin-top: 0.45rem;
+  padding: 0.7rem 1rem;
+  border: 1px solid rgba(240, 207, 119, 0.7);
+  border-radius: 9px;
+  background: linear-gradient(110deg, #b7801f, #f0d477);
+  color: #17130b;
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.password-recovery-form > button[type="submit"]:hover:not(:disabled),
+.password-recovery-complete > button:hover {
+  filter: brightness(1.08);
+}
+
+.password-recovery-form > button[type="submit"]:disabled {
+  cursor: wait;
+  filter: grayscale(0.35);
+  opacity: 0.7;
+}
+
+.password-recovery-form > .password-recovery-secondary {
+  align-self: center;
+  margin-top: 0.15rem;
+  padding: 0.35rem;
+  border: 0;
+  background: transparent;
+  color: #e6bd5d;
+  font-size: 0.76rem;
+  font-weight: 700;
+}
+
+.password-recovery-form > .password-recovery-secondary:hover:not(:disabled) {
+  color: #ffe6a1;
+}
+
+.password-recovery-error {
+  margin: 0.15rem 0;
+  padding: 0.65rem 0.75rem;
+  border: 1px solid rgba(220, 53, 69, 0.38);
+  border-radius: 8px;
+  background: rgba(220, 53, 69, 0.11);
+  color: #ffb4a9 !important;
+  font-size: 0.76rem !important;
+}
+
+.password-recovery-complete {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  text-align: center;
+}
+
 .login-header h2 { margin: 0; color: #f5eedf; font-size: 1.6rem; text-align: center; letter-spacing: 0; }
 .login-header h2 strong { color: var(--brand-medium); }
 .login-header p { margin: 0.35rem 0 2.7rem; color: rgba(245, 238, 223, 0.62); text-align: center; font-size: 0.9rem; }
@@ -1866,7 +2655,32 @@ html body .dashboard-page .table.table-innhub.table-striped tbody tr td,
   color: rgba(245, 238, 223, 0.38);
 }
 
-.login-password-icon { position: absolute; top: 50%; right: 1rem; transform: translateY(-50%); color: rgba(245, 238, 223, 0.38); }
+.login-password-toggle {
+  position: absolute;
+  top: 50%;
+  right: 0.75rem;
+  display: grid;
+  width: 2rem;
+  height: 2rem;
+  place-items: center;
+  padding: 0;
+  transform: translateY(-50%);
+  border: 0;
+  background: transparent;
+  color: rgba(245, 238, 223, 0.62);
+  cursor: pointer;
+}
+
+.login-password-toggle:hover,
+.login-password-toggle:focus-visible {
+  color: var(--brand-soft);
+}
+
+.login-password-toggle:focus-visible {
+  outline: 2px solid var(--brand-medium);
+  outline-offset: 2px;
+  border-radius: 0.25rem;
+}
 
 .login-row {
   display: flex;
@@ -1874,6 +2688,45 @@ html body .dashboard-page .table.table-innhub.table-striped tbody tr td,
   justify-content: space-between;
   gap: 0.75rem;
   margin-top: -0.15rem;
+}
+
+.login-admin-note {
+  color: rgba(245, 238, 223, 0.62);
+  font-size: 0.82rem;
+}
+
+.login-error {
+  padding: 0.7rem 0.85rem;
+  border: 1px solid rgba(220, 53, 69, 0.55);
+  border-radius: 0.55rem;
+  background: rgba(220, 53, 69, 0.12);
+  color: #ffb4a9;
+  font-size: 0.88rem;
+  text-align: left;
+}
+
+.login-button:disabled {
+  cursor: wait;
+  filter: grayscale(0.25);
+  opacity: 0.75;
+  transform: none;
+}
+
+.auth-status {
+  display: flex;
+  min-height: 100vh;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 2rem;
+  background: var(--surface);
+  color: var(--text-dark);
+  text-align: center;
+}
+
+.auth-status-error {
+  color: #ffb4a9;
 }
 
 .login-checkbox {
@@ -2405,6 +3258,135 @@ html body .dashboard-page .table.table-innhub.table-striped tbody tr td,
   .value-cards {
     grid-template-columns: 1fr;
   }
+}
+
+.support-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 10001;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  overflow-y: auto;
+  background: rgba(0, 0, 0, 0.72);
+  backdrop-filter: blur(3px);
+}
+
+.support-modal {
+  position: relative;
+  width: min(540px, 100%);
+  max-height: calc(100vh - 2rem);
+  overflow-y: auto;
+  padding: 2rem;
+  border: 1px solid #d3a83d;
+  border-radius: 1.2rem;
+  background: #0c0d0e;
+  box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.6);
+}
+
+.support-modal-close {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.9rem;
+  border: 0;
+  background: transparent;
+  color: #f4f4f4;
+  font-size: 1.8rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.support-modal-close:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.support-modal-eyebrow {
+  color: #d3a83d;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.support-modal h2 {
+  margin: 0.35rem 2rem 0.5rem 0;
+  color: #fff;
+  font-size: 1.65rem;
+}
+
+.support-modal-intro,
+.support-modal-success p {
+  margin: 0 0 1.25rem;
+  color: rgba(255, 255, 255, 0.76);
+}
+
+.support-modal-form {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.support-modal-form label {
+  margin-top: 0.4rem;
+  color: #f4f4f4;
+  font-weight: 600;
+}
+
+.support-modal-form input,
+.support-modal-form textarea {
+  width: 100%;
+  border: 1px solid rgba(211, 168, 61, 0.55);
+  border-radius: 0.55rem;
+  padding: 0.7rem 0.8rem;
+  background: #151515;
+  color: #fff;
+  font: inherit;
+}
+
+.support-modal-form input:focus,
+.support-modal-form textarea:focus {
+  outline: 2px solid rgba(211, 168, 61, 0.7);
+  outline-offset: 1px;
+}
+
+.support-modal-form input[readonly] {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.support-modal-form textarea {
+  resize: vertical;
+}
+
+.support-modal-error {
+  margin: 0.35rem 0;
+  color: #ff9a9a;
+}
+
+.support-modal-submit {
+  justify-self: start;
+  margin-top: 0.65rem;
+  border: 1px solid #d3a83d;
+  border-radius: 0.55rem;
+  padding: 0.75rem 1.2rem;
+  background: #b68722;
+  color: #fff;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.support-modal-submit:hover:not(:disabled) {
+  background: #c99b33;
+}
+
+.support-modal-submit:disabled {
+  cursor: wait;
+  opacity: 0.7;
+}
+
+.support-modal-success h2 {
+  margin-top: 0;
 }
 
 .modal-backdrop-show {
@@ -4585,6 +5567,30 @@ html body .dashboard-page .table.table-innhub.table-striped tbody tr td,
   margin: 1.2rem auto;
 }
 
+.empleado-modal-dialog {
+  width: min(1100px, calc(100vw - 3rem));
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.empleado-modal-dialog .modal-content {
+  width: 100%;
+  max-height: calc(100vh - 2.4rem);
+}
+
+.empleado-modal-dialog .modal-body {
+  overflow-y: auto;
+  padding: 1.25rem 1.5rem;
+}
+
+.empleado-modal-dialog .form-section {
+  padding: 1.1rem 1.2rem 0.8rem;
+}
+
+.empleado-modal-dialog .form-group-icon {
+  margin-bottom: 0.8rem;
+}
+
 .modal-content {
   border: 1px solid rgba(200, 150, 41, 0.42);
   border-radius: 1.3rem;
@@ -4788,6 +5794,85 @@ html body .dashboard-page .table.table-innhub.table-striped tbody tr td,
   letter-spacing: 0.12em;
 }
 
+@media (max-width: 600px) {
+  .empleado-modal-dialog {
+    width: calc(100% - 1rem);
+    margin: 0.5rem auto;
+  }
+
+  .empleado-modal-dialog .modal-content {
+    max-height: calc(100vh - 1rem);
+  }
+
+  .empleado-modal-dialog .modal-body {
+    padding: 1rem;
+  }
+}
+
+@media (max-width: 700px) {
+  .navbar-profile {
+    right: 0.75rem;
+  }
+
+  .navbar-profile-trigger {
+    padding: 0.2rem;
+    border-color: transparent;
+    background: transparent;
+  }
+
+  .navbar-profile-copy,
+  .navbar-profile-chevron {
+    display: none;
+  }
+
+  .navbar-profile-menu {
+    right: 0;
+  }
+
+  .perfil-modal-backdrop {
+    padding: 0.65rem;
+  }
+
+  .perfil-modal {
+    max-height: calc(100vh - 1.3rem);
+  }
+
+  .perfil-modal-header,
+  .perfil-modal-content {
+    padding-right: 1rem;
+    padding-left: 1rem;
+  }
+
+  .perfil-details {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
+  }
+
+  .perfil-detail > div {
+    min-width: 0;
+  }
+
+  .perfil-detail strong {
+    overflow-wrap: anywhere;
+    white-space: normal;
+  }
+
+  .perfil-password-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .perfil-edit-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .perfil-modal-actions {
+    flex-direction: column-reverse;
+  }
+
+  .perfil-modal-actions button {
+    justify-content: center;
+  }
+}
+
 .innhub-logo {
   margin-right: 0.6rem;
   font-size: 1.8rem;
@@ -4948,9 +6033,140 @@ html body .dashboard-page .table.table-innhub.table-striped tbody tr td,
   line-height: 1;
 }
 
+.toast-login-success {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  transform: none;
+  background: rgba(0, 0, 0, 0.76);
+  pointer-events: auto;
+  backdrop-filter: blur(7px);
+}
+
+.toast-login-success .toast-message {
+  box-sizing: border-box;
+  display: flex;
+  width: min(440px, calc(100vw - 2rem));
+  min-width: 0;
+  min-height: 260px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 2rem;
+  border: 1px solid rgba(226, 190, 96, 0.85);
+  border-radius: 22px;
+  background:
+    radial-gradient(circle at 50% 0, rgba(211, 169, 64, 0.2), transparent 56%),
+    linear-gradient(145deg, #1d1b16, #0d0d0c);
+  color: #fff6df;
+  font-size: clamp(1.3rem, 4vw, 1.65rem);
+  font-weight: 750;
+  line-height: 1.35;
+  text-align: center;
+  box-shadow: 0 28px 90px rgba(0, 0, 0, 0.65), 0 0 45px rgba(200, 150, 41, 0.2);
+  animation: login-success-enter 240ms ease-out both;
+}
+
+.toast-login-success .toast-message::before {
+  content: "✓";
+  display: grid;
+  width: 76px;
+  height: 76px;
+  place-items: center;
+  border: 2px solid rgba(226, 190, 96, 0.72);
+  border-radius: 50%;
+  background: rgba(211, 169, 64, 0.13);
+  color: #f0cf77;
+  font-size: 2.8rem;
+  line-height: 1;
+  box-shadow: 0 0 32px rgba(211, 169, 64, 0.14);
+}
+
+@keyframes login-success-enter {
+  from {
+    transform: translateY(10px) scale(0.96);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
 .toast-backdrop.toast-error .toast-message {
   border-left: 6px solid #dc3545;
   box-shadow: 0 18px 48px rgba(0,0,0,0.45), 0 0 0 1px rgba(220,53,69,0.18), 0 0 22px rgba(200,150,41,0.18);
+}
+
+.payment-return-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 12001;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  background: rgba(0, 0, 0, 0.72);
+  backdrop-filter: blur(6px);
+}
+
+.payment-return-dialog {
+  box-sizing: border-box;
+  width: min(440px, 100%);
+  padding: 2rem;
+  border: 1px solid rgba(226, 190, 96, 0.45);
+  border-radius: 22px;
+  background: linear-gradient(145deg, #1d1b16, #0d0d0c);
+  color: #fff6df;
+  text-align: center;
+  box-shadow: 0 28px 90px rgba(0, 0, 0, 0.65);
+}
+
+.payment-return-icon {
+  display: grid;
+  width: 68px;
+  height: 68px;
+  margin: 0 auto 1rem;
+  place-items: center;
+  border: 2px solid currentColor;
+  border-radius: 50%;
+  color: #f0cf77;
+  font-size: 2rem;
+}
+
+.payment-return-backdrop.is-success .payment-return-icon {
+  color: #83d6a0;
+}
+
+.payment-return-backdrop.is-error .payment-return-icon {
+  color: #ffaaa1;
+}
+
+.payment-return-dialog h2 {
+  margin: 0 0 0.7rem;
+}
+
+.payment-return-dialog p {
+  margin: 0 0 1.5rem;
+  color: rgba(255, 246, 223, 0.82);
+  line-height: 1.55;
+}
+
+.payment-return-dialog button {
+  min-height: 44px;
+  padding: 0.7rem 1.2rem;
+  border: 0;
+  border-radius: 999px;
+  background: #d3a940;
+  color: #17140d;
+  font: inherit;
+  font-weight: 750;
+  cursor: pointer;
+}
+
+.payment-return-dialog button:hover {
+  background: #e6c46a;
 }
 
 .reservation-inline-error {
@@ -5487,6 +6703,19 @@ html body .dashboard-page .table.table-innhub.table-striped tbody tr td,
   text-align: right;
 }
 
+.reservation-summary-payment {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 0.75rem;
+  color: var(--text-muted);
+}
+
+.reservation-summary-payment strong {
+  color: var(--brand-soft);
+  text-align: right;
+}
+
 .reservation-summary > small,
 .reservation-verification small,
 .reservation-payment-option small {
@@ -5632,6 +6861,13 @@ html body .dashboard-page .table.table-innhub.table-striped tbody tr td,
   color: #fff;
 }
 
+.reservation-payment-security {
+  display: block;
+  margin-top: 0.8rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
 @media (max-width: 760px) {
   .reservation-backdrop {
     padding: 0.6rem;
@@ -5683,6 +6919,569 @@ html body .dashboard-page .table.table-innhub.table-striped tbody tr td,
   .reservation-steps {
     grid-template-columns: 1fr;
   }
+}
+
+.reservations-page {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  padding-top: 0.25rem;
+}
+
+.reservations-welcome {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  min-height: 205px;
+  overflow: hidden;
+  padding: clamp(1.5rem, 3.5vw, 2.75rem);
+  border: 1px solid rgba(211, 169, 64, 0.25);
+  border-radius: 24px;
+  background:
+    radial-gradient(ellipse at 82% 10%, rgba(211, 169, 64, 0.18), transparent 34%),
+    linear-gradient(115deg, #292a2b 0%, #30302d 62%, #39352b 100%);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.16);
+}
+
+.reservations-welcome-copy {
+  position: relative;
+  z-index: 1;
+  max-width: 670px;
+}
+
+.reservations-eyebrow,
+.reservations-section-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #e6bd5d;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.reservations-welcome h1 {
+  margin: 0.75rem 0 0.55rem;
+  color: #fffaf0;
+  font-size: clamp(1.8rem, 3vw, 2.65rem);
+  font-weight: 750;
+  letter-spacing: -0.035em;
+}
+
+.reservations-welcome p {
+  max-width: 610px;
+  margin: 0;
+  color: rgba(255, 250, 240, 0.68);
+  font-size: 0.96rem;
+  line-height: 1.7;
+}
+
+.reservations-room-link {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.85rem 1.15rem;
+  border: 1px solid rgba(228, 189, 93, 0.55);
+  border-radius: 12px;
+  background: rgba(211, 169, 64, 0.13);
+  color: #f3d17a;
+  font-size: 0.84rem;
+  font-weight: 750;
+  text-decoration: none;
+  transition: background 160ms ease, transform 160ms ease;
+}
+
+.reservations-room-link:hover {
+  transform: translateY(-2px);
+  background: rgba(211, 169, 64, 0.22);
+  color: #ffe6a1;
+}
+
+.reservations-room-link .fa-arrow-up-right-from-square {
+  font-size: 0.7rem;
+  opacity: 0.72;
+}
+
+.reservations-welcome-art {
+  position: absolute;
+  right: 24%;
+  bottom: -82px;
+  display: grid;
+  width: 220px;
+  height: 220px;
+  place-items: center;
+  border: 1px solid rgba(228, 189, 93, 0.1);
+  border-radius: 50%;
+  color: rgba(228, 189, 93, 0.09);
+  font-size: 7rem;
+  pointer-events: none;
+}
+
+.reservations-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.reservations-stat-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  min-height: 116px;
+  padding: 1.15rem 1.25rem;
+  border: 1px solid rgba(211, 169, 64, 0.15);
+  border-radius: 18px;
+  background: #2a2a2c;
+}
+
+.reservations-stat-icon,
+.reservations-note-icon {
+  display: grid;
+  flex: 0 0 auto;
+  width: 48px;
+  height: 48px;
+  place-items: center;
+  border-radius: 15px;
+  font-size: 1.15rem;
+}
+
+.reservations-stat-icon-gold {
+  background: rgba(211, 169, 64, 0.15);
+  color: #e6bd5d;
+}
+
+.reservations-stat-icon-green {
+  background: rgba(84, 177, 127, 0.14);
+  color: #7dd7a1;
+}
+
+.reservations-stat-icon-blue {
+  background: rgba(102, 160, 212, 0.15);
+  color: #8fc5f2;
+}
+
+.reservations-stat-card > div {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 0.18rem;
+}
+
+.reservations-stat-label {
+  color: rgba(255, 255, 255, 0.65);
+  font-size: 0.78rem;
+}
+
+.reservations-stat-card strong {
+  color: #fffaf0;
+  font-size: 1.65rem;
+  line-height: 1.15;
+}
+
+.reservations-stat-card small {
+  color: rgba(255, 255, 255, 0.45);
+  font-size: 0.7rem;
+}
+
+.reservations-integration-note {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.2rem;
+  border: 1px solid rgba(211, 169, 64, 0.23);
+  border-radius: 16px;
+  background: linear-gradient(100deg, rgba(211, 169, 64, 0.1), rgba(42, 42, 44, 0.96) 58%);
+}
+
+.reservations-note-icon {
+  width: 42px;
+  height: 42px;
+  background: rgba(211, 169, 64, 0.15);
+  color: #e6bd5d;
+}
+
+.reservations-integration-note > div {
+  min-width: 0;
+  flex: 1;
+}
+
+.reservations-integration-note strong {
+  color: #f3d17a;
+  font-size: 0.88rem;
+}
+
+.reservations-integration-note p {
+  margin: 0.22rem 0 0;
+  color: rgba(255, 255, 255, 0.64);
+  font-size: 0.77rem;
+  line-height: 1.55;
+}
+
+.reservations-connection-status {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.4rem 0.65rem;
+  border: 1px solid rgba(230, 189, 93, 0.2);
+  border-radius: 99px;
+  background: rgba(211, 169, 64, 0.08);
+  color: #e6bd5d;
+  font-size: 0.68rem;
+  font-weight: 750;
+}
+
+.reservations-connection-status > span {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #e6bd5d;
+  box-shadow: 0 0 0 3px rgba(230, 189, 93, 0.12);
+}
+
+.reservations-main-card,
+.reservations-rooms-card {
+  padding: 1.35rem;
+  border: 1px solid rgba(211, 169, 64, 0.14);
+  border-radius: 20px;
+  background: #2a2a2c;
+}
+
+.reservations-section-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.reservations-section-heading h2 {
+  margin: 0.32rem 0 0.28rem;
+  color: #fffaf0;
+  font-size: 1.22rem;
+  font-weight: 700;
+}
+
+.reservations-section-heading p {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.54);
+  font-size: 0.78rem;
+  line-height: 1.55;
+}
+
+.reservations-section-kicker {
+  font-size: 0.62rem;
+  letter-spacing: 0.12em;
+}
+
+.reservations-count-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.42rem;
+  padding: 0.5rem 0.7rem;
+  border: 1px solid rgba(211, 169, 64, 0.2);
+  border-radius: 99px;
+  color: #e6bd5d;
+  font-size: 0.7rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.reservations-empty-state {
+  display: flex;
+  min-height: 300px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1.6rem 1rem 1rem;
+  text-align: center;
+}
+
+.reservations-empty-illustration {
+  position: relative;
+  display: grid;
+  width: 126px;
+  height: 112px;
+  place-items: center;
+  margin-bottom: 0.75rem;
+  border: 1px solid rgba(211, 169, 64, 0.14);
+  border-radius: 36px;
+  background: linear-gradient(145deg, rgba(211, 169, 64, 0.1), rgba(211, 169, 64, 0.025));
+  color: #e6bd5d;
+  font-size: 2.5rem;
+}
+
+.reservations-empty-sun {
+  position: absolute;
+  top: 21px;
+  right: 21px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #e6bd5d;
+  box-shadow: 0 0 18px rgba(230, 189, 93, 0.7);
+}
+
+.reservations-empty-bed {
+  position: absolute;
+  right: -9px;
+  bottom: -7px;
+  display: grid;
+  width: 35px;
+  height: 35px;
+  place-items: center;
+  border: 3px solid #2a2a2c;
+  border-radius: 50%;
+  background: #d3a940;
+  color: #282725;
+  font-size: 0.85rem;
+}
+
+.reservations-empty-state h3 {
+  margin: 0.5rem 0 0.4rem;
+  color: #fffaf0;
+  font-size: 1.08rem;
+}
+
+.reservations-empty-state > p {
+  max-width: 490px;
+  margin: 0;
+  color: rgba(255, 255, 255, 0.56);
+  font-size: 0.82rem;
+  line-height: 1.65;
+}
+
+.reservations-empty-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  margin-top: 1.1rem;
+  color: #e6bd5d;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.reservations-empty-link:hover {
+  color: #ffe6a1;
+}
+
+.reservations-refresh-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.55rem 0.8rem;
+  border: 1px solid rgba(211, 169, 64, 0.22);
+  border-radius: 10px;
+  background: rgba(211, 169, 64, 0.07);
+  color: #e6bd5d;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.reservations-refresh-button:hover:not(:disabled) {
+  background: rgba(211, 169, 64, 0.15);
+}
+
+.reservations-refresh-button:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+
+.reservations-room-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr));
+  gap: 0.75rem;
+  margin-top: 1.2rem;
+}
+
+.reservations-room-item {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.85rem;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.025);
+}
+
+.reservations-room-icon {
+  display: grid;
+  flex: 0 0 auto;
+  width: 40px;
+  height: 40px;
+  place-items: center;
+  border-radius: 12px;
+  background: rgba(211, 169, 64, 0.12);
+  color: #e6bd5d;
+}
+
+.reservations-room-icon.is-disponible {
+  background: rgba(84, 177, 127, 0.13);
+  color: #7dd7a1;
+}
+
+.reservations-room-icon.is-ocupada,
+.reservations-room-icon.is-reservada {
+  background: rgba(102, 160, 212, 0.13);
+  color: #8fc5f2;
+}
+
+.reservations-room-icon.is-mantenimiento,
+.reservations-room-icon.is-no-disponible {
+  background: rgba(228, 121, 104, 0.13);
+  color: #f39b8d;
+}
+
+.reservations-room-info {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+  gap: 0.18rem;
+}
+
+.reservations-room-info strong {
+  overflow: hidden;
+  color: #fffaf0;
+  font-size: 0.8rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.reservations-room-info > span {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.7rem;
+}
+
+.reservations-room-status {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 0.35rem;
+  color: rgba(255, 255, 255, 0.56);
+  font-size: 0.66rem;
+  white-space: nowrap;
+}
+
+.reservations-room-status > span {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #aaa;
+}
+
+.reservations-room-status.is-disponible {
+  color: #8fdaa9;
+}
+
+.reservations-room-status.is-disponible > span {
+  background: #65c58b;
+}
+
+.reservations-room-status.is-ocupada,
+.reservations-room-status.is-reservada {
+  color: #9acbf1;
+}
+
+.reservations-room-status.is-ocupada > span,
+.reservations-room-status.is-reservada > span {
+  background: #6ea8d5;
+}
+
+.reservations-room-status.is-mantenimiento,
+.reservations-room-status.is-no-disponible {
+  color: #f1a294;
+}
+
+.reservations-room-status.is-mantenimiento > span,
+.reservations-room-status.is-no-disponible > span {
+  background: #e77e6e;
+}
+
+.reservations-load-error,
+.reservations-rooms-loading,
+.reservations-rooms-empty {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  margin-top: 1.15rem;
+  padding: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.8rem;
+}
+
+.reservations-load-error {
+  flex-wrap: wrap;
+  border-color: rgba(228, 121, 104, 0.25);
+  color: #f1a294;
+}
+
+.reservations-load-error > span {
+  flex: 1;
+}
+
+.reservations-load-error button {
+  border: 0;
+  background: transparent;
+  color: #f3d17a;
+  font-weight: 700;
+}
+
+.reservations-rooms-loading i {
+  color: #e6bd5d;
+}
+
+@media (max-width: 900px) {
+  .reservations-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .reservations-stat-card {
+    min-height: 96px;
+  }
+}
+
+@media (max-width: 640px) {
+  .reservations-welcome {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .reservations-welcome-art {
+    right: -30px;
+    bottom: -95px;
+  }
+
+  .reservations-integration-note {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .reservations-connection-status {
+    margin-left: 3.25rem;
+  }
+
+  .reservations-main-card,
+  .reservations-rooms-card {
+    padding: 1rem;
+  }
+
+  .reservations-room-item {
+    flex-wrap: wrap;
+  }
+
+  .reservations-room-status {
+    margin-left: 3.1rem;
+  }
 
   .reservation-step {
     min-height: 2.2rem;
@@ -5704,5 +7503,441 @@ html body .dashboard-page .table.table-innhub.table-striped tbody tr td,
 
   .reservation-room-action {
     grid-column: auto;
+  }
+}
+
+.home-reservation-lookup-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  padding: 0.68rem 1rem;
+  border: 1px solid rgba(226, 190, 96, 0.62);
+  border-radius: 0.45rem;
+  background: linear-gradient(135deg, rgba(200, 150, 41, 0.2), rgba(200, 150, 41, 0.08));
+  color: #f0cf77;
+  font-size: 0.78rem;
+  font-weight: 750;
+  letter-spacing: 0.015em;
+  white-space: nowrap;
+  transition: transform 160ms ease, background 160ms ease, box-shadow 160ms ease;
+}
+
+.home-reservation-lookup-button:hover,
+.home-reservation-lookup-button:focus-visible {
+  transform: translateY(-1px);
+  background: linear-gradient(135deg, rgba(200, 150, 41, 0.34), rgba(200, 150, 41, 0.15));
+  box-shadow: 0 8px 24px rgba(200, 150, 41, 0.16);
+  color: #ffe6a1;
+}
+
+.reservation-lookup-backdrop {
+  position: fixed;
+  z-index: 11000;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  overflow-y: auto;
+  padding: 1.25rem;
+  background: rgba(0, 0, 0, 0.78);
+  backdrop-filter: blur(8px);
+}
+
+.reservation-lookup-modal {
+  position: relative;
+  width: min(100%, 560px);
+  max-height: min(90vh, 850px);
+  overflow-y: auto;
+  padding: clamp(1.4rem, 4vw, 2.2rem);
+  border: 1px solid rgba(211, 169, 64, 0.36);
+  border-radius: 22px;
+  background:
+    radial-gradient(ellipse at 50% 0, rgba(211, 169, 64, 0.12), transparent 35%),
+    #181817;
+  color: #fffaf0;
+  box-shadow: 0 28px 90px rgba(0, 0, 0, 0.6);
+}
+
+.reservation-lookup-close {
+  position: absolute;
+  top: 0.9rem;
+  right: 1rem;
+  display: grid;
+  width: 36px;
+  height: 36px;
+  place-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.04);
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 1.45rem;
+  line-height: 1;
+}
+
+.reservation-lookup-close:hover:not(:disabled) {
+  border-color: rgba(211, 169, 64, 0.5);
+  color: #f0cf77;
+}
+
+.reservation-lookup-heading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0.2rem 1.4rem 1.5rem;
+  text-align: center;
+}
+
+.reservation-lookup-icon {
+  display: grid;
+  width: 58px;
+  height: 58px;
+  place-items: center;
+  margin-bottom: 1rem;
+  border: 1px solid rgba(211, 169, 64, 0.3);
+  border-radius: 18px;
+  background: rgba(211, 169, 64, 0.12);
+  color: #f0cf77;
+  font-size: 1.4rem;
+}
+
+.reservation-lookup-heading .reservation-eyebrow {
+  color: #e6bd5d;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+}
+
+.reservation-lookup-heading h2 {
+  margin: 0.5rem 0 0.35rem;
+  color: #fffaf0;
+  font-size: clamp(1.5rem, 4vw, 1.9rem);
+}
+
+.reservation-lookup-heading p {
+  max-width: 390px;
+  margin: 0;
+  color: rgba(255, 250, 240, 0.62);
+  font-size: 0.84rem;
+  line-height: 1.6;
+}
+
+.reservation-lookup-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+
+.reservation-lookup-form > label {
+  margin-top: 0.35rem;
+  color: #f5eedf;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.reservation-lookup-input-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  min-height: 52px;
+  padding: 0 0.9rem;
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  border-radius: 11px;
+  background: rgba(255, 255, 255, 0.045);
+  color: #d3a940;
+}
+
+.reservation-lookup-input-wrap:focus-within {
+  border-color: rgba(230, 189, 93, 0.72);
+  box-shadow: 0 0 0 3px rgba(211, 169, 64, 0.1);
+}
+
+.reservation-lookup-input-wrap input {
+  width: 100%;
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: #fffaf0;
+  font: inherit;
+  font-size: 0.92rem;
+}
+
+.reservation-lookup-input-wrap input::placeholder {
+  color: rgba(255, 255, 255, 0.38);
+}
+
+.reservation-lookup-phone-fields {
+  display: grid;
+  grid-template-columns: minmax(8.5rem, 0.8fr) minmax(0, 1.6fr);
+  gap: 0.55rem;
+}
+
+.reservation-lookup-phone-fields .reservation-country-code {
+  min-height: 52px;
+  border-color: rgba(255, 255, 255, 0.13);
+  border-radius: 11px;
+  background: rgba(255, 255, 255, 0.045);
+}
+
+.reservation-lookup-phone-fields .reservation-lookup-input-wrap {
+  min-width: 0;
+}
+
+.reservation-lookup-form > small {
+  color: rgba(255, 250, 240, 0.48);
+  font-size: 0.72rem;
+  line-height: 1.5;
+}
+
+@media (max-width: 420px) {
+  .reservation-lookup-phone-fields {
+    grid-template-columns: minmax(7.5rem, 0.9fr) minmax(0, 1.4fr);
+    gap: 0.4rem;
+  }
+}
+
+.reservation-lookup-code-hint {
+  margin: 0 0 0.35rem;
+  color: rgba(255, 250, 240, 0.7);
+  font-size: 0.82rem;
+  line-height: 1.6;
+}
+
+.reservation-lookup-code-hint strong {
+  color: #f0cf77;
+}
+
+.reservation-lookup-submit {
+  display: inline-flex;
+  min-height: 48px;
+  align-items: center;
+  justify-content: center;
+  margin-top: 0.4rem;
+  padding: 0.75rem 1rem;
+  border: 1px solid rgba(240, 207, 119, 0.7);
+  border-radius: 10px;
+  background: linear-gradient(110deg, #b7801f, #f0d477);
+  color: #17130b;
+  font-size: 0.86rem;
+  font-weight: 800;
+  transition: filter 160ms ease, transform 160ms ease;
+}
+
+.reservation-lookup-submit:hover:not(:disabled) {
+  transform: translateY(-1px);
+  filter: brightness(1.08);
+}
+
+.reservation-lookup-submit:disabled {
+  cursor: not-allowed;
+  filter: grayscale(0.35);
+  opacity: 0.65;
+}
+
+.reservation-lookup-back {
+  align-self: center;
+  margin-top: 0.25rem;
+  border: 0;
+  background: transparent;
+  color: #e6bd5d;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.reservation-lookup-back:hover:not(:disabled) {
+  color: #ffe6a1;
+}
+
+.reservation-lookup-message {
+  margin: 0.1rem 0;
+  padding: 0.7rem 0.8rem;
+  border-radius: 9px;
+  font-size: 0.77rem;
+  line-height: 1.5;
+}
+
+.reservation-lookup-message.is-error {
+  border: 1px solid rgba(225, 95, 95, 0.3);
+  background: rgba(150, 34, 34, 0.14);
+  color: #ffaaa1;
+}
+
+.reservation-lookup-message.is-success {
+  border: 1px solid rgba(90, 190, 130, 0.25);
+  background: rgba(45, 130, 80, 0.12);
+  color: #9de0b0;
+}
+
+.reservation-lookup-results {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.reservation-lookup-card {
+  padding: 1rem;
+  border: 1px solid rgba(211, 169, 64, 0.21);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.035);
+}
+
+.reservation-lookup-card-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.reservation-lookup-card-heading > div {
+  display: flex;
+  flex-direction: column;
+  gap: 0.12rem;
+}
+
+.reservation-lookup-card-heading > div > span {
+  color: rgba(255, 250, 240, 0.5);
+  font-size: 0.67rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.reservation-lookup-card-heading strong {
+  color: #f0cf77;
+  font-size: 1rem;
+}
+
+.reservation-lookup-status {
+  padding: 0.38rem 0.65rem;
+  border: 1px solid rgba(230, 189, 93, 0.23);
+  border-radius: 99px;
+  background: rgba(211, 169, 64, 0.09);
+  color: #f0cf77;
+  font-size: 0.7rem;
+  font-weight: 750;
+}
+
+.reservation-lookup-status.is-confirmada {
+  border-color: rgba(91, 190, 132, 0.27);
+  background: rgba(45, 130, 80, 0.13);
+  color: #9de0b0;
+}
+
+.reservation-lookup-status.is-cancelada {
+  border-color: rgba(225, 95, 95, 0.27);
+  background: rgba(150, 34, 34, 0.13);
+  color: #ffaaa1;
+}
+
+.reservation-lookup-status.is-rechazada {
+  border-color: rgba(225, 95, 95, 0.27);
+  background: rgba(150, 34, 34, 0.13);
+  color: #ffaaa1;
+}
+
+.reservation-lookup-card dl {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+  margin: 0;
+  padding-top: 0.85rem;
+}
+
+.reservation-lookup-card dl > div {
+  min-width: 0;
+}
+
+.reservation-lookup-card dt {
+  margin-bottom: 0.2rem;
+  color: rgba(255, 250, 240, 0.48);
+  font-size: 0.68rem;
+}
+
+.reservation-lookup-card dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+  color: #f7f0e2;
+  font-size: 0.78rem;
+  font-weight: 650;
+}
+
+.reservation-lookup-observation {
+  margin: 0.8rem 0 0;
+  padding-top: 0.7rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
+  color: rgba(255, 250, 240, 0.68);
+  font-size: 0.75rem;
+  line-height: 1.5;
+}
+
+.reservation-lookup-observation strong {
+  color: #e6bd5d;
+}
+
+.reservation-lookup-no-results {
+  display: flex;
+  min-height: 160px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 1rem;
+  border: 1px dashed rgba(211, 169, 64, 0.25);
+  border-radius: 14px;
+  color: rgba(255, 250, 240, 0.62);
+  text-align: center;
+}
+
+.reservation-lookup-no-results > i {
+  margin-bottom: 0.3rem;
+  color: #e6bd5d;
+  font-size: 1.6rem;
+}
+
+.reservation-lookup-no-results strong {
+  color: #fffaf0;
+  font-size: 0.88rem;
+}
+
+.reservation-lookup-no-results span {
+  font-size: 0.75rem;
+  line-height: 1.5;
+}
+
+.reservation-lookup-payment-note {
+  margin: 0;
+  padding: 0.7rem 0.8rem;
+  border-left: 2px solid rgba(211, 169, 64, 0.58);
+  background: rgba(211, 169, 64, 0.055);
+  color: rgba(255, 250, 240, 0.5);
+  font-size: 0.68rem;
+  line-height: 1.55;
+}
+
+@media (max-width: 900px) {
+  .home-actions {
+    flex-wrap: wrap;
+  }
+
+  .home-reservation-lookup-button {
+    padding: 0.58rem 0.75rem;
+  }
+}
+
+@media (max-width: 520px) {
+  .reservation-lookup-backdrop {
+    padding: 0.6rem;
+  }
+
+  .reservation-lookup-modal {
+    max-height: 94vh;
+    padding: 1.2rem;
+    border-radius: 17px;
+  }
+
+  .reservation-lookup-card dl {
+    grid-template-columns: 1fr;
   }
 }
