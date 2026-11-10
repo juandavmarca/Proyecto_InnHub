@@ -1,4 +1,4 @@
-const BASE_URL = "http://localhost/ERPInnHub/backend";
+const BASE_URL = "https://innhub.site/backend";
 
 async function solicitarAuth(endpoint, options = {}) {
   const response = await fetch(`${BASE_URL}/Auth/${endpoint}.php`, {

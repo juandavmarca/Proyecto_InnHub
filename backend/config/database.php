@@ -1,9 +1,9 @@
 <?php
 
  $host = "localhost";
- $db = "innhub";
- $user = "root";
- $pass = "";
+ $db = "u586922323_innhub";
+ $user = "u586922323_innhub";
+ $pass = "InnHub-2026S";
 
  try {
  $pdo = new PDO(
