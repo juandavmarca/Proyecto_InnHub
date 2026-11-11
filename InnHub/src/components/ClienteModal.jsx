@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
-import { crearCliente, editarCliente } from "../services/api";
+import { BASE_URL, crearCliente, editarCliente } from "../services/api";
 
-const logo = "http://localhost/ERPInnHub/backend/uploads/logo.png";
+const logo = `${BASE_URL}/uploads/logo.png`;
 
 const TIPO_DOCUMENTO_OPTIONS = [
   "Cédula de ciudadanía",
