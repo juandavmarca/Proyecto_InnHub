@@ -2,12 +2,13 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import CenteredToast from "./CenteredToast";
 import {
+  BASE_URL,
   confirmarRecuperacionPassword,
   iniciarSesion,
   solicitarRecuperacionPassword,
 } from "../services/api";
 
-const logo = "http://localhost/ERPInnHub/backend/uploads/logo.png";
+const logo = `${BASE_URL}/uploads/logo.png`;
 
 export function FormLogin() {
   const navigate = useNavigate();

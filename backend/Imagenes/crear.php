@@ -38,7 +38,7 @@ if (!empty($_FILES['imagen']) && $_FILES['imagen']['error'] === UPLOAD_ERR_OK) {
     $targetPath = $uploadDir . $filename;
 
     if (move_uploaded_file($_FILES['imagen']['tmp_name'], $targetPath)) {
-        $url = 'http://localhost/ERPInnHub/backend/uploads/' . $filename;
+        $url = '/backend/uploads/' . $filename;
     }
 }
 
@@ -61,7 +61,7 @@ if (!empty($_FILES['video']) && $_FILES['video']['error'] === UPLOAD_ERR_OK) {
     $targetPath = $uploadDir . $filename;
 
     if (move_uploaded_file($_FILES['video']['tmp_name'], $targetPath)) {
-        $urlVideo = 'http://localhost/ERPInnHub/backend/uploads/' . $filename;
+        $urlVideo = '/backend/uploads/' . $filename;
     }
 }
 

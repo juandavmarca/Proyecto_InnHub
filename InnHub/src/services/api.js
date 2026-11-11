@@ -1,4 +1,17 @@
-const BASE_URL = "https://innhub.site/backend";
+export const BASE_URL = "https://innhub.site/backend";
+
+function normalizarUrlMedia(url) {
+  if (!url) return url;
+
+  const mediaUrl = new URL(url, `${BASE_URL}/`);
+  if (mediaUrl.hostname === "localhost" || mediaUrl.hostname === "127.0.0.1") {
+    mediaUrl.protocol = new URL(BASE_URL).protocol;
+    mediaUrl.host = new URL(BASE_URL).host;
+    mediaUrl.pathname = mediaUrl.pathname.replace(/^\/ERPInnHub(?=\/backend(?:\/|$))/, "");
+  }
+
+  return mediaUrl.href;
+}
 
 async function solicitarAuth(endpoint, options = {}) {
   const response = await fetch(`${BASE_URL}/Auth/${endpoint}.php`, {
@@ -404,7 +417,12 @@ export async function obtenerImagenes(id_habitacion) {
     if (!response.ok) {
       throw new Error("Error al obtener imágenes");
     }
-    return await response.json();
+    const imagenes = await response.json();
+    return imagenes.map((imagen) => ({
+      ...imagen,
+      url: normalizarUrlMedia(imagen.url),
+      url_video: normalizarUrlMedia(imagen.url_video),
+    }));
   } catch (error) {
     console.error(error);
     throw error;
