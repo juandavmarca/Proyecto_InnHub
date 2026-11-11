@@ -35,14 +35,7 @@ const formatLookupMoney = (value) => new Intl.NumberFormat("es-CO", {
   currency: "COP",
   maximumFractionDigits: 0,
 }).format(Number(value) || 0);
-const nightlyRatesByGuestCount = {
-  1: 65000,
-  2: 120000,
-  3: 175000,
-  4: 230000,
-  5: 285000,
-  6: 340000,
-};
+const nightlyRatePerPerson = 65000;
 const phoneCountryCodes = [
   { country: "Argentina", code: "+54", flag: "🇦🇷" },
   { country: "Australia", code: "+61", flag: "🇦🇺" },
@@ -368,7 +361,7 @@ const rooms = [
   {
     title: "Habitación Individual",
     category: "individual",
-    price: "$65.000 COP / noche",
+    price: "$65.000 COP / persona / noche",
     description: "Un espacio confortable para una estadía tranquila y práctica.",
     image: roomMediaUrl("individual_1.JPG"),
     video: roomMediaUrl("habitacion ind.mp4"),
@@ -377,7 +370,7 @@ const rooms = [
   {
     title: "Habitación Doble",
     category: "doble",
-    price: "$120.000 COP / noche",
+    price: "$65.000 COP / persona / noche",
     description: "Una opción cómoda para parejas o amigos.",
     image: roomMediaUrl("doble_1.JPG"),
     video: roomMediaUrl("habitacion dob.mp4"),
@@ -386,7 +379,7 @@ const rooms = [
   {
     title: "Habitación Familiar",
     category: "familiar",
-    price: "$175.000 COP / noche",
+    price: "$65.000 COP / persona / noche",
     description: "Más espacio y comodidad para compartir en familia.",
     image: roomMediaUrl("familiar_1.JPG"),
     video: roomMediaUrl("habitacion fam.mp4"),
@@ -635,7 +628,7 @@ function Home() {
 
           const tipo = String(habitacion.tipo || room.category).trim();
           const numero = String(habitacion.numero || "").trim();
-          const precio = Number(habitacion.precio_noche || 0).toLocaleString("es-CO");
+          const precio = (Number(habitacion.precio_noche) || nightlyRatePerPerson).toLocaleString("es-CO");
 
           return {
             ...room,
@@ -643,7 +636,7 @@ function Home() {
             tipo,
             numero,
             title: `Habitación ${tipo}`,
-            price: `$${precio} COP / noche`,
+            price: `$${precio} COP / persona / noche`,
             totalHabitaciones: habitacionesDeCategoria.length,
             habitacionesDisponibles: habitacionesDisponibles.length,
             totalCamas: habitacionesDeCategoria.reduce(
@@ -706,7 +699,7 @@ function Home() {
   const nights = checkIn && checkOut
     ? Math.round((new Date(`${checkOut}T00:00:00`) - new Date(`${checkIn}T00:00:00`)) / 86400000)
     : 0;
-  const nightlyRate = nightlyRatesByGuestCount[guestCount];
+  const nightlyRate = nightlyRatePerPerson * guestCount;
   const bookingTotal = nightlyRate * nights;
   const formatCurrency = (amount) => `$${Number(amount).toLocaleString("es-CO")} COP`;
   const formatStayDate = (date) => date
@@ -1241,14 +1234,14 @@ function Home() {
                   <span>{nights} {nights === 1 ? "noche" : "noches"} · {guestCount} {guestCount === 1 ? "persona" : "personas"}</span>
                 </div>
                 <div className="booking-price-preview-row">
-                  <span>Tarifa por noche</span>
+                  <span>Tarifa por noche ({guestCount} {guestCount === 1 ? "persona" : "personas"})</span>
                   <strong>{formatCurrency(nightlyRate)}</strong>
                 </div>
                 <div className="booking-price-preview-total">
                   <span>Total estimado</span>
                   <strong>{formatCurrency(bookingTotal)}</strong>
                 </div>
-                <small>El valor final se confirma al completar la reserva.</small>
+                <small>Tarifa de {formatCurrency(nightlyRatePerPerson)} por persona y noche.</small>
               </div>
             )}
             {searchError && <p className="reservation-inline-error" role="alert">{searchError}</p>}
@@ -1310,6 +1303,7 @@ function Home() {
                     </div>
                     <div className="reservation-room-action">
                       <strong>{formatCurrency(nightlyRate)} <small>/ noche</small></strong>
+                      <small>{formatCurrency(nightlyRatePerPerson)} por persona</small>
                       <button
                         className="btn btn-book"
                         type="button"
@@ -2077,7 +2071,10 @@ function Home() {
                     <span>Sin características registradas.</span>
                   )}
                 </div>
-                <p className="room-modal-price">{formatCurrency(nightlyRate)} / noche</p>
+                <p className="room-modal-price">
+                  {formatCurrency(nightlyRate)} / noche
+                  <small> ({formatCurrency(nightlyRatePerPerson)} por persona)</small>
+                </p>
                   <button
                     className="btn btn-secondary"
                     type="button"

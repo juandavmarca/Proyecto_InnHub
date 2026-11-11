@@ -38,16 +38,9 @@ if (
     responder(400, ['exito' => false, 'mensaje' => 'Los datos de la estadía o del pago no son válidos.']);
 }
 
-$tarifasPorPersonas = [
-    1 => 65000,
-    2 => 120000,
-    3 => 175000,
-    4 => 230000,
-    5 => 285000,
-    6 => 340000,
-];
+$tarifaPorPersona = 65000;
 $noches = (int) $fechaEntradaObj->diff($fechaSalidaObj)->days;
-$totalPesos = $tarifasPorPersonas[$personas] * $noches;
+$totalPesos = $tarifaPorPersona * $personas * $noches;
 $montoPesos = $porcentaje === 50 ? intdiv($totalPesos, 2) : $totalPesos;
 $montoCentavos = $montoPesos * 100;
 $configuracion = cargarConfiguracionWompi();
