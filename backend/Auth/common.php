@@ -5,7 +5,11 @@ header('Content-Type: application/json; charset=utf-8');
 header('Cache-Control: no-store');
 
 $origen = $_SERVER['HTTP_ORIGIN'] ?? '';
-$origenesPermitidos = ['http://localhost:5173', 'http://127.0.0.1:5173'];
+$origenesPermitidos = [
+    'http://localhost:5173',
+    'http://127.0.0.1:5173',
+    'https://innhub.site'
+];
 
 if ($origen !== '' && !in_array($origen, $origenesPermitidos, true)) {
     http_response_code(403);

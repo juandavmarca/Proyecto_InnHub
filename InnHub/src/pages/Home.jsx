@@ -6,6 +6,7 @@ import ConfirmDialog from "../components/ConfirmDialog";
 import CenteredToast from "../components/CenteredToast";
 import SolicitudAtencionModal from "../components/SolicitudAtencionModal";
 import {
+  BASE_URL,
   obtenerCamas,
   obtenerCaracteristicas,
   obtenerHabitaciones,
@@ -19,8 +20,9 @@ import {
   verificarCodigoWhatsapp,
 } from "../services/api";
 
-const homeLogo = "http://localhost/ERPInnHub/backend/uploads/logo.png";
-const termsDocumentUrl = "http://localhost/ERPInnHub/backend/Verificacion/terminos.php";
+const homeLogo = `${BASE_URL}/uploads/logo.png`;
+const termsDocumentUrl = `${BASE_URL}/Verificacion/terminos.php`;
+const roomMediaUrl = (filename) => `${BASE_URL}/ImgHabitaciones/${encodeURIComponent(filename)}`;
 const formatLookupDate = (value) => {
   if (!value) return "Pendiente";
   const date = new Date(String(value).replace(" ", "T"));
@@ -203,16 +205,16 @@ function PhoneCountryPicker({ country, onChange }) {
 
 //arreglo para almacenar las imágenes de la galería de experiencias
 const galleryImages = [
-  "http://localhost/ERPInnHub/backend/ImgHabitaciones/espacio_1.JPG",
-  "http://localhost/ERPInnHub/backend/ImgHabitaciones/espacio_2.JPG",
-  "http://localhost/ERPInnHub/backend/ImgHabitaciones/espacio_3.JPG",
-  "http://localhost/ERPInnHub/backend/ImgHabitaciones/espacio_4.JPG",
-  "http://localhost/ERPInnHub/backend/ImgHabitaciones/espacio_5.JPG",
-  "http://localhost/ERPInnHub/backend/ImgHabitaciones/espacio_6.JPG",
-  "http://localhost/ERPInnHub/backend/ImgHabitaciones/espacio_7.JPG",
-  "http://localhost/ERPInnHub/backend/ImgHabitaciones/espacio_8.JPG",
-  "http://localhost/ERPInnHub/backend/ImgHabitaciones/espacio_9.JPG",
-  "http://localhost/ERPInnHub/backend/ImgHabitaciones/toalla.JPG",
+  roomMediaUrl("espacio_1.JPG"),
+  roomMediaUrl("espacio_2.JPG"),
+  roomMediaUrl("espacio_3.JPG"),
+  roomMediaUrl("espacio_4.JPG"),
+  roomMediaUrl("espacio_5.JPG"),
+  roomMediaUrl("espacio_6.JPG"),
+  roomMediaUrl("espacio_7.JPG"),
+  roomMediaUrl("espacio_8.JPG"),
+  roomMediaUrl("espacio_9.JPG"),
+  roomMediaUrl("toalla.JPG"),
 ];
 
 function BookingDatePicker({ id, label, value, min, rangeStart, rangeEnd, onChange }) {
@@ -368,8 +370,8 @@ const rooms = [
     category: "individual",
     price: "$65.000 COP / noche",
     description: "Un espacio confortable para una estadía tranquila y práctica.",
-    image: "http://localhost/ERPInnHub/backend/ImgHabitaciones/individual_1.jpg",
-    video: "https://www.w3schools.com/html/mov_bbb.mp4",
+    image: roomMediaUrl("individual_1.JPG"),
+    video: roomMediaUrl("habitacion ind.mp4"),
     button: "Reservar ahora",
   },
   {
@@ -377,8 +379,8 @@ const rooms = [
     category: "doble",
     price: "$120.000 COP / noche",
     description: "Una opción cómoda para parejas o amigos.",
-    image: "http://localhost/ERPInnHub/backend/ImgHabitaciones/familiar_3.jpg",
-    video: "https://www.w3schools.com/html/mov_bbb.mp4",
+    image: roomMediaUrl("doble_1.JPG"),
+    video: roomMediaUrl("habitacion dob.mp4"),
     button: "Ver detalles",
   },
   {
@@ -386,8 +388,8 @@ const rooms = [
     category: "familiar",
     price: "$175.000 COP / noche",
     description: "Más espacio y comodidad para compartir en familia.",
-    image: "http://localhost/ERPInnHub/backend/ImgHabitaciones/familiar_1.jpg",
-    video: "https://www.w3schools.com/html/mov_bbb.mp4",
+    image: roomMediaUrl("familiar_1.JPG"),
+    video: roomMediaUrl("habitacion fam.mp4"),
     button: "Reservar ahora",
   },
 ];

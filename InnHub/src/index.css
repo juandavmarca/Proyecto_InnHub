@@ -2933,7 +2933,7 @@ html body .dashboard-page .table.table-innhub.table-striped tbody tr td,
   overflow: hidden;
   padding: 5.2rem 2rem 7rem;
   background-image: linear-gradient(180deg, rgba(4, 59, 51, 0.5), rgba(4, 59, 51, 0.14)),
-    url("http://localhost/ERPInnHub/backend/ImgHabitaciones/espacio_4.JPG");
+    url("https://innhub.site/backend/ImgHabitaciones/espacio_4.JPG");
   background-size: cover;
   background-position: center;
   color: white;
@@ -4767,7 +4767,7 @@ html body .dashboard-page .table.table-innhub.table-striped tbody tr td,
   overflow: visible;
   padding: clamp(5rem, 10vw, 8.5rem) 2rem 5rem;
   background-image: linear-gradient(90deg, rgba(5, 5, 5, 0.62) 0%, rgba(5, 5, 5, 0.32) 48%, rgba(5, 5, 5, 0.45) 100%),
-    url("http://localhost/ERPInnHub/backend/ImgHabitaciones/espacio_4.JPG");
+    url("https://innhub.site/backend/ImgHabitaciones/espacio_4.JPG");
 }
 
 .hero-overlay {
