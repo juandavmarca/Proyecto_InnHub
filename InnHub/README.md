@@ -14,7 +14,7 @@ El código de cuatro dígitos se envía automáticamente al pasar a la verificac
 
 ### Tarifas de reserva
 
-La tarifa por noche depende de la cantidad de huéspedes: 1 persona $65.000 COP; 2 personas $120.000 COP; 3 personas $175.000 COP; 4 personas $230.000 COP; 5 personas $285.000 COP; 6 personas $340.000 COP. El total se calcula multiplicando la tarifa por la cantidad de noches.
+La tarifa es de $65.000 COP por persona y noche. El total se calcula multiplicando la tarifa por persona por la cantidad de huéspedes y noches.
 
 ### Clientes sin documento
 
