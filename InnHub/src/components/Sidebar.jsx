@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
-import { cerrarSesion, obtenerSesion } from "../services/api";
+import { BASE_URL, cerrarSesion, obtenerSesion } from "../services/api";
 
-const logo = "http://localhost/ERPInnHub/backend/uploads/logodash.png";
+const logo = `${BASE_URL}/uploads/logodash.png`;
 
 function Sidebar() {
   const navigate = useNavigate();
+  const [menuMovilAbierto, setMenuMovilAbierto] = useState(false);
   const [logoutError, setLogoutError] = useState("");
   const [rol, setRol] = useState("");
   const [sessionError, setSessionError] = useState("");
@@ -36,6 +37,7 @@ function Sidebar() {
     setLogoutError("");
     try {
       await cerrarSesion();
+      setMenuMovilAbierto(false);
       navigate("/login", { replace: true });
     } catch (error) {
       setLogoutError(error.message || "No se pudo cerrar la sesión.");
@@ -43,7 +45,26 @@ function Sidebar() {
   };
 
   return (
-    <div className="sidebar text-white">
+    <>
+    <button
+      type="button"
+      className="dashboard-menu-toggle"
+      aria-label={menuMovilAbierto ? "Cerrar menú de navegación" : "Abrir menú de navegación"}
+      aria-expanded={menuMovilAbierto}
+      aria-controls="dashboard-sidebar"
+      onClick={() => setMenuMovilAbierto((abierto) => !abierto)}
+    >
+      <i className={`fas ${menuMovilAbierto ? "fa-xmark" : "fa-bars"}`} aria-hidden="true" />
+    </button>
+    {menuMovilAbierto && (
+      <button
+        type="button"
+        className="dashboard-sidebar-backdrop"
+        aria-label="Cerrar menú de navegación"
+        onClick={() => setMenuMovilAbierto(false)}
+      />
+    )}
+    <div id="dashboard-sidebar" className={`sidebar text-white ${menuMovilAbierto ? "sidebar-open" : ""}`}>
       <div className="sidebar-brand">
         <img src={logo} alt="Logo del panel administrativo" className="sidebar-brand-logo" />
         <div className="sidebar-brand-content">
@@ -62,6 +83,7 @@ function Sidebar() {
                   `nav-link ${isActive ? "active" : "text-white"}`
                 }
                 to="/dashboard"
+                onClick={() => setMenuMovilAbierto(false)}
               >
                 <i className="fas fa-chart-line"></i>
                 <span className="sidebar-label">Dashboard</span>
@@ -74,6 +96,7 @@ function Sidebar() {
                 `nav-link ${isActive ? "active" : "text-white"}`
               }
               to="/Clientes"
+              onClick={() => setMenuMovilAbierto(false)}
             >
               <i className="fas fa-users"></i>
               <span className="sidebar-label">Clientes</span>
@@ -87,6 +110,7 @@ function Sidebar() {
                   `nav-link ${isActive ? "active" : "text-white"}`
                 }
                 to="/Empleados"
+                onClick={() => setMenuMovilAbierto(false)}
               >
                 <i className="fas fa-user-tie"></i>
                 <span className="sidebar-label">Empleados</span>
@@ -100,6 +124,7 @@ function Sidebar() {
                 `nav-link ${isActive ? "active" : "text-white"}`
               }
               to="/reservas"
+              onClick={() => setMenuMovilAbierto(false)}
             >
               <i className="fas fa-calendar-check"></i>
               <span className="sidebar-label">Reservas</span>
@@ -111,6 +136,7 @@ function Sidebar() {
                 `nav-link ${isActive ? "active" : "text-white"}`
               }
               to="/Habitaciones"
+              onClick={() => setMenuMovilAbierto(false)}
             >
               <i className="fas fa-bed"></i>
               <span className="sidebar-label">Habitaciones</span>
@@ -123,6 +149,7 @@ function Sidebar() {
                   `nav-link ${isActive ? "active" : "text-white"}`
                 }
                 to="/Deshabilitados"
+                onClick={() => setMenuMovilAbierto(false)}
               >
                 <i className="fas fa-gear"></i>
                 <span className="sidebar-label">Deshabilitados</span>
@@ -141,6 +168,7 @@ function Sidebar() {
         </button>
       </div>
     </div>
+    </>
   );
 }
 
