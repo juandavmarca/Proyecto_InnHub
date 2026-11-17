@@ -1996,7 +1996,12 @@ function Home() {
           onClick={handleCloseRoomModal}
         >
           <div className="room-modal" onClick={(event) => event.stopPropagation()}>
-            <button className="modal-close" type="button" onClick={handleCloseRoomModal}>
+            <button
+              className="modal-close room-modal-close"
+              type="button"
+              onClick={handleCloseRoomModal}
+              aria-label="Cerrar detalles de la habitación"
+            >
               ×
             </button>
             <div className="room-modal-grid">
