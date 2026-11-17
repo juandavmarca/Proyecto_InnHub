@@ -1,32 +1,6 @@
 <?php
 declare(strict_types=1);
 
-$archivoEnvWompi = __DIR__ . '/.env';
-if (is_file($archivoEnvWompi)) {
-    if (!is_readable($archivoEnvWompi)) {
-        error_log('No se puede leer la configuración local de Wompi.');
-        http_response_code(500);
-        header('Content-Type: application/json; charset=utf-8');
-        echo json_encode(['exito' => false, 'mensaje' => 'No se pudo leer la configuración de pagos.']);
-        exit;
-    }
-
-    foreach (file($archivoEnvWompi, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) as $linea) {
-        $linea = trim($linea);
-        if ($linea === '' || str_starts_with($linea, '#')) {
-            continue;
-        }
-        $partes = explode('=', $linea, 2);
-        if (count($partes) === 2) {
-            $clave = trim($partes[0]);
-            $valor = trim(trim($partes[1]), "\"'");
-            if (getenv($clave) === false) {
-                putenv($clave . '=' . $valor);
-            }
-        }
-    }
-}
-
 require_once __DIR__ . '/../Verificacion/common.php';
 require_once __DIR__ . '/../config/database.php';
 
@@ -45,7 +19,7 @@ function cargarConfiguracionWompi(): array
             error_log('Falta una variable requerida para la integración de Wompi.');
             responder(500, [
                 'exito' => false,
-                'mensaje' => 'Configura las credenciales de prueba de Wompi en backend/Pagos/.env.'
+                'mensaje' => 'Configura las variables WOMPI_* en el archivo privado de InnHub.'
             ]);
         }
     }
@@ -59,6 +33,28 @@ function cargarConfiguracionWompi(): array
         responder(500, [
             'exito' => false,
             'mensaje' => 'La configuración de la pasarela no es válida. Comunícate con el hotel.'
+        ]);
+    }
+
+    $partesUrlRetorno = parse_url($configuracion['urlRetorno']);
+    $esquemaUrlRetorno = strtolower((string) ($partesUrlRetorno['scheme'] ?? ''));
+    $hostUrlRetorno = strtolower(trim((string) ($partesUrlRetorno['host'] ?? ''), '[]'));
+    if (
+        !is_array($partesUrlRetorno)
+        || !in_array($esquemaUrlRetorno, ['http', 'https'], true)
+        || $hostUrlRetorno === ''
+        || (
+            $configuracion['ambiente'] === 'prod'
+            && (
+                $esquemaUrlRetorno !== 'https'
+                || in_array($hostUrlRetorno, ['localhost', '127.0.0.1', '::1'], true)
+            )
+        )
+    ) {
+        error_log('La URL de retorno de Wompi no es válida para el ambiente configurado.');
+        responder(500, [
+            'exito' => false,
+            'mensaje' => 'Configura WOMPI_REDIRECT_URL con una URL HTTPS pública para producción.'
         ]);
     }
 
