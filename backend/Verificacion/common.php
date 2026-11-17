@@ -3,25 +3,19 @@ declare(strict_types=1);
 
 header('Content-Type: application/json; charset=utf-8');
 
-$archivoEnv = __DIR__ . '/.env';
-if (is_file($archivoEnv)) {
-    if (!is_readable($archivoEnv)) {
-        error_log('No se puede leer la configuración local de la aplicación.');
-        http_response_code(500);
-        echo json_encode(['exito' => false, 'mensaje' => 'No se pudo leer la configuración del servidor.']);
-        exit;
-    }
+function responder(int $status, array $datos): never
+{
+    http_response_code($status);
+    echo json_encode($datos, JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE);
+    exit;
+}
 
-    foreach (file($archivoEnv, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) as $linea) {
-        $linea = trim($linea);
-        if ($linea === '' || str_starts_with($linea, '#')) {
-            continue;
-        }
-        $partes = explode('=', $linea, 2);
-        if (count($partes) === 2 && trim($partes[0]) === 'APP_FRONTEND_ORIGIN' && getenv('APP_FRONTEND_ORIGIN') === false) {
-            putenv('APP_FRONTEND_ORIGIN=' . trim(trim($partes[1]), "\"'"));
-        }
-    }
+require_once __DIR__ . '/../config/env.php';
+try {
+    cargarEntornoInnHub();
+} catch (RuntimeException $error) {
+    error_log('No se pudo cargar la configuración privada de InnHub: ' . $error->getMessage());
+    responder(500, ['exito' => false, 'mensaje' => 'No se pudo leer la configuración del servidor.']);
 }
 
 $origen = $_SERVER['HTTP_ORIGIN'] ?? '';
@@ -50,13 +44,6 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'OPTIONS') {
     exit;
 }
 
-function responder(int $status, array $datos): never
-{
-    http_response_code($status);
-    echo json_encode($datos, JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE);
-    exit;
-}
-
 function leerEntrada(): array
 {
     $contenido = file_get_contents('php://input');
@@ -71,40 +58,13 @@ function leerEntrada(): array
 
 function cargarConfiguracionWuapi(): array
 {
-    $archivoEnv = __DIR__ . '/.env';
-    if (is_file($archivoEnv)) {
-        if (!is_readable($archivoEnv)) {
-            error_log('No se puede leer la configuración local de Waupi.');
-            responder(500, ['exito' => false, 'mensaje' => 'No se pudo leer la configuración de Waupi.']);
-        }
-
-        $lineas = file($archivoEnv, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-        foreach ($lineas as $linea) {
-            $linea = trim($linea);
-            if ($linea === '' || str_starts_with($linea, '#')) {
-                continue;
-            }
-
-            $partes = explode('=', $linea, 2);
-            if (count($partes) !== 2) {
-                continue;
-            }
-
-            $clave = trim($partes[0]);
-            $valor = trim(trim($partes[1]), "\"'");
-            if (in_array($clave, ['WUAPI_ACCOUNT_ID', 'WUAPI_API_KEY'], true) && getenv($clave) === false) {
-                putenv($clave . '=' . $valor);
-            }
-        }
-    }
-
     $accountId = trim((string) (getenv('WUAPI_ACCOUNT_ID') ?: ''));
     $apiKey = trim((string) (getenv('WUAPI_API_KEY') ?: ''));
 
     if ($accountId === '' || $apiKey === '') {
         responder(500, [
             'exito' => false,
-            'mensaje' => 'Configura WUAPI_ACCOUNT_ID y WUAPI_API_KEY en backend/Verificacion/.env.'
+            'mensaje' => 'Configura WUAPI_ACCOUNT_ID y WUAPI_API_KEY en el archivo privado de InnHub.'
         ]);
     }
 

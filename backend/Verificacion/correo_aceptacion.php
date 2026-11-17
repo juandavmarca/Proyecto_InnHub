@@ -5,31 +5,16 @@ use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception as PHPMailerException;
 
 require_once __DIR__ . '/terminos_contenido.php';
+require_once __DIR__ . '/../config/env.php';
 
 function configuracionCorreo(): array
 {
-    $archivoEnv = __DIR__ . '/.env';
+    cargarEntornoInnHub();
+
     $configuracion = [];
-    if (is_file($archivoEnv)) {
-        if (!is_readable($archivoEnv)) {
-            throw new RuntimeException('No se puede leer la configuración SMTP.');
-        }
-
-        foreach (file($archivoEnv, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) as $linea) {
-            $linea = trim($linea);
-            if ($linea === '' || str_starts_with($linea, '#')) {
-                continue;
-            }
-            $partes = explode('=', $linea, 2);
-            if (count($partes) === 2) {
-                $configuracion[trim($partes[0])] = trim(trim($partes[1]), "\"'");
-            }
-        }
-    }
-
     $claves = [
         'SMTP_HOST', 'SMTP_PORT', 'SMTP_USER', 'SMTP_PASS', 'SMTP_SECURE',
-        'MAIL_FROM', 'MAIL_FROM_NAME', 'APP_PUBLIC_URL'
+        'SMTP_CA_FILE', 'MAIL_FROM', 'MAIL_FROM_NAME', 'APP_PUBLIC_URL'
     ];
     foreach ($claves as $clave) {
         $valorEntorno = getenv($clave);
