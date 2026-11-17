@@ -237,7 +237,11 @@ export async function obtenerEmpleados() {
     if (!response.ok) {
       throw new Error("Error al obtener empleados");
     }
-    return await response.json();
+    const empleados = await response.json();
+    return empleados.map((empleado) => ({
+      ...empleado,
+      foto_perifl: normalizarUrlMedia(empleado.foto_perifl || empleado.foto_perfil),
+    }));
   } catch (error) {
     console.error(error);
     throw error;

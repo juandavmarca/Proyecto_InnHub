@@ -63,7 +63,7 @@ if (!empty($_FILES['foto_perifl']) && $_FILES['foto_perifl']['error'] === UPLOAD
     $targetPath = $uploadDir . $filename;
 
     if (move_uploaded_file($_FILES['foto_perifl']['tmp_name'], $targetPath)) {
-        $fotoPerfilUrl = "http://localhost/ERPInnHub/backend/uploads/{$filename}";
+        $fotoPerfilUrl = "/backend/uploads/{$filename}";
     }
 }
 
