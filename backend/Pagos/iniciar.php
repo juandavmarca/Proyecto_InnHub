@@ -20,7 +20,7 @@ if (
 $entrada = leerEntrada();
 $fechaEntrada = trim((string) ($entrada['fecha_entrada'] ?? ''));
 $fechaSalida = trim((string) ($entrada['fecha_salida'] ?? ''));
-$idHabitacion = filter_var($entrada['id_habitacion'] ?? null, FILTER_VALIDATE_INT);
+$tipoHabitacion = trim((string) ($entrada['tipo_habitacion'] ?? ''));
 $personas = filter_var($entrada['numero_persona'] ?? null, FILTER_VALIDATE_INT);
 $porcentaje = filter_var($entrada['porcentaje_pago'] ?? null, FILTER_VALIDATE_INT);
 $fechaEntradaObj = DateTimeImmutable::createFromFormat('!Y-m-d', $fechaEntrada);
@@ -31,7 +31,7 @@ if (
     !$fechaEntradaObj || $fechaEntradaObj->format('Y-m-d') !== $fechaEntrada
     || !$fechaSalidaObj || $fechaSalidaObj->format('Y-m-d') !== $fechaSalida
     || $fechaEntradaObj < $hoy || $fechaSalidaObj <= $fechaEntradaObj
-    || !$idHabitacion || $idHabitacion < 1
+    || $tipoHabitacion === '' || strlen($tipoHabitacion) > 50
     || !$personas || $personas < 1 || $personas > 6
     || !in_array($porcentaje, [50, 100], true)
 ) {
@@ -61,40 +61,45 @@ try {
         responder(401, ['exito' => false, 'mensaje' => 'No encontramos tus datos verificados. Vuelve a verificar tu teléfono.']);
     }
 
-    $buscarHabitacion = $pdo->prepare(
-        'SELECT estado
+    $buscarHabitaciones = $pdo->prepare(
+        "SELECT id_habitacion
          FROM habitaciones
-         WHERE id_habitacion = :id_habitacion
-         FOR UPDATE'
+         WHERE LOWER(TRIM(tipo)) = LOWER(TRIM(:tipo_habitacion))
+           AND LOWER(TRIM(COALESCE(estado, ''))) = 'disponible'
+         ORDER BY id_habitacion
+         FOR UPDATE"
     );
-    $buscarHabitacion->execute([':id_habitacion' => $idHabitacion]);
-    $habitacion = $buscarHabitacion->fetch(PDO::FETCH_ASSOC);
-    if (!$habitacion || strtolower(trim((string) $habitacion['estado'])) !== 'disponible') {
+    $buscarHabitaciones->execute([':tipo_habitacion' => $tipoHabitacion]);
+    $habitacionesDisponibles = $buscarHabitaciones->fetchAll(PDO::FETCH_COLUMN);
+    if (!$habitacionesDisponibles) {
         $pdo->rollBack();
-        responder(409, ['exito' => false, 'mensaje' => 'La habitación seleccionada ya no está disponible. Elige otra habitación.']);
+        responder(409, ['exito' => false, 'mensaje' => 'No hay habitaciones disponibles de ese tipo. Elige otra opción.']);
     }
 
-    $buscarCruce = $pdo->prepare(
-        "SELECT id_reserva
-         FROM reservas
-         WHERE habitaciones_id_habitacion = :id_habitacion
-           AND DATE(fecha_entrada) < :fecha_salida
-           AND DATE(fecha_salida) > :fecha_entrada
-           AND LOWER(COALESCE(estado, '')) NOT IN ('cancelada', 'cancelado', 'pago rechazado', 'rechazada')
-           AND (
-               LOWER(COALESCE(estado, '')) <> 'pendiente de pago'
-               OR fecha_reserva >= DATE_SUB(NOW(), INTERVAL 30 MINUTE)
+    $contarReservasActivas = $pdo->prepare(
+        "SELECT COUNT(*)
+         FROM reservas r
+         LEFT JOIN habitaciones h ON h.id_habitacion = r.habitaciones_id_habitacion
+         WHERE LOWER(TRIM(COALESCE(NULLIF(r.tipo_habitacion_solicitada, ''), h.tipo, '')))
+                   = LOWER(TRIM(:tipo_habitacion))
+           AND DATE(r.fecha_entrada) < :fecha_salida
+           AND DATE(r.fecha_salida) > :fecha_entrada
+           AND LOWER(TRIM(COALESCE(r.estado, ''))) NOT IN (
+               'cancelada', 'cancelado', 'pago rechazado', 'rechazada'
            )
-         LIMIT 1"
+           AND (
+               LOWER(TRIM(COALESCE(r.estado, ''))) <> 'pendiente de pago'
+               OR r.fecha_reserva >= DATE_SUB(NOW(), INTERVAL 30 MINUTE)
+           )"
     );
-    $buscarCruce->execute([
-        ':id_habitacion' => $idHabitacion,
+    $contarReservasActivas->execute([
+        ':tipo_habitacion' => $tipoHabitacion,
         ':fecha_salida' => $fechaSalida,
         ':fecha_entrada' => $fechaEntrada,
     ]);
-    if ($buscarCruce->fetch(PDO::FETCH_ASSOC)) {
+    if ((int) $contarReservasActivas->fetchColumn() >= count($habitacionesDisponibles)) {
         $pdo->rollBack();
-        responder(409, ['exito' => false, 'mensaje' => 'La habitación ya tiene una reserva para esas fechas. Elige otras fechas.']);
+        responder(409, ['exito' => false, 'mensaje' => 'No hay habitaciones de ese tipo disponibles para esas fechas. Elige otras fechas u otra categoría.']);
     }
 
     $referencia = 'INN' . strtoupper(bin2hex(random_bytes(12)));
@@ -102,16 +107,16 @@ try {
     $crearReserva = $pdo->prepare(
         "INSERT INTO reservas
             (fecha_reserva, fecha_entrada, fecha_salida, estado, id_cliente, id_empleado,
-             habitaciones_id_habitacion, numero_persona, observacion, monto_total)
+             habitaciones_id_habitacion, tipo_habitacion_solicitada, numero_persona, observacion, monto_total)
          VALUES
             (NOW(), :fecha_entrada, :fecha_salida, 'Pendiente de pago', :id_cliente, NULL,
-             :id_habitacion, :numero_persona, :observacion, :monto_total)"
+             NULL, :tipo_habitacion, :numero_persona, :observacion, :monto_total)"
     );
     $crearReserva->execute([
         ':fecha_entrada' => $fechaEntrada . ' 00:00:00',
         ':fecha_salida' => $fechaSalida . ' 00:00:00',
         ':id_cliente' => (int) $verificacion['cliente_id'],
-        ':id_habitacion' => $idHabitacion,
+        ':tipo_habitacion' => $tipoHabitacion,
         ':numero_persona' => $personas,
         ':observacion' => $observacion,
         ':monto_total' => $totalPesos,

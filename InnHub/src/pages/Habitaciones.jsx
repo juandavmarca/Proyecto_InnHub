@@ -295,7 +295,7 @@ function Habitaciones() {
       {detalleHabitacion && (
         <div className="modal-backdrop modal-backdrop-show" onClick={cerrarDetalleHabitacion}>
           <div className="room-detail-modal" onClick={(event) => event.stopPropagation()}>
-            <button className="modal-close room-detail-close" type="button" onClick={cerrarDetalleHabitacion}>
+            <button className="modal-close room-detail-close" type="button" onClick={cerrarDetalleHabitacion} aria-label="Cerrar detalle de habitación">
               ×
             </button>
 

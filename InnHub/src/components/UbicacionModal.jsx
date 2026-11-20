@@ -7,7 +7,7 @@ function UbicacionModal({ onCerrar }) {
         <div className="modal-header">
           <h2>Nuestra ubicación</h2>
 
-          <button onClick={onCerrar}>
+          <button type="button" aria-label="Cerrar ubicación" onClick={onCerrar}>
             ✕
           </button>
         </div>
