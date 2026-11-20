@@ -115,7 +115,7 @@ try {
     $pdo->commit();
     responderReservas(200, [
         'exito' => true,
-        'mensaje' => 'Reserva confirmada y habitación asignada.',
+        'mensaje' => 'Reserva confirmada y habitación asignada. No quedó registrado el empleado responsable.',
     ]);
 } catch (PDOException $error) {
     if ($pdo->inTransaction()) {
