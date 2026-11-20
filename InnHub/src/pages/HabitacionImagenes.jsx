@@ -212,7 +212,7 @@ function HabitacionImagenes() {
           <div className="disabled-empty-state">Aún no hay imágenes para esta habitación.</div>
         ) : (
           <div className="table-responsive">
-            <table className="table table-dark table-striped align-middle">
+            <table className="table table-dark table-striped align-middle mobile-record-cards">
               <thead>
                 <tr>
                   <th>#</th>
@@ -224,12 +224,12 @@ function HabitacionImagenes() {
               <tbody>
                 {imagenes.map((item, index) => (
                   <tr key={item.id}>
-                    <td>{index + 1}</td>
-                    <td>
+                    <td data-label="#">{index + 1}</td>
+                    <td data-label="Imagen">
                       <img src={item.url} alt={`Imagen ${index + 1}`} style={{ width: 80, height: 60, objectFit: "cover", borderRadius: 8 }} />
                     </td>
-                    <td style={{ maxWidth: 440, wordBreak: "break-all" }}>{item.url}</td>
-                    <td>
+                    <td data-label="URL" style={{ maxWidth: 440, wordBreak: "break-all" }}>{item.url}</td>
+                    <td data-label="Acciones">
                       <button type="button" className="btn btn-sm btn-danger" onClick={() => confirmarEliminacion(item)}>Eliminar</button>
                     </td>
                   </tr>

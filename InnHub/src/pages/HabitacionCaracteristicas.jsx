@@ -177,7 +177,7 @@ function HabitacionCaracteristicas() {
           <div className="disabled-empty-state">Aún no hay características para esta habitación.</div>
         ) : (
           <div className="table-responsive">
-            <table className="table table-dark table-striped align-middle">
+            <table className="table table-dark table-striped align-middle mobile-record-cards">
               <thead>
                 <tr>
                   <th>#</th>
@@ -189,10 +189,10 @@ function HabitacionCaracteristicas() {
               <tbody>
                 {caracteristicas.map((item, index) => (
                   <tr key={item.idcarac}>
-                    <td>{index + 1}</td>
-                    <td>{item.nombre}</td>
-                    <td>{item.descripcion}</td>
-                    <td>
+                    <td data-label="#">{index + 1}</td>
+                    <td data-label="Nombre">{item.nombre}</td>
+                    <td data-label="Descripción">{item.descripcion}</td>
+                    <td data-label="Acciones">
                       <button type="button" className="btn btn-sm btn-danger" onClick={() => confirmarEliminacion(item)}>Eliminar</button>
                     </td>
                   </tr>

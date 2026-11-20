@@ -126,7 +126,7 @@ function Clientes() {
       />
       {/* tabla de clientes */}
       <div className="dashboard-table-card mt-3">
-        <table className="table table-striped table-innhub">
+        <table className="table table-striped table-innhub mobile-record-cards">
         <thead>
           <tr>
             <th>Documento</th>
@@ -143,14 +143,14 @@ function Clientes() {
         <tbody>
           {clientesFiltrados.map((cliente) => (
             <tr key={cliente.id_cliente}>
-              <td>{cliente.documento || "Pendiente"}</td>
-              <td>{cliente.tipo_documento || "Pendiente"}</td>
-              <td>{cliente.nombre}</td>
-              <td>{cliente.apellido}</td>
-              <td>{cliente.telefono}</td>
-              <td>{cliente.email}</td>
-              <td>{cliente.ciudad_re || "Pendiente"}</td>
-              <td>
+              <td data-label="Documento">{cliente.documento || "Pendiente"}</td>
+              <td data-label="Tipo de documento">{cliente.tipo_documento || "Pendiente"}</td>
+              <td data-label="Nombre">{cliente.nombre}</td>
+              <td data-label="Apellido">{cliente.apellido}</td>
+              <td data-label="Teléfono">{cliente.telefono}</td>
+              <td data-label="Email">{cliente.email}</td>
+              <td data-label="Ciudad">{cliente.ciudad_re || "Pendiente"}</td>
+              <td data-label="Acciones">
                 <div className="d-flex gap-2">
                   <button className="btn btn-sm" style={{backgroundColor: '#c89629', color: '#090808', border: 'none'}} data-bs-toggle="modal" data-bs-target="#clienteModal" onClick={() => handleEditarCliente(cliente)} title="Editar">
                     <i className="fa-solid fa-pen"></i>
