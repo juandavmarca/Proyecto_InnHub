@@ -247,7 +247,7 @@ function HabitacionCamas() {
           <div className="disabled-empty-state">Aún no hay camas registradas para esta habitación.</div>
         ) : (
           <div className="table-responsive">
-            <table className="table table-dark table-striped align-middle">
+            <table className="table table-dark table-striped align-middle mobile-record-cards">
               <thead>
                 <tr>
                   <th>#</th>
@@ -259,10 +259,10 @@ function HabitacionCamas() {
               <tbody>
                 {camas.map((cama, index) => (
                   <tr key={cama.idCamas}>
-                    <td>{index + 1}</td>
-                    <td>{cama.tipo}</td>
-                    <td>{cama.cantidad}</td>
-                    <td>
+                    <td data-label="#">{index + 1}</td>
+                    <td data-label="Tipo">{cama.tipo}</td>
+                    <td data-label="Cantidad">{cama.cantidad}</td>
+                    <td data-label="Acciones">
                       <button
                         type="button"
                         className="btn btn-sm btn-danger"

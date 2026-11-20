@@ -200,7 +200,7 @@ function Habitaciones() {
       />
       {/* tabla de habitaciones*/}
       <div className="dashboard-table-card mt-3">
-        <table className="table table-striped table-innhub habitaciones-table">
+        <table className="table table-striped table-innhub habitaciones-table mobile-record-cards">
         <thead>
           <tr>
             <th>Número</th>
@@ -221,16 +221,16 @@ function Habitaciones() {
 
             return (
               <tr key={habitacion.id_habitacion} className={`habitacion-row ${statusClass}`}>
-                <td>{habitacion.numero}</td>
-                <td>{habitacion.tipo}</td>
-                <td>{habitacion.precio_noche}</td>
-                <td>
+                <td data-label="Número">{habitacion.numero}</td>
+                <td data-label="Tipo">{habitacion.tipo}</td>
+                <td data-label="Precio por noche">{habitacion.precio_noche}</td>
+                <td data-label="Camas">
                   <div className="habitacion-meta-cell habitacion-meta-counter" title="Número de camas">
                     <i className="fas fa-bed habitacion-meta-icon"></i>
                     <span>{camas}</span>
                   </div>
                 </td>
-                <td>
+                <td data-label="Ver detalle">
                   <button
                     type="button"
                     className="habitacion-meta-cell habitacion-meta-link"
@@ -241,13 +241,13 @@ function Habitaciones() {
                     <span>Ver</span>
                   </button>
                 </td>
-                <td>
+                <td data-label="Estado">
                   <span className={`estado-badge ${statusClass}`}>
                     <span className="estado-dot" />
                     {statusText}
                   </span>
                 </td>
-                <td>
+                <td data-label="Especificaciones">
                   <div className="d-flex gap-2 flex-wrap align-items-center justify-content-center">
                     <Link
                       to={`/HabitacionCamas?id_habitacion=${habitacion.id_habitacion}`}
@@ -275,7 +275,7 @@ function Habitaciones() {
                     </Link>
                   </div>
                 </td>
-                <td>
+                <td data-label="Acciones">
                   <div className="d-flex gap-2">
                     <button className="btn btn-sm" style={{backgroundColor: '#c89629', color: '#090808', border: 'none'}} data-bs-toggle="modal" data-bs-target="#habitacionModal" onClick={() => handleEditarHabitacion(habitacion)} title="Editar">
                       <i className="fa-solid fa-pen"></i>

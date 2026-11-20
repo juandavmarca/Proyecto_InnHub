@@ -126,7 +126,7 @@ function Empleados() {
       />
       {/* tabla de empleados*/}
       <div className="dashboard-table-card mt-3">
-        <table className="table table-striped table-innhub">
+        <table className="table table-striped table-innhub mobile-record-cards">
         <thead>
           <tr>
             <th>Documento</th>
@@ -142,20 +142,20 @@ function Empleados() {
         <tbody>
           {empleadosFiltrados.map((empleado) => (
             <tr key={empleado.documento}>
-              <td>{empleado.documento}</td>
-              <td>{empleado.nombre}</td>
-              <td>{empleado.apellido}</td>
-              <td>{empleado.cargo}</td>
-              <td>{empleado.telefono}</td>
-              <td>{empleado.email}</td>
-              <td>
+              <td data-label="Documento">{empleado.documento}</td>
+              <td data-label="Nombre">{empleado.nombre}</td>
+              <td data-label="Apellido">{empleado.apellido}</td>
+              <td data-label="Cargo">{empleado.cargo}</td>
+              <td data-label="Teléfono">{empleado.telefono}</td>
+              <td data-label="Email">{empleado.email}</td>
+              <td data-label="Foto">
                 <img
                   className="avatar-img"
                   src={empleado.foto_perifl || ""}
                   alt={empleado.nombre || "foto"}
                 />
               </td>
-              <td>
+              <td data-label="Acciones">
                 <div className="d-flex gap-2">
                   <button className="btn btn-sm" style={{backgroundColor: '#c89629', color: '#090808', border: 'none'}} data-bs-toggle="modal" data-bs-target="#empleadoModal" onClick={() => handleEditarEmpleado(empleado)} title="Editar">
                     <i className="fa-solid fa-pen"></i>
