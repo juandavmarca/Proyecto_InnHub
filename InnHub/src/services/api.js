@@ -124,6 +124,10 @@ export function verificarCodigoConsultaReserva(telefono, codigo) {
   return solicitarVerificacion("verificar_reserva", { telefono, codigo });
 }
 
+export function actualizarReservasVerificadas() {
+  return solicitarVerificacion("consultar_reservas", {});
+}
+
 async function solicitarPago(endpoint, datos) {
   const response = await fetch(`${BASE_URL}/Pagos/${endpoint}.php`, {
     method: "POST",
@@ -148,6 +152,43 @@ export function iniciarPagoWompi(datos) {
 
 export function consultarEstadoPago(referencia) {
   return solicitarPago("estado", { referencia });
+}
+
+async function solicitarGestionReservas(endpoint, options = {}) {
+  const { query = "", ...fetchOptions } = options;
+  const response = await fetch(`${BASE_URL}/Reservas/${endpoint}.php${query}`, {
+    credentials: "include",
+    ...fetchOptions,
+  });
+  let resultado;
+  try {
+    resultado = await response.json();
+  } catch {
+    throw new Error(`El servidor no pudo completar la operación de reservas (HTTP ${response.status}).`);
+  }
+
+  if (!response.ok || !resultado.exito) {
+    throw new Error(resultado.mensaje || "No se pudo completar la operación de reservas.");
+  }
+
+  return resultado;
+}
+
+export function obtenerReservasPendientesRecepcion() {
+  return solicitarGestionReservas("listar");
+}
+
+export function obtenerHabitacionesParaReserva(idReserva) {
+  const query = new URLSearchParams({ id_reserva: String(idReserva) });
+  return solicitarGestionReservas("habitaciones_disponibles", { query: `?${query.toString()}` });
+}
+
+export function confirmarReservaRecepcion(idReserva, idHabitacion) {
+  return solicitarGestionReservas("confirmar", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ id_reserva: idReserva, id_habitacion: idHabitacion }),
+  });
 }
 
 export async function enviarSugerenciaAtencion(email, descripcion) {

@@ -37,27 +37,12 @@ if (!hash_equals((string) $datosOtp['codigo'], $codigo)) {
 }
 
 try {
-    $marcadores = implode(',', array_fill(0, count($datosOtp['clientes']), '?'));
-    $stmt = $pdo->prepare(
-        "SELECT r.id_reserva, r.fecha_reserva, r.fecha_entrada, r.fecha_salida,
-                r.estado, r.numero_persona, r.observacion, r.monto_total,
-                h.numero AS numero_habitacion, h.tipo AS tipo_habitacion,
-                p.estado AS estado_pago, p.monto, p.metodo_pago, p.fecha_pago,
-                p.referencia_transaccion
-         FROM reservas r
-         LEFT JOIN habitaciones h ON h.id_habitacion = r.habitaciones_id_habitacion
-         LEFT JOIN pagos p ON p.id_pago = (
-             SELECT p2.id_pago
-             FROM pagos p2
-             WHERE p2.id_reserva = r.id_reserva
-             ORDER BY p2.fecha_pago DESC, p2.id_pago DESC
-             LIMIT 1
-         )
-         WHERE r.id_cliente IN ({$marcadores})
-         ORDER BY r.fecha_reserva DESC, r.id_reserva DESC"
-    );
-    $stmt->execute(array_map('intval', $datosOtp['clientes']));
-    $reservas = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $clientesVerificados = array_map('intval', $datosOtp['clientes']);
+    $reservas = consultarReservasDeClientes($clientesVerificados);
+    $_SESSION['reserva_consulta_verificada'] = [
+        'clientes' => $clientesVerificados,
+        'expiracion' => time() + 1800,
+    ];
     unset($_SESSION[$claveOtp]);
 
     responder(200, [

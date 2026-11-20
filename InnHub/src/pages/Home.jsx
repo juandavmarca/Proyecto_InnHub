@@ -7,6 +7,7 @@ import CenteredToast from "../components/CenteredToast";
 import SolicitudAtencionModal from "../components/SolicitudAtencionModal";
 import {
   BASE_URL,
+  actualizarReservasVerificadas,
   obtenerCamas,
   obtenerCaracteristicas,
   obtenerHabitaciones,
@@ -25,7 +26,11 @@ const termsDocumentUrl = `${BASE_URL}/Verificacion/terminos.php`;
 const roomMediaUrl = (filename) => `${BASE_URL}/ImgHabitaciones/${encodeURIComponent(filename)}`;
 const formatLookupDate = (value) => {
   if (!value) return "Pendiente";
-  const date = new Date(String(value).replace(" ", "T"));
+  const rawDate = String(value).trim();
+  const dateOnly = /^(\d{4})-(\d{2})-(\d{2})$/.exec(rawDate);
+  const date = dateOnly
+    ? new Date(Number(dateOnly[1]), Number(dateOnly[2]) - 1, Number(dateOnly[3]))
+    : new Date(rawDate.replace(" ", "T"));
   return Number.isNaN(date.getTime())
     ? String(value)
     : date.toLocaleDateString("es-CO", { day: "numeric", month: "long", year: "numeric" });
@@ -450,6 +455,7 @@ function Home() {
   const [lookupCode, setLookupCode] = useState("");
   const [lookupCodeSent, setLookupCodeSent] = useState(false);
   const [lookupReservations, setLookupReservations] = useState(null);
+  const [lookupRefreshError, setLookupRefreshError] = useState("");
   const [lookupLoading, setLookupLoading] = useState(false);
   const [lookupError, setLookupError] = useState("");
   const [lookupNotice, setLookupNotice] = useState("");
@@ -505,6 +511,7 @@ function Home() {
     setLookupCode("");
     setLookupCodeSent(false);
     setLookupReservations(null);
+    setLookupRefreshError("");
     setLookupLoading(false);
     setLookupError("");
     setLookupNotice("");
@@ -542,6 +549,7 @@ function Home() {
         lookupCode
       );
       setLookupReservations(resultado.reservas || []);
+      setLookupRefreshError("");
       setLookupNotice(resultado.mensaje);
     } catch (error) {
       setLookupError(error.message || "No se pudo verificar el código.");
@@ -560,6 +568,7 @@ function Home() {
         setLookupCode("");
         setLookupCodeSent(false);
         setLookupReservations(null);
+        setLookupRefreshError("");
         setLookupError("");
         setLookupNotice("");
       }
@@ -567,6 +576,35 @@ function Home() {
     document.addEventListener("keydown", closeOnEscape);
     return () => document.removeEventListener("keydown", closeOnEscape);
   }, [showReservationLookup, lookupLoading]);
+
+  const lookupHasResults = lookupReservations !== null;
+
+  useEffect(() => {
+    if (!showReservationLookup || !lookupHasResults) return undefined;
+
+    let active = true;
+    let interval;
+    const actualizarReservas = async () => {
+      try {
+        const resultado = await actualizarReservasVerificadas();
+        if (active) {
+          setLookupReservations(Array.isArray(resultado.reservas) ? resultado.reservas : []);
+          setLookupRefreshError("");
+        }
+      } catch (error) {
+        if (active) {
+          setLookupRefreshError(error.message || "No se pudieron actualizar los estados de tus reservas.");
+          window.clearInterval(interval);
+        }
+      }
+    };
+
+    interval = window.setInterval(actualizarReservas, 15000);
+    return () => {
+      active = false;
+      window.clearInterval(interval);
+    };
+  }, [showReservationLookup, lookupHasResults]);
 
   const updateGuestCount = (value) => {
     setGuestCount((current) => Math.min(6, Math.max(1, current + value)));
@@ -929,7 +967,7 @@ function Home() {
       const resultado = await iniciarPagoWompi({
         fecha_entrada: checkIn,
         fecha_salida: checkOut,
-        id_habitacion: selectedRoom.id_habitacion,
+        tipo_habitacion: selectedRoom.tipo || selectedRoom.category,
         numero_persona: guestCount,
         porcentaje_pago: Number(paymentPercentage),
       });
@@ -985,7 +1023,7 @@ function Home() {
         if (estado === "APPROVED") {
           setPaymentReturnToast({
             show: true,
-            message: "¡Pago confirmado! Tu reserva quedó registrada.",
+            message: "¡Pago aprobado! Recepción te asignará una habitación y confirmará tu reserva.",
             type: "success",
             status: "approved",
           });
@@ -1474,7 +1512,7 @@ function Home() {
       {showExperienceModal && (
         <div className="modal-backdrop modal-backdrop-show" onClick={handleCloseExperienceModal}>
           <div className="experience-modal" onClick={(event) => event.stopPropagation()}>
-            <button className="modal-close" type="button" onClick={handleCloseExperienceModal}>
+            <button className="modal-close" type="button" onClick={handleCloseExperienceModal} aria-label="Cerrar galería de experiencias">
               ×
             </button>
             <div className="experience-carousel">
@@ -1624,49 +1662,102 @@ function Home() {
 
             {lookupReservations !== null && (
               <div className="reservation-lookup-results">
+                {lookupRefreshError && (
+                  <p className="reservation-lookup-message is-error" role="alert">
+                    {lookupRefreshError}
+                  </p>
+                )}
                 {lookupReservations.length ? (
                   lookupReservations.map((reserva) => {
                     const estado = String(reserva.estado || "Pendiente").trim();
                     const estadoNormalizado = estado.toLowerCase();
+                    const enEsperaRecepcion = estadoNormalizado.includes("pago aprobado")
+                      || estadoNormalizado.includes("pendiente de confirmación")
+                      || estadoNormalizado.includes("pendiente de confirmacion");
+                    const estadoLabel = enEsperaRecepcion ? "En espera de confirmación" : estado;
                     const estadoClase = estadoNormalizado.includes("cancel")
                       ? "cancelada"
-                      : estadoNormalizado.includes("pago rechazado")
+                      : estadoNormalizado.includes("rechaz")
                         ? "rechazada"
-                        : estadoNormalizado.includes("pago aprobado") || estadoNormalizado.includes("confirm")
+                        : estadoNormalizado.includes("confirmada")
                         ? "confirmada"
                         : "pendiente";
-                    const estadoPago = String(reserva.estado_pago || "Sin pago registrado").trim();
-                    const pagoAprobado = estadoPago.toUpperCase() === "APPROVED";
+                    const estadoPagoOriginal = String(reserva.estado_pago || "").trim();
+                    const estadoPagoNormalizado = estadoPagoOriginal.toUpperCase();
+                    const estadoPago = estadoPagoNormalizado === "APPROVED"
+                      ? "Pago aprobado"
+                      : estadoPagoNormalizado === "PENDING"
+                        ? "Pendiente"
+                        : estadoPagoOriginal || "Sin pago registrado";
+                    const pagoAprobado = estadoPagoNormalizado === "APPROVED";
                     const saldoPendiente = reserva.monto_total !== null && reserva.monto_total !== undefined
                       ? Math.max(Number(reserva.monto_total) - (pagoAprobado ? Number(reserva.monto || 0) : 0), 0)
                       : null;
 
                     return (
                       <article className="reservation-lookup-card" key={reserva.id_reserva}>
-                        <div className="reservation-lookup-card-heading">
-                          <div>
+                        <header className="reservation-lookup-card-heading">
+                          <div className="reservation-lookup-card-title">
                             <span>Reserva</span>
                             <strong>#{reserva.id_reserva}</strong>
+                            {reserva.fecha_reserva && (
+                              <small>Solicitada el {formatLookupDate(reserva.fecha_reserva)}</small>
+                            )}
                           </div>
-                          <span className={`reservation-lookup-status is-${estadoClase}`}>{estado}</span>
+                          <span className={`reservation-lookup-status is-${estadoClase}`}>{estadoLabel}</span>
+                        </header>
+                        <div className="reservation-lookup-stay">
+                          <div>
+                            <span><i className="fa-solid fa-arrow-right-to-bracket" aria-hidden="true" />Entrada</span>
+                            <strong>{formatLookupDate(reserva.fecha_entrada)}</strong>
+                          </div>
+                          <i className="fa-solid fa-arrow-right reservation-lookup-stay-arrow" aria-hidden="true" />
+                          <div>
+                            <span><i className="fa-solid fa-arrow-right-from-bracket" aria-hidden="true" />Salida</span>
+                            <strong>{formatLookupDate(reserva.fecha_salida)}</strong>
+                          </div>
                         </div>
-                        <dl>
-                          <div><dt>Entrada</dt><dd>{formatLookupDate(reserva.fecha_entrada)}</dd></div>
-                          <div><dt>Salida</dt><dd>{formatLookupDate(reserva.fecha_salida)}</dd></div>
-                          <div><dt>Creada</dt><dd>{formatLookupDate(reserva.fecha_reserva)}</dd></div>
-                          <div><dt>Habitación</dt><dd>{reserva.numero_habitacion ? `#${reserva.numero_habitacion} · ${reserva.tipo_habitacion || ""}` : "Pendiente de asignación"}</dd></div>
-                          <div><dt>Personas</dt><dd>{reserva.numero_persona || "—"}</dd></div>
-                          <div><dt>Pago</dt><dd>{estadoPago}</dd></div>
-                          {reserva.monto_total !== null && reserva.monto_total !== undefined && (
-                            <div><dt>Total de estadía</dt><dd>{formatLookupMoney(reserva.monto_total)}</dd></div>
+                        <div className="reservation-lookup-room">
+                          <span className="reservation-lookup-room-icon" aria-hidden="true">
+                            <i className="fa-solid fa-bed" />
+                          </span>
+                          <div>
+                            <span>Habitación</span>
+                            <strong>
+                              {reserva.numero_habitacion
+                                ? `#${reserva.numero_habitacion} · ${reserva.tipo_habitacion || ""}`
+                                : `Pendiente de asignación${reserva.tipo_habitacion ? ` · ${reserva.tipo_habitacion}` : ""}`}
+                            </strong>
+                          </div>
+                          <span className="reservation-lookup-guests">
+                            <i className="fa-solid fa-user-group" aria-hidden="true" />
+                            {reserva.numero_persona || "—"}{" "}
+                            {Number(reserva.numero_persona) === 1 ? "persona" : "personas"}
+                          </span>
+                        </div>
+                        <section className="reservation-lookup-payment">
+                          <div className="reservation-lookup-payment-heading">
+                            <span>Estado del pago</span>
+                            <strong className={pagoAprobado ? "is-approved" : ""}>{estadoPago}</strong>
+                          </div>
+                          <div className="reservation-lookup-payment-details">
+                            {reserva.monto_total !== null && reserva.monto_total !== undefined && (
+                              <div><span>Total de estadía</span><strong>{formatLookupMoney(reserva.monto_total)}</strong></div>
+                            )}
+                            {reserva.monto && (
+                              <div><span>Valor del pago</span><strong>{formatLookupMoney(reserva.monto)}</strong></div>
+                            )}
+                            {pagoAprobado && saldoPendiente !== null && saldoPendiente > 0 && (
+                              <div><span>Saldo en el hotel</span><strong>{formatLookupMoney(saldoPendiente)}</strong></div>
+                            )}
+                          </div>
+                          {(reserva.metodo_pago || reserva.fecha_pago) && (
+                            <div className="reservation-lookup-payment-meta">
+                              {reserva.metodo_pago && <span><i className="fa-regular fa-credit-card" aria-hidden="true" />{reserva.metodo_pago}</span>}
+                              {reserva.fecha_pago && <span><i className="fa-regular fa-clock" aria-hidden="true" />{formatLookupDate(reserva.fecha_pago)}</span>}
+                            </div>
                           )}
-                          {reserva.monto && <div><dt>Valor del pago</dt><dd>{formatLookupMoney(reserva.monto)}</dd></div>}
-                          {pagoAprobado && saldoPendiente !== null && saldoPendiente > 0 && (
-                            <div><dt>Saldo por pagar en el hotel</dt><dd>{formatLookupMoney(saldoPendiente)}</dd></div>
-                          )}
-                          {reserva.metodo_pago && <div><dt>Medio de pago</dt><dd>{reserva.metodo_pago}</dd></div>}
-                          {reserva.fecha_pago && <div><dt>Fecha de pago</dt><dd>{formatLookupDate(reserva.fecha_pago)}</dd></div>}
-                        </dl>
+                        </section>
                         {reserva.observacion && (
                           <p className="reservation-lookup-observation">
                             <strong>Nota:</strong> {reserva.observacion}
@@ -1946,7 +2037,7 @@ function Home() {
                       {paymentLoading ? "Conectando con Wompi…" : "Continuar al pago"}
                     </button>
                     <small className="reservation-payment-security">
-                      El pago se procesa de forma segura en Wompi. La reserva se confirma cuando Wompi aprueba la transacción.
+                      El pago se procesa de forma segura en Wompi. Cuando se apruebe, recepción asignará una habitación y confirmará tu reserva.
                     </small>
                   </section>
                 )}

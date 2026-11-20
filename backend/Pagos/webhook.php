@@ -112,7 +112,7 @@ try {
         if ($estado === 'APPROVED') {
             $actualizarReserva = $pdo->prepare(
                 "UPDATE reservas
-                 SET estado = 'Pago aprobado'
+                 SET estado = 'Pendiente de confirmación'
                  WHERE id_reserva = :id_reserva
                    AND estado IN ('Pendiente de pago', 'Pago rechazado')"
             );

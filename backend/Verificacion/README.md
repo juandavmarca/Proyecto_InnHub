@@ -17,9 +17,9 @@ En el Dashboard de comercios de Wompi, activa el ambiente de producción y copia
 Configura en la sección de eventos del ambiente de producción esta URL:
 `https://innhub.site/backend/Pagos/webhook.php`
 
-Wompi debe notificar el evento `transaction.updated`. El webhook valida la firma y el monto antes de guardar el estado del pago y actualizar la reserva a `Pago aprobado` o `Pago rechazado`. El navegador no confirma por sí solo un pago.
+Wompi debe notificar el evento `transaction.updated`. El webhook valida la firma y el monto antes de guardar el estado del pago y dejar las transacciones aprobadas como `Pendiente de confirmación`, para que recepción asigne la habitación. Las transacciones rechazadas quedan como `Pago rechazado`. El navegador no confirma por sí solo un pago.
 
-Antes de habilitar pagos reales, confirma que la migración `backend/migrations/20261106_reservas_pagos_wompi.sql` ya se ejecutó en la base de producción; ejecútala solo si aún no está aplicada. Usa credenciales `test` únicamente con el ambiente sandbox de Wompi y credenciales `prod` para cobros reales.
+Antes de habilitar pagos reales, confirma que la migración `backend/migrations/20261106_reservas_pagos_wompi.sql` ya se ejecutó en la base de producción; ejecútala solo si aún no está aplicada. Para que las reservas pagadas queden pendientes de asignación y recepción pueda escoger la habitación por tipo, aplica también `backend/migrations/20261120_reservas_asignacion_recepcion.sql` una sola vez en cada base de datos. Usa credenciales `test` únicamente con el ambiente sandbox de Wompi y credenciales `prod` para cobros reales.
 
 ## Instalación y publicación
 
