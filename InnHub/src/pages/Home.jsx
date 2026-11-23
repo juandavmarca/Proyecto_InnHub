@@ -2168,8 +2168,7 @@ function Home() {
                   )}
                 </div>
                 <p className="room-modal-price">
-                  {formatCurrency(nightlyRate)} / noche
-                  <small> ({formatCurrency(nightlyRatePerPerson)} por persona)</small>
+                  {formatCurrency(nightlyRatePerPerson)} por persona
                 </p>
                   <button
                     className="btn btn-secondary"
