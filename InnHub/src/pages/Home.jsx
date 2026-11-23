@@ -41,6 +41,98 @@ const formatLookupMoney = (value) => new Intl.NumberFormat("es-CO", {
   maximumFractionDigits: 0,
 }).format(Number(value) || 0);
 const nightlyRatePerPerson = 65000;
+const translations = {
+  en: {
+    "Hotel Ejecutivo": "Executive Hotel",
+    Inicio: "Home",
+    Habitaciones: "Rooms",
+    Contacto: "Contact",
+    "Verificar mi reserva": "Check my reservation",
+    Administración: "Administration",
+    "Bienvenido a Sonsón": "Welcome to Sonsón",
+    "Elegancia, confort y servicio excepcional en un solo lugar.": "Elegance, comfort, and exceptional service in one place.",
+    "Reserva ya": "Book now",
+    "Encuentra tu habitación ideal": "Find your ideal room",
+    "Fechas y disponibilidad": "Dates and availability",
+    "Habitación seleccionada": "Selected room",
+    Cambiar: "Change",
+    Entrada: "Check-in",
+    Salida: "Check-out",
+    "Personas (máximo 6)": "Guests (maximum 6)",
+    "Quitar una persona": "Remove one guest",
+    "Agregar una persona": "Add one guest",
+    "Resumen estimado": "Estimated summary",
+    noche: "night",
+    noches: "nights",
+    persona: "guest",
+    personas: "guests",
+    "Tarifa por noche": "Nightly rate",
+    "Total estimado": "Estimated total",
+    "Buscar fechas y continuar": "Search dates and continue",
+    "Buscar habitación": "Search rooms",
+    "Buscar habitaciones": "Search rooms",
+    "Seleccionar fecha": "Select date",
+    Elegir: "Choose",
+    "Mes anterior": "Previous month",
+    "Mes siguiente": "Next month",
+    "Fecha seleccionada": "Selected date",
+    "Selecciona un día": "Select a day",
+    Cerrar: "Close",
+    "Ventajas del hotel": "Hotel benefits",
+    "Servicio 24/7": "24/7 Service",
+    "Estamos siempre disponibles para ti.": "We are always available for you.",
+    Comodidad: "Comfort",
+    "Habitaciones diseñadas para tu descanso.": "Rooms designed for your comfort.",
+    Seguridad: "Safety",
+    "Tu tranquilidad es nuestra prioridad.": "Your peace of mind is our priority.",
+    Ubicación: "Location",
+    "En el corazón de la ciudad, cerca de todo.": "In the heart of the city, close to everything.",
+    "Beneficios del hotel": "Hotel benefits",
+    "Ubicación estratégica": "Strategic location",
+    "Acceso fácil a sitios turísticos, restaurantes y transporte local.": "Easy access to tourist attractions, restaurants, and local transportation.",
+    "Atención 24/7": "24/7 Assistance",
+    "Soporte para reservas, consultas y servicios personalizados.": "Support for reservations, inquiries, and personalized services.",
+    "Experiencias únicas": "Unique experiences",
+    "Planes especiales, cenas temáticas y actividades de bienestar.": "Special packages, themed dinners, and wellness activities.",
+    "Encuentra el espacio perfecto para tu estadía": "Find the perfect space for your stay",
+    "Habitaciones Individuales": "Single Rooms",
+    "Habitaciones Dobles": "Double Rooms",
+    "Habitaciones Familiares": "Family Rooms",
+    "Un espacio confortable para una estadía tranquila y práctica.": "A comfortable space for a peaceful and practical stay.",
+    "Una opción cómoda para parejas o amigos.": "A comfortable option for couples or friends.",
+    "Más espacio y comodidad para compartir en familia.": "More space and comfort to enjoy with family.",
+    "habitaciones disponibles": "rooms available",
+    "habitación disponible": "room available",
+    "Tu estadía": "Your stay",
+    "Habitaciones para tu viaje": "Rooms for your trip",
+    "Consultar disponibilidad…": "Checking availability…",
+    "Reservar ahora": "Book now",
+    "No disponible": "Unavailable",
+    "Ver fotos, video y características": "View photos, video, and features",
+    "Explora": "Explore",
+    "Hospitalidad elegante en Sonsón, donde cada detalle está pensado para tu descanso.": "Elegant hospitality in Sonsón, where every detail is designed for your comfort.",
+    "Todos los derechos reservados.": "All rights reserved.",
+    "Tipo:": "Type:",
+    "Camas:": "Beds:",
+    Características: "Features",
+    "Sin características registradas.": "No features registered.",
+    "por persona": "per person",
+    "Continuar": "Continue",
+    "Ver detalles": "View details",
+    "Recepción 24/7": "24/7 Front Desk",
+    "Consulta segura": "Secure lookup",
+    "Cerrar galería de experiencias": "Close experience gallery",
+    "Imagen anterior": "Previous image",
+    "Siguiente imagen": "Next image",
+    "Seleccionar imagen": "Select image",
+    Individual: "Single",
+    Doble: "Double",
+    Familiar: "Family",
+  },
+};
+const translate = (language, text) => (
+  language === "en" ? translations.en[text] || text : text
+);
 const phoneCountryCodes = [
   { country: "Argentina", code: "+54", flag: "🇦🇷" },
   { country: "Australia", code: "+61", flag: "🇦🇺" },
@@ -215,7 +307,7 @@ const galleryImages = [
   roomMediaUrl("toalla.JPG"),
 ];
 
-function BookingDatePicker({ id, label, value, min, rangeStart, rangeEnd, onChange }) {
+function BookingDatePicker({ id, label, value, min, rangeStart, rangeEnd, onChange, language }) {
   const [isOpen, setIsOpen] = useState(false);
   const [visibleMonth, setVisibleMonth] = useState(() => {
     const date = value || min;
@@ -231,7 +323,8 @@ function BookingDatePicker({ id, label, value, min, rangeStart, rangeEnd, onChan
     ? new Date(minimumDate.getFullYear(), minimumDate.getMonth(), 1)
     : null;
   const monthStart = new Date(year, month, 1);
-  const monthLabel = visibleMonth.toLocaleDateString("es-CO", { month: "long", year: "numeric" });
+  const locale = language === "en" ? "en-US" : "es-CO";
+  const monthLabel = visibleMonth.toLocaleDateString(locale, { month: "long", year: "numeric" });
 
   useEffect(() => {
     if (!isOpen) return undefined;
@@ -280,29 +373,29 @@ function BookingDatePicker({ id, label, value, min, rangeStart, rangeEnd, onChan
           <path d="M7.5 3v4M16.5 3v4M3.5 9.5h17" />
         </svg>
         <span>{value
-          ? new Date(`${value}T00:00:00`).toLocaleDateString("es-CO", { day: "numeric", month: "long", year: "numeric" })
-          : "Seleccionar fecha"}
+          ? new Date(`${value}T00:00:00`).toLocaleDateString(locale, { day: "numeric", month: "long", year: "numeric" })
+          : translate(language, "Seleccionar fecha")}
         </span>
-        <span className="booking-date-trigger-hint">{value ? "Cambiar" : "Elegir"}</span>
+        <span className="booking-date-trigger-hint">{translate(language, value ? "Cambiar" : "Elegir")}</span>
       </button>
       {isOpen && (
-        <div className="booking-calendar" role="dialog" aria-label={`Calendario de ${label.toLowerCase()}`}>
+        <div className="booking-calendar" role="dialog" aria-label={`${language === "en" ? "Calendar for" : "Calendario de"} ${label.toLowerCase()}`}>
           <div className="booking-calendar-header">
             <button
               type="button"
-              aria-label="Mes anterior"
+              aria-label={translate(language, "Mes anterior")}
               disabled={minimumMonth && monthStart <= minimumMonth}
               onClick={() => setVisibleMonth(new Date(year, month - 1, 1))}
             >
               ‹
             </button>
             <strong>{monthLabel}</strong>
-            <button type="button" aria-label="Mes siguiente" onClick={() => setVisibleMonth(new Date(year, month + 1, 1))}>
+            <button type="button" aria-label={translate(language, "Mes siguiente")} onClick={() => setVisibleMonth(new Date(year, month + 1, 1))}>
               ›
             </button>
           </div>
           <div className="booking-calendar-grid booking-calendar-weekdays" aria-hidden="true">
-            {["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"].map((weekday) => (
+            {(language === "en" ? ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"] : ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"]).map((weekday) => (
               <span key={weekday}>{weekday}</span>
             ))}
           </div>
@@ -334,7 +427,7 @@ function BookingDatePicker({ id, label, value, min, rangeStart, rangeEnd, onChan
                   disabled={isDisabled}
                   className={dayClasses}
                   aria-pressed={value === dateValue}
-                  aria-label={`${day}${isRangeStart ? ", fecha de entrada" : ""}${isRangeEnd ? ", fecha de salida" : ""}`}
+                  aria-label={`${day}${isRangeStart ? language === "en" ? ", check-in date" : ", fecha de entrada" : ""}${isRangeEnd ? language === "en" ? ", check-out date" : ", fecha de salida" : ""}`}
                   onClick={() => selectDate(day)}
                 >
                   {day}
@@ -343,8 +436,11 @@ function BookingDatePicker({ id, label, value, min, rangeStart, rangeEnd, onChan
             })}
           </div>
           <div className="booking-calendar-footer">
-            <span>{value ? `Fecha seleccionada: ${new Date(`${value}T00:00:00`).toLocaleDateString("es-CO", { day: "numeric", month: "short" })}` : "Selecciona un día"}</span>
-            <button type="button" onClick={() => setIsOpen(false)}>Cerrar</button>
+            <span>{value
+              ? `${translate(language, "Fecha seleccionada")}: ${new Date(`${value}T00:00:00`).toLocaleDateString(locale, { day: "numeric", month: "short" })}`
+              : translate(language, "Selecciona un día")}
+            </span>
+            <button type="button" onClick={() => setIsOpen(false)}>{translate(language, "Cerrar")}</button>
           </div>
         </div>
       )}
@@ -441,6 +537,8 @@ const obtenerUrlYoutubeEmbed = (url) => {
 
 function Home() {
   const navigate = useNavigate();
+  const [language, setLanguage] = useState("es");
+  const t = (text) => translate(language, text);
   const [checkIn, setCheckIn] = useState("");
   const [checkOut, setCheckOut] = useState("");
   const [guestCount, setGuestCount] = useState(2);
@@ -501,6 +599,27 @@ function Home() {
   });
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [privacyAccepted, setPrivacyAccepted] = useState(false);
+
+  useEffect(() => {
+    document.documentElement.lang = language;
+  }, [language]);
+
+  const getRoomTitle = (title) => {
+    if (language !== "en") return title;
+    return String(title || "")
+      .replace(/^Habitación\s*/i, "Room ")
+      .replace(/\bIndividual\b/i, "Single")
+      .replace(/\bDoble\b/i, "Double")
+      .replace(/\bFamiliar\b/i, "Family");
+  };
+
+  const getAvailabilityLabel = (count) =>
+    `${count} ${t(count === 1 ? "habitación disponible" : "habitaciones disponibles")}`;
+
+  const getCategoryAvailabilityLabel = (category) => {
+    const room = obtenerDatosCategoria(category);
+    return `${room?.habitacionesDisponibles || 0}/${room?.totalHabitaciones || 0} ${t("habitaciones disponibles")}`;
+  };
 
   const getFullPhoneNumber = () => `${phoneCountry.code}${guestDetails.phone.replace(/\D/g, "")}`;
 
@@ -1165,18 +1284,18 @@ function Home() {
   };
 
   return (
-    <div className="home-page">
+    <div className="home-page" lang={language}>
       <header className="home-header">
         <div className="home-brand">
           <img src={homeLogo} alt="Hotel Valencia logo" className="home-logo-image" />
-          <span className="home-subtitle">Hotel Ejecutivo</span>
+          <span className="home-subtitle">{t("Hotel Ejecutivo")}</span>
         </div>
         <nav className="home-nav">
-          <a href="#hero">Inicio</a>
+          <a href="#hero">{t("Inicio")}</a>
           {/* <a href="#services">Servicios</a> */}
-          <a href="#rooms">Habitaciones</a>
+          <a href="#rooms">{t("Habitaciones")}</a>
           {/* <a href="#reviews">Reseñas</a> */}
-          <a href="#contact">Contacto</a>
+          <a href="#contact">{t("Contacto")}</a>
         </nav>
         <div className="home-actions">
           <button
@@ -1185,16 +1304,23 @@ function Home() {
             onClick={() => setShowReservationLookup(true)}
           >
             <i className="fa-solid fa-ticket" aria-hidden="true" />
-            Verificar mi reserva
+            {t("Verificar mi reserva")}
           </button>
           <button
             type="button"
             className="btn btn-register"
             onClick={() => setShowAdminAlert(true)}
           >
-            Administración
+            {t("Administración")}
           </button>
-          <button className="btn btn-lang">ES</button>
+          <button
+            className="btn btn-lang"
+            type="button"
+            aria-label={language === "es" ? "Change language to English" : "Cambiar idioma a español"}
+            onClick={() => setLanguage((current) => current === "es" ? "en" : "es")}
+          >
+            {language.toUpperCase()}
+          </button>
         </div>
       </header>
 
@@ -1202,13 +1328,13 @@ function Home() {
         <div className="hero-overlay"></div>
         <div className="hero-content">
           <div className="hero-copy">
-            <span className="eyebrow">Bienvenido a Sonsón</span>
+            <span className="eyebrow">{t("Bienvenido a Sonsón")}</span>
             <br />
-            <span className="smsprincipal">Elegancia, confort y servicio excepcional en un solo lugar.</span>
+            <span className="smsprincipal">{t("Elegancia, confort y servicio excepcional en un solo lugar.")}</span>
             
             <div className="hero-buttons">
               <a href="#rooms" className="btn btn-cta">
-                Reserva ya
+                {t("Reserva ya")}
               </a>
              
             </div>
@@ -1216,26 +1342,27 @@ function Home() {
 
           <form className="hero-booking-card" onSubmit={handleSearchRooms}>
             <div className="booking-card-header">
-              <span>Encuentra tu habitación ideal</span>
-              <strong>Fechas y disponibilidad</strong>
+              <span>{t("Encuentra tu habitación ideal")}</span>
+              <strong>{t("Fechas y disponibilidad")}</strong>
             </div>
             {roomForDateSelection && (
               <div className="booking-selected-room">
                 <div>
-                  <span>Habitación seleccionada</span>
-                  <strong>{roomForDateSelection.title}</strong>
+                  <span>{t("Habitación seleccionada")}</span>
+                  <strong>{getRoomTitle(roomForDateSelection.title)}</strong>
                 </div>
-                <button type="button" onClick={handleChangeRoomBeforeSearch}>Cambiar</button>
+                <button type="button" onClick={handleChangeRoomBeforeSearch}>{t("Cambiar")}</button>
               </div>
             )}
             <div className="booking-row">
               <BookingDatePicker
                 id="booking-check-in"
-                label="Entrada"
+                label={t("Entrada")}
                 value={checkIn}
                 min={todayInput}
                 rangeStart={checkIn}
                 rangeEnd={checkOut}
+                language={language}
                 onChange={(date) => {
                   setCheckIn(date);
                   if (checkOut && checkOut <= date) setCheckOut("");
@@ -1246,11 +1373,12 @@ function Home() {
             <div className="booking-row">
               <BookingDatePicker
                 id="booking-check-out"
-                label="Salida"
+                label={t("Salida")}
                 value={checkOut}
                 min={checkIn || todayInput}
                 rangeStart={checkIn}
                 rangeEnd={checkOut}
+                language={language}
                 onChange={(date) => {
                   setCheckOut(date);
                   setSearchError("");
@@ -1258,33 +1386,36 @@ function Home() {
               />
             </div>
             <div className="booking-row">
-              <label htmlFor="booking-guests">Personas (máximo 6)</label>
+              <label htmlFor="booking-guests">{t("Personas (máximo 6)")}</label>
               <div className="counter" id="booking-guests">
-                <button type="button" onClick={() => updateGuestCount(-1)} disabled={guestCount <= 1} aria-label="Quitar una persona">−</button>
+                <button type="button" onClick={() => updateGuestCount(-1)} disabled={guestCount <= 1} aria-label={t("Quitar una persona")}>−</button>
                 <span>{guestCount}</span>
-                <button type="button" onClick={() => updateGuestCount(1)} disabled={guestCount >= 6} aria-label="Agregar una persona">+</button>
+                <button type="button" onClick={() => updateGuestCount(1)} disabled={guestCount >= 6} aria-label={t("Agregar una persona")}>+</button>
               </div>
             </div>
             {nights > 0 && (
               <div className="booking-price-preview" aria-live="polite" aria-atomic="true">
                 <div className="booking-price-preview-heading">
-                  <span>Resumen estimado</span>
-                  <span>{nights} {nights === 1 ? "noche" : "noches"} · {guestCount} {guestCount === 1 ? "persona" : "personas"}</span>
+                  <span>{t("Resumen estimado")}</span>
+                  <span>{nights} {t(nights === 1 ? "noche" : "noches")} · {guestCount} {t(guestCount === 1 ? "persona" : "personas")}</span>
                 </div>
                 <div className="booking-price-preview-row">
-                  <span>Tarifa por noche ({guestCount} {guestCount === 1 ? "persona" : "personas"})</span>
+                  <span>{t("Tarifa por noche")} ({guestCount} {t(guestCount === 1 ? "persona" : "personas")})</span>
                   <strong>{formatCurrency(nightlyRate)}</strong>
                 </div>
                 <div className="booking-price-preview-total">
-                  <span>Total estimado</span>
+                  <span>{t("Total estimado")}</span>
                   <strong>{formatCurrency(bookingTotal)}</strong>
                 </div>
-                <small>Tarifa de {formatCurrency(nightlyRatePerPerson)} por persona y noche.</small>
+                <small>{language === "en"
+                  ? `Rate of ${formatCurrency(nightlyRatePerPerson)} per person per night.`
+                  : `Tarifa de ${formatCurrency(nightlyRatePerPerson)} por persona y noche.`}
+                </small>
               </div>
             )}
             {searchError && <p className="reservation-inline-error" role="alert">{searchError}</p>}
             <button className="btn btn-book" type="submit">
-              {roomForDateSelection ? "Buscar fechas y continuar" : "Buscar habitación"}
+              {t(roomForDateSelection ? "Buscar fechas y continuar" : "Buscar habitación")}
             </button>
           </form>
         </div>
@@ -1303,10 +1434,10 @@ function Home() {
             onClick={(event) => event.stopPropagation()}
           >
             <button className="reservation-close" type="button" onClick={() => setShowSearchResults(false)} aria-label="Cerrar resultados">×</button>
-            <span className="reservation-eyebrow">Tu estadía</span>
-            <h2 id="reservation-results-title">Habitaciones para tu viaje</h2>
+            <span className="reservation-eyebrow">{t("Tu estadía")}</span>
+            <h2 id="reservation-results-title">{t("Habitaciones para tu viaje")}</h2>
             <p className="reservation-results-dates">
-              {checkIn} → {checkOut} · {nights} {nights === 1 ? "noche" : "noches"} · {guestCount} {guestCount === 1 ? "persona" : "personas"}
+              {checkIn} → {checkOut} · {nights} {t(nights === 1 ? "noche" : "noches")} · {guestCount} {t(guestCount === 1 ? "persona" : "personas")}
             </p>
             <div className="reservation-room-list">
               {rooms.map((room) => {
@@ -1318,7 +1449,7 @@ function Home() {
                     <div className="reservation-room-image-wrap">
                       <img
                         src={image}
-                        alt={roomData?.title || room.title}
+                        alt={getRoomTitle(roomData?.title || room.title)}
                         onError={(event) => { event.currentTarget.src = homeLogo; }}
                       />
                       <button
@@ -1326,29 +1457,29 @@ function Home() {
                         type="button"
                         disabled={!roomData || availableRooms < 1}
                         onClick={() => handlePreviewRoom({ ...room, ...roomData, image })}
-                        aria-label={`Ver fotos, video y características de ${roomData?.title || room.title}`}
-                        title="Ver fotos, video y características"
+                        aria-label={`${t("Ver fotos, video y características")} de ${getRoomTitle(roomData?.title || room.title)}`}
+                        title={t("Ver fotos, video y características")}
                       >
                         <i className="fa-solid fa-eye" aria-hidden="true" />
                       </button>
                     </div>
                     <div className="reservation-room-copy">
-                      <h3>{roomData?.title || room.title}</h3>
-                      <p>{room.description}</p>
+                      <h3>{getRoomTitle(roomData?.title || room.title)}</h3>
+                      <p>{t(room.description)}</p>
                       <span className={availableRooms ? "reservation-availability" : "reservation-unavailable"}>
-                        {roomsLoading ? "Consultando disponibilidad…" : `${availableRooms} ${availableRooms === 1 ? "habitación disponible" : "habitaciones disponibles"}`}
+                        {roomsLoading ? t("Consultar disponibilidad…") : getAvailabilityLabel(availableRooms)}
                       </span>
                     </div>
                     <div className="reservation-room-action">
-                      <strong>{formatCurrency(nightlyRate)} <small>/ noche</small></strong>
-                      <small>{formatCurrency(nightlyRatePerPerson)} por persona</small>
+                      <strong>{formatCurrency(nightlyRate)} <small>/ {t("noche")}</small></strong>
+                      <small>{formatCurrency(nightlyRatePerPerson)} {t("por persona")}</small>
                       <button
                         className="btn btn-book"
                         type="button"
                         disabled={!roomData || availableRooms < 1}
                         onClick={() => handleStartBooking({ ...room, ...roomData, image })}
                       >
-                        {availableRooms ? "Reservar ahora" : "No disponible"}
+                        {availableRooms ? t("Reservar ahora") : t("No disponible")}
                       </button>
                     </div>
                   </article>
@@ -1356,52 +1487,54 @@ function Home() {
               })}
             </div>
             <p className="reservation-disclaimer">
-              La disponibilidad corresponde al estado actual registrado en el hotel; la consulta de ocupación por fechas requiere conectar el módulo de reservas.
+              {language === "en"
+                ? "Availability reflects the current status registered at the hotel; date-based occupancy requires connecting the reservations module."
+                : "La disponibilidad corresponde al estado actual registrado en el hotel; la consulta de ocupación por fechas requiere conectar el módulo de reservas."}
             </p>
           </section>
         </div>
       )}
 
-      <section className="feature-strip" aria-label="Ventajas del hotel">
+      <section className="feature-strip" aria-label={t("Ventajas del hotel")}>
         <div className="feature-strip-grid">
           <article className="feature-card">
             <div className="feature-icon" aria-hidden="true">🔔</div>
             <div className="feature-copy">
-              <h3>Servicio 24/7</h3>
-              <p>Estamos siempre disponibles para ti.</p>
+              <h3>{t("Servicio 24/7")}</h3>
+              <p>{t("Estamos siempre disponibles para ti.")}</p>
             </div>
           </article>
 
           <article className="feature-card">
             <div className="feature-icon" aria-hidden="true">🛏️</div>
             <div className="feature-copy">
-              <h3>Comodidad</h3>
-              <p>Habitaciones diseñadas para tu descanso.</p>
+              <h3>{t("Comodidad")}</h3>
+              <p>{t("Habitaciones diseñadas para tu descanso.")}</p>
             </div>
           </article>
 
           <article className="feature-card">
             <div className="feature-icon" aria-hidden="true">🛡️</div>
             <div className="feature-copy">
-              <h3>Seguridad</h3>
-              <p>Tu tranquilidad es nuestra prioridad.</p>
+              <h3>{t("Seguridad")}</h3>
+              <p>{t("Tu tranquilidad es nuestra prioridad.")}</p>
             </div>
           </article>
 
           <article className="feature-card">
             <div className="feature-icon" aria-hidden="true">📍</div>
             <div className="feature-copy">
-              <h3>Ubicación</h3>
-              <p>En el corazón de la ciudad, cerca de todo.</p>
+              <h3>{t("Ubicación")}</h3>
+              <p>{t("En el corazón de la ciudad, cerca de todo.")}</p>
             </div>
           </article>
         </div>
       </section>
 
-      <section className="value-cards" aria-label="Beneficios del hotel">
+      <section className="value-cards" aria-label={t("Beneficios del hotel")}>
         <button type="button" className="value-card value-card-button" onClick={() => setMostrarUbicacion(true)}>
-          <h3>Ubicación estratégica</h3> 
-          <p>Acceso fácil a sitios turísticos, restaurantes y transporte local.</p>
+          <h3>{t("Ubicación estratégica")}</h3>
+          <p>{t("Acceso fácil a sitios turísticos, restaurantes y transporte local.")}</p>
         </button>
 
         <button
@@ -1409,13 +1542,13 @@ function Home() {
           className="value-card value-card-button"
           onClick={() => setMostrarAtencion(true)}
         >
-          <h3>Atención 24/7</h3>
-          <p>Soporte para reservas, consultas y servicios personalizados.</p>
+          <h3>{t("Atención 24/7")}</h3>
+          <p>{t("Soporte para reservas, consultas y servicios personalizados.")}</p>
         </button>
 
         <button type="button" className="value-card value-card-button" onClick={handleOpenExperienceModal}>
-          <h3>Experiencias únicas</h3>
-          <p>Planes especiales, cenas temáticas y actividades de bienestar.</p>
+          <h3>{t("Experiencias únicas")}</h3>
+          <p>{t("Planes especiales, cenas temáticas y actividades de bienestar.")}</p>
         </button>
       </section>
 
@@ -1437,8 +1570,8 @@ function Home() {
 
       <section className="rooms-section home-section" id="rooms">
         <div className="section-title align-left">
-          <span>Habitaciones</span>
-          <h2>Encuentra el espacio perfecto para tu estadía</h2>
+          <span>{t("Habitaciones")}</span>
+          <h2>{t("Encuentra el espacio perfecto para tu estadía")}</h2>
         </div>
         <div className="room-categories">
           <button
@@ -1448,10 +1581,10 @@ function Home() {
             style={{ backgroundImage: `url(${publicRooms.find(r => r.category === "individual")?.image || rooms.find(r => r.category === "individual")?.image})` }}
           >
             <div className="category-overlay">
-              <h3>Habitaciones Individuales</h3>
+              <h3>{t("Habitaciones Individuales")}</h3>
               {/* <p>Confort y privacidad para una persona.</p> */}
               <div className="category-availability">
-                <strong>{obtenerDatosCategoria("individual")?.habitacionesDisponibles || 0}/{obtenerDatosCategoria("individual")?.totalHabitaciones || 0} habitaciones disponibles</strong>
+                <strong>{getCategoryAvailabilityLabel("individual")}</strong>
               </div>
             </div>
           </button>
@@ -1463,10 +1596,10 @@ function Home() {
             style={{ backgroundImage: `url(${publicRooms.find(r => r.category === "doble")?.image || rooms.find(r => r.category === "doble")?.image})` }}
           >
             <div className="category-overlay">
-              <h3>Habitaciones Dobles</h3>
+              <h3>{t("Habitaciones Dobles")}</h3>
               {/* <p>El espacio ideal para compartir.</p> */}
               <div className="category-availability">
-                <strong>{obtenerDatosCategoria("doble")?.habitacionesDisponibles || 0}/{obtenerDatosCategoria("doble")?.totalHabitaciones || 0} habitaciones disponibles</strong>
+                <strong>{getCategoryAvailabilityLabel("doble")}</strong>
               </div>
             </div>
           </button>
@@ -1478,10 +1611,10 @@ function Home() {
             style={{ backgroundImage: `url(${publicRooms.find(r => r.category === "familiar")?.image || rooms.find(r => r.category === "familiar")?.image})` }}
           >
             <div className="category-overlay">
-              <h3>Habitaciones Familiares</h3>
+              <h3>{t("Habitaciones Familiares")}</h3>
               {/* <p>Amplitud y comodidad para toda la familia.</p> */}
               <div className="category-availability">
-                <strong>{obtenerDatosCategoria("familiar")?.habitacionesDisponibles || 0}/{obtenerDatosCategoria("familiar")?.totalHabitaciones || 0} habitaciones disponibles</strong>
+                <strong>{getCategoryAvailabilityLabel("familiar")}</strong>
               </div>
             </div>
           </button>
@@ -2091,7 +2224,7 @@ function Home() {
               className="modal-close room-modal-close"
               type="button"
               onClick={handleCloseRoomModal}
-              aria-label="Cerrar detalles de la habitación"
+              aria-label={language === "en" ? "Close room details" : "Cerrar detalles de la habitación"}
             >
               ×
             </button>
@@ -2102,7 +2235,7 @@ function Home() {
                     videoYoutubeEmbed ? (
                       <iframe
                         src={videoYoutubeEmbed}
-                        title={`Video de ${activeRoom.title}`}
+                        title={`${language === "en" ? "Video of" : "Video de"} ${getRoomTitle(activeRoom.title)}`}
                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                         allowFullScreen
                       />
@@ -2112,14 +2245,14 @@ function Home() {
                   ) : (
                     <img
                       src={activeRoom.imagenesReales[activeRoomGalleryIndex - 1]}
-                      alt={`${activeRoom.title} imagen ${activeRoomGalleryIndex}`}
+                      alt={`${getRoomTitle(activeRoom.title)} ${language === "en" ? "image" : "imagen"} ${activeRoomGalleryIndex}`}
                     />
                   )}
                   {(activeRoom.imagenesReales?.length || 0) > 0 && (
                     <div className="room-modal-gallery-controls">
-                      <button type="button" onClick={() => cambiarGaleria(-1)} aria-label="Elemento anterior">‹</button>
+                      <button type="button" onClick={() => cambiarGaleria(-1)} aria-label={language === "en" ? "Previous item" : "Elemento anterior"}>‹</button>
                       <span>{activeRoomGalleryIndex + 1} / {1 + activeRoom.imagenesReales.length}</span>
-                      <button type="button" onClick={() => cambiarGaleria(1)} aria-label="Siguiente elemento">›</button>
+                      <button type="button" onClick={() => cambiarGaleria(1)} aria-label={language === "en" ? "Next item" : "Siguiente elemento"}>›</button>
                     </div>
                   )}
                 </div>
@@ -2128,7 +2261,7 @@ function Home() {
                     type="button"
                     className={`room-modal-gallery-thumb room-modal-video-thumb ${activeRoomGalleryIndex === 0 ? "active" : ""}`}
                     onClick={() => setActiveRoomGalleryIndex(0)}
-                    aria-label="Ver video de la habitación"
+                    aria-label={language === "en" ? "View room video" : "Ver video de la habitación"}
                   >
                     <img src={homeLogo} alt="Hotel Valencia" />
                   </button>
@@ -2138,24 +2271,28 @@ function Home() {
                       type="button"
                       className={`room-modal-gallery-thumb ${activeRoomGalleryIndex === index + 1 ? "active" : ""}`}
                       onClick={() => setActiveRoomGalleryIndex(index + 1)}
-                      aria-label={`Ver imagen ${index + 1}`}
+                      aria-label={`${language === "en" ? "View image" : "Ver imagen"} ${index + 1}`}
                     >
-                      <img src={image} alt={`${activeRoom.title} miniatura ${index + 1}`} />
+                      <img src={image} alt={`${getRoomTitle(activeRoom.title)} ${language === "en" ? "thumbnail" : "miniatura"} ${index + 1}`} />
                     </button>
                   ))}
                 </div>
               </div>
               <div className="room-modal-details">
-                <h2>{activeRoom.title}</h2>
-                <p className="room-modal-type">Tipo: {activeRoom.tipo || activeRoom.category}</p>
+                <h2>{getRoomTitle(activeRoom.title)}</h2>
+                <p className="room-modal-type">
+                  {t("Tipo:")} {language === "en"
+                    ? getRoomTitle(`Habitación ${activeRoom.tipo || activeRoom.category}`).replace(/^Room /, "")
+                    : activeRoom.tipo || activeRoom.category}
+                </p>
                 <p className="room-modal-registered-count">
-                  {activeRoom.habitacionesDisponibles || 0}/{activeRoom.totalHabitaciones || 0} habitaciones disponibles
+                  {activeRoom.habitacionesDisponibles || 0}/{activeRoom.totalHabitaciones || 0} {t("habitaciones disponibles")}
                 </p>
                 <div className="room-modal-real-data">
-                  <p><strong>Camas:</strong> {activeRoom.numeroCamas || 0}</p>
+                  <p><strong>{t("Camas:")}</strong> {activeRoom.numeroCamas || 0}</p>
                 </div>
                 <div className="room-modal-features">
-                  <h3>Características</h3>
+                  <h3>{t("Características")}</h3>
                   {activeRoom.caracteristicasReales?.length > 0 ? (
                     activeRoom.caracteristicasReales.map((caracteristica, index) => (
                       <div key={`${caracteristica.idcarac || index}`} className="room-modal-feature">
@@ -2164,11 +2301,11 @@ function Home() {
                       </div>
                     ))
                   ) : (
-                    <span>Sin características registradas.</span>
+                    <span>{t("Sin características registradas.")}</span>
                   )}
                 </div>
                 <p className="room-modal-price">
-                  {formatCurrency(nightlyRatePerPerson)} por persona
+                  {formatCurrency(nightlyRatePerPerson)} {t("por persona")}
                 </p>
                   <button
                     className="btn btn-secondary"
@@ -2180,7 +2317,7 @@ function Home() {
                     )}
                     disabled={Number(activeRoom.habitacionesDisponibles || 0) < 1}
                   >
-                    {Number(activeRoom.habitacionesDisponibles || 0) > 0 ? "Continuar" : "No disponible"}
+                    {Number(activeRoom.habitacionesDisponibles || 0) > 0 ? t("Continuar") : t("No disponible")}
                   </button>
                   {roomPreviewFromSearch && (
                     <button
@@ -2188,7 +2325,7 @@ function Home() {
                       type="button"
                       onClick={handleCloseRoomModal}
                     >
-                      ← Volver a habitaciones
+                      ← {language === "en" ? "Back to rooms" : "Volver a habitaciones"}
                     </button>
                   )}
               </div>
@@ -2262,25 +2399,25 @@ function Home() {
             <img src={homeLogo} alt="Hotel Valencia logo" className="footer-logo" />
             <div>
               <span className="footer-brand-name">Hotel Valencia</span>
-              <p>Hospitalidad elegante en Sonsón, donde cada detalle está pensado para tu descanso.</p>
+              <p>{t("Hospitalidad elegante en Sonsón, donde cada detalle está pensado para tu descanso.")}</p>
             </div>
           </div>
 
           <div className="footer-links">
-            <h4>Explora</h4>
+            <h4>{t("Explora")}</h4>
             <ul>
-              <li><a href="#hero">Inicio</a></li>
-              <li><a href="#rooms">Habitaciones</a></li>
-              <li><a href="#contact">Contacto</a></li>
+              <li><a href="#hero">{t("Inicio")}</a></li>
+              <li><a href="#rooms">{t("Habitaciones")}</a></li>
+              <li><a href="#contact">{t("Contacto")}</a></li>
             </ul>
           </div>
 
           <div className="footer-contact">
-            <h4>Contacto</h4>
+            <h4>{t("Contacto")}</h4>
             <p>📍 Sonsón, Antioquia</p>
             <p>📞 +57 300 123 4567</p>
             <p>✉️ info@hotelvalencia.com</p>
-            <p>🕒 Recepción 24/7</p>
+            <p>🕒 {t("Recepción 24/7")}</p>
           </div>
         </div>
 
@@ -2288,7 +2425,7 @@ function Home() {
 
         <div className="footer-copy">
           <span>© 2026 Hotel Valencia.</span>
-          <span>Todos los derechos reservados.</span>
+          <span>{t("Todos los derechos reservados.")}</span>
         </div>
       </footer>
     </div>
