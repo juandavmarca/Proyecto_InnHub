@@ -3,9 +3,18 @@ import { obtenerEmpleados, actualizarEstadoEmpleado } from "../services/api";
 import { useEffect, useState } from "react";
 import ConfirmDialog from "../components/ConfirmDialog";
 import CenteredToast from "../components/CenteredToast";
+
+const normalizeSearchText = (value) =>
+  String(value ?? "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .trim()
+    .toLocaleLowerCase("es");
+
 function Empleados() {
   const [empleados, setEmpleados] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [busquedaNombre, setBusquedaNombre] = useState("");
   const [empleadoEditar, setEmpleadoEditar] = useState(null);
   const [confirm, setConfirm] = useState({ show: false, title: "", message: "", onConfirm: null });
   const [toast, setToast] = useState({ show: false, message: "", type: "info" });
@@ -89,7 +98,12 @@ function Empleados() {
     });
   };
 
-  const empleadosFiltrados = empleados.filter((empleado) => !empleado.deshabilitado);
+  const terminoBusqueda = normalizeSearchText(busquedaNombre);
+  const empleadosFiltrados = empleados.filter((empleado) => {
+    if (empleado.deshabilitado) return false;
+    const nombreCompleto = normalizeSearchText(`${empleado.nombre || ""} ${empleado.apellido || ""}`);
+    return nombreCompleto.includes(terminoBusqueda);
+  });
 
   if (loading) {
     return <div className="alert alert-info">Cargando empleados...</div>;
@@ -100,6 +114,17 @@ function Empleados() {
       <div className="dashboard-page-header">
         <h1>Empleados</h1>
         <div className="dashboard-actions">
+          <div className="dashboard-search">
+            <i className="fa-solid fa-magnifying-glass" aria-hidden="true" />
+            <input
+              type="search"
+              className="dashboard-search-input"
+              aria-label="Buscar empleados por nombre o apellido"
+              placeholder="Buscar por nombre o apellido"
+              value={busquedaNombre}
+              onChange={(event) => setBusquedaNombre(event.target.value)}
+            />
+          </div>
           <button className="btn btn-success" data-bs-toggle="modal" data-bs-target="#empleadoModal" onClick={handleNuevoEmpleado}>
             + Nuevo Empleado
           </button>
@@ -140,7 +165,13 @@ function Empleados() {
           </tr>
         </thead>
         <tbody>
-          {empleadosFiltrados.map((empleado) => (
+          {empleadosFiltrados.length === 0 ? (
+            <tr>
+              <td colSpan="8" className="text-center">
+                {terminoBusqueda ? "No se encontraron empleados con ese nombre." : "No hay empleados registrados."}
+              </td>
+            </tr>
+          ) : empleadosFiltrados.map((empleado) => (
             <tr key={empleado.documento}>
               <td data-label="Documento">{empleado.documento}</td>
               <td data-label="Nombre">{empleado.nombre}</td>

@@ -618,7 +618,7 @@ function Home() {
 
   const getCategoryAvailabilityLabel = (category) => {
     const room = obtenerDatosCategoria(category);
-    return `${room?.habitacionesDisponibles || 0}/${room?.totalHabitaciones || 0} ${t("habitaciones disponibles")}`;
+    return getAvailabilityLabel(room?.habitacionesDisponibles || 0);
   };
 
   const getFullPhoneNumber = () => `${phoneCountry.code}${guestDetails.phone.replace(/\D/g, "")}`;
