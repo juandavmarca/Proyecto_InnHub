@@ -3,9 +3,18 @@ import { obtenerClientes, actualizarEstadoCliente } from "../services/api";
 import { useEffect, useState } from "react";
 import ConfirmDialog from "../components/ConfirmDialog";
 import CenteredToast from "../components/CenteredToast";
+
+const normalizeSearchText = (value) =>
+  String(value ?? "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .trim()
+    .toLocaleLowerCase("es");
+
 function Clientes() {
   const [clientes, setClientes] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [busquedaNombre, setBusquedaNombre] = useState("");
   const [clienteEditar, setClienteEditar] = useState(null);
   const [confirm, setConfirm] = useState({ show: false, title: "", message: "", onConfirm: null });
   const [toast, setToast] = useState({ show: false, message: "", type: "info" });
@@ -89,7 +98,12 @@ function Clientes() {
     });
   };
 
-  const clientesFiltrados = clientes.filter((cliente) => !cliente.deshabilitado);
+  const terminoBusqueda = normalizeSearchText(busquedaNombre);
+  const clientesFiltrados = clientes.filter((cliente) => {
+    if (cliente.deshabilitado) return false;
+    const nombreCompleto = normalizeSearchText(`${cliente.nombre || ""} ${cliente.apellido || ""}`);
+    return nombreCompleto.includes(terminoBusqueda);
+  });
 
   if (loading) {
     return <div className="alert alert-info">Cargando clientes...</div>;
@@ -100,6 +114,17 @@ function Clientes() {
       <div className="dashboard-page-header">
         <h1>Clientes</h1>
         <div className="dashboard-actions">
+          <div className="dashboard-search">
+            <i className="fa-solid fa-magnifying-glass" aria-hidden="true" />
+            <input
+              type="search"
+              className="dashboard-search-input"
+              aria-label="Buscar clientes por nombre o apellido"
+              placeholder="Buscar por nombre o apellido"
+              value={busquedaNombre}
+              onChange={(event) => setBusquedaNombre(event.target.value)}
+            />
+          </div>
           <button className="btn btn-success" data-bs-toggle="modal" data-bs-target="#clienteModal" onClick={handleNuevoCliente}>
             + Nuevo Cliente
           </button>
@@ -141,7 +166,13 @@ function Clientes() {
           </tr>
         </thead>
         <tbody>
-          {clientesFiltrados.map((cliente) => (
+          {clientesFiltrados.length === 0 ? (
+            <tr>
+              <td colSpan="8" className="text-center">
+                {terminoBusqueda ? "No se encontraron clientes con ese nombre." : "No hay clientes registrados."}
+              </td>
+            </tr>
+          ) : clientesFiltrados.map((cliente) => (
             <tr key={cliente.id_cliente}>
               <td data-label="Documento">{cliente.documento || "Pendiente"}</td>
               <td data-label="Tipo de documento">{cliente.tipo_documento || "Pendiente"}</td>
