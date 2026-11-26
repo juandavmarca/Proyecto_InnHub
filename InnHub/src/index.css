@@ -7856,6 +7856,35 @@ html body .dashboard-page .table.table-innhub.table-striped tbody tr td,
   color: rgba(255, 250, 240, 0.42);
 }
 
+.reservation-create-date-field {
+  min-width: 0;
+}
+
+.reservation-create-date-field .booking-date-picker {
+  gap: 0.38rem;
+}
+
+.reservation-create-date-field .booking-date-label {
+  color: rgba(255, 250, 240, 0.82);
+  font-size: 0.76rem;
+  font-weight: 700;
+}
+
+.reservation-create-date-field .booking-date-trigger {
+  min-height: 42px;
+  padding: 0.6rem 0.75rem;
+  border-color: rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+  background: #19191b;
+  font-size: 0.82rem;
+}
+
+.reservation-create-date-field .booking-date-trigger:hover,
+.reservation-create-date-field .booking-date-trigger.is-open,
+.reservation-create-date-field .booking-date-trigger:focus-visible {
+  background: rgba(211, 169, 64, 0.08);
+}
+
 .reservation-create-grid,
 .reservation-new-client-fields {
   display: grid;

@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import BookingDatePicker from "./BookingDatePicker";
 import {
   crearCliente,
   iniciarPagoReservaRecepcion,
@@ -192,6 +193,10 @@ function ReservaRecepcionModal({ habitaciones, onClose }) {
   const iniciarPago = async (event) => {
     event.preventDefault();
     setErrorReserva("");
+    if (!fechaEntrada || !fechaSalida || fechaSalida <= fechaEntrada) {
+      setErrorReserva("Selecciona una fecha de entrada y salida válidas.");
+      return;
+    }
     if (!idCliente || !idHabitacion || !porcentajePago) {
       setErrorReserva("Selecciona el cliente, la habitación y el porcentaje que se pagará.");
       return;
@@ -362,14 +367,16 @@ function ReservaRecepcionModal({ habitaciones, onClose }) {
               </div>
             </div>
             <div className="reservation-create-grid">
-              <label className="reservation-create-field">
-                Fecha de entrada
-                <input
-                  type="date"
+              <div className="reservation-create-date-field">
+                <BookingDatePicker
+                  id="reservation-check-in"
+                  label="Fecha de entrada"
                   value={fechaEntrada}
                   min={fechaLocal()}
-                  onChange={(event) => {
-                    const nuevaFecha = event.target.value;
+                  rangeStart={fechaEntrada}
+                  rangeEnd={fechaSalida}
+                  required
+                  onChange={(nuevaFecha) => {
                     const nuevaSalida = fechaSalida && fechaSalida <= nuevaFecha ? "" : fechaSalida;
                     setFechaEntrada(nuevaFecha);
                     if (nuevaSalida !== fechaSalida) setFechaSalida("");
@@ -378,28 +385,26 @@ function ReservaRecepcionModal({ habitaciones, onClose }) {
                     setErrorHabitaciones("");
                     setCargandoHabitaciones(Boolean(nuevaFecha && nuevaSalida && nuevaSalida > nuevaFecha && tipoHabitacion));
                   }}
-                  required
-                  disabled={enviandoPago}
                 />
-              </label>
-              <label className="reservation-create-field">
-                Fecha de salida
-                <input
-                  type="date"
+              </div>
+              <div className="reservation-create-date-field">
+                <BookingDatePicker
+                  id="reservation-check-out"
+                  label="Fecha de salida"
                   value={fechaSalida}
                   min={fechaEntrada ? siguienteFecha(fechaEntrada) : siguienteFecha(fechaLocal())}
-                  onChange={(event) => {
-                    const nuevaFecha = event.target.value;
+                  rangeStart={fechaEntrada}
+                  rangeEnd={fechaSalida}
+                  required
+                  onChange={(nuevaFecha) => {
                     setFechaSalida(nuevaFecha);
                     setOpcionesHabitacion([]);
                     setIdHabitacion("");
                     setErrorHabitaciones("");
                     setCargandoHabitaciones(Boolean(fechaEntrada && nuevaFecha > fechaEntrada && tipoHabitacion));
                   }}
-                  required
-                  disabled={enviandoPago}
                 />
-              </label>
+              </div>
               <label className="reservation-create-field">
                 Número de huéspedes
                 <select value={numeroPersonas} onChange={(event) => setNumeroPersonas(event.target.value)} disabled={enviandoPago}>
