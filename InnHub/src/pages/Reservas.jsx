@@ -444,21 +444,11 @@ function Reservas() {
             y confirma la estadía del huésped.
           </p>
         </div>
-        <div className="reservations-welcome-actions">
-          <button
-            type="button"
-            className="reservation-create-trigger"
-            onClick={() => setMostrarCrearReserva(true)}
-          >
-            <i className="fa-solid fa-plus" aria-hidden="true" />
-            Crear reserva
-          </button>
-          <Link className="reservations-room-link" to="/Habitaciones">
-            <i className="fa-solid fa-bed" aria-hidden="true" />
-            Ver habitaciones
-            <i className="fa-solid fa-arrow-up-right-from-square" aria-hidden="true" />
-          </Link>
-        </div>
+        <Link className="reservations-room-link" to="/Habitaciones">
+          <i className="fa-solid fa-bed" aria-hidden="true" />
+          Ver habitaciones
+          <i className="fa-solid fa-arrow-up-right-from-square" aria-hidden="true" />
+        </Link>
         <div className="reservations-welcome-art" aria-hidden="true">
           <i className="fa-solid fa-bell-concierge" />
         </div>
@@ -495,6 +485,25 @@ function Reservas() {
             <small>Estado actual del hotel</small>
           </div>
         </article>
+      </section>
+
+      <section className="reservations-create-card" aria-labelledby="reservations-create-title">
+        <span className="reservations-stat-icon reservations-stat-icon-gold reservations-create-icon" aria-hidden="true">
+          <i className="fa-solid fa-plus" />
+        </span>
+        <div className="reservations-create-copy">
+          <span className="reservations-section-kicker">Atención presencial</span>
+          <h2 id="reservations-create-title">Realizar una reserva</h2>
+          <p>Registra la estadía de un huésped, selecciona su habitación y gestiona el pago desde el panel.</p>
+        </div>
+        <button
+          type="button"
+          className="reservation-create-trigger"
+          onClick={() => setMostrarCrearReserva(true)}
+        >
+          <i className="fa-solid fa-plus" aria-hidden="true" />
+          Iniciar reserva
+        </button>
       </section>
 
       <section className="reservations-integration-note" aria-label="Estado de pagos">
