@@ -7070,15 +7070,6 @@ html body .dashboard-page .table.table-innhub.table-striped tbody tr td,
   max-width: 670px;
 }
 
-.reservations-welcome-actions {
-  position: relative;
-  z-index: 1;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.65rem;
-}
-
 .reservation-create-trigger {
   display: inline-flex;
   flex-shrink: 0;
@@ -7196,6 +7187,40 @@ html body .dashboard-page .table.table-innhub.table-striped tbody tr td,
   border: 1px solid rgba(211, 169, 64, 0.15);
   border-radius: 18px;
   background: #2a2a2c;
+}
+
+.reservations-create-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  min-width: 0;
+  padding: 1.15rem 1.25rem;
+  border: 1px solid rgba(211, 169, 64, 0.2);
+  border-radius: 18px;
+  background: linear-gradient(110deg, #2a2a2c, #302d26);
+}
+
+.reservations-create-icon {
+  width: 48px;
+  height: 48px;
+}
+
+.reservations-create-copy {
+  flex: 1;
+  min-width: 0;
+}
+
+.reservations-create-copy h2 {
+  margin: 0.35rem 0 0.25rem;
+  color: #fffaf0;
+  font-size: 1.05rem;
+}
+
+.reservations-create-copy p {
+  margin: 0;
+  color: rgba(255, 250, 240, 0.62);
+  font-size: 0.82rem;
+  line-height: 1.55;
 }
 
 .reservations-stat-icon,
@@ -8267,14 +8292,16 @@ html body .dashboard-page .table.table-innhub.table-striped tbody tr td,
     flex-direction: column;
   }
 
-  .reservations-welcome-actions {
-    width: 100%;
-    align-items: stretch;
-    flex-direction: column;
+  .reservations-create-card {
+    align-items: flex-start;
+    flex-wrap: wrap;
   }
 
-  .reservation-create-trigger,
-  .reservations-welcome-actions .reservations-room-link {
+  .reservations-create-copy {
+    flex-basis: calc(100% - 64px);
+  }
+
+  .reservations-create-card .reservation-create-trigger {
     width: 100%;
     justify-content: center;
   }
