@@ -25,6 +25,7 @@ function autorizarRecepcion(): array
     try {
         $stmt = $pdo->prepare(
             'SELECT u.documento, u.rol, u.estado,
+                    e.id_empleado,
                     e.cargo AS cargo_empleado, e.estado AS estado_empleado
              FROM usuarios u
              LEFT JOIN empleados e ON e.documento = u.documento
@@ -55,7 +56,7 @@ function autorizarRecepcion(): array
     }
 
     return [
-        'id_empleado' => null,
+        'id_empleado' => isset($usuario['id_empleado']) ? (int) $usuario['id_empleado'] : null,
         'rol' => $rol,
     ];
 }
