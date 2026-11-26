@@ -1,11 +1,14 @@
-import { useEffect, useMemo, useState } from "react";
+import { lazy, Suspense, useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import {
   confirmarReservaRecepcion,
+  consultarEstadoPago,
   obtenerHabitaciones,
   obtenerHabitacionesParaReserva,
   obtenerReservasPendientesRecepcion,
 } from "../services/api";
+
+const ReservaRecepcionModal = lazy(() => import("../components/ReservaRecepcionModal"));
 
 const resolveStatus = (habitacion) => {
   const estado = String(habitacion.estado || "").trim().toLowerCase();
@@ -242,6 +245,7 @@ function Reservas() {
   const [refreshKey, setRefreshKey] = useState(0);
   const [queueRefreshKey, setQueueRefreshKey] = useState(0);
   const [confirmingId, setConfirmingId] = useState(null);
+  const [mostrarCrearReserva, setMostrarCrearReserva] = useState(false);
 
   useEffect(() => {
     let active = true;
@@ -294,6 +298,102 @@ function Reservas() {
     return () => window.clearInterval(interval);
   }, []);
 
+  useEffect(() => {
+    const parametros = new URLSearchParams(window.location.search);
+    const referencia = parametros.get("pago");
+    if (!referencia) return undefined;
+
+    parametros.delete("pago");
+    const query = parametros.toString();
+    window.history.replaceState(
+      window.history.state,
+      "",
+      `${window.location.pathname}${query ? `?${query}` : ""}${window.location.hash}`
+    );
+
+    let active = true;
+    let timeout;
+    let intentos = 0;
+    let revisarPago;
+    const reintentar = () => {
+      intentos += 1;
+      timeout = window.setTimeout(revisarPago, 2000);
+    };
+    revisarPago = async () => {
+      try {
+        const resultado = await consultarEstadoPago(referencia);
+        if (!active) return;
+
+        const estadoPago = String(resultado.estado || "").toUpperCase();
+        const estadoReserva = String(resultado.estado_reserva || "").trim().toLowerCase();
+        if (estadoPago === "APPROVED" && estadoReserva === "confirmada") {
+          setReservasNotice(
+            `¡Pago aprobado! La reserva #${resultado.id_reserva} quedó confirmada para la habitación ${resultado.numero_habitacion || resultado.id_habitacion}.`
+          );
+          setReservasError("");
+          setRefreshKey((key) => key + 1);
+          setQueueRefreshKey((key) => key + 1);
+          return;
+        }
+
+        if (estadoPago === "APPROVED" && ["pendiente de confirmación", "pago aprobado"].includes(estadoReserva)) {
+          try {
+            const confirmacion = await confirmarReservaRecepcion(
+              Number(resultado.id_reserva),
+              Number(resultado.id_habitacion)
+            );
+            if (!active) return;
+            setReservasNotice(
+              `¡Pago aprobado! ${confirmacion.mensaje} Reserva #${resultado.id_reserva}, habitación ${resultado.numero_habitacion || resultado.id_habitacion}.`
+            );
+            setReservasError("");
+            setRefreshKey((key) => key + 1);
+            setQueueRefreshKey((key) => key + 1);
+          } catch (error) {
+            if (!active) return;
+            const estadoActualizado = await consultarEstadoPago(referencia);
+            if (!active) return;
+            if (String(estadoActualizado.estado_reserva || "").trim().toLowerCase() === "confirmada") {
+              setReservasNotice(
+                `¡Pago aprobado! La reserva #${estadoActualizado.id_reserva} quedó confirmada para la habitación ${estadoActualizado.numero_habitacion || estadoActualizado.id_habitacion}.`
+              );
+              setReservasError("");
+            } else {
+              setReservasError(
+                `Wompi aprobó el pago, pero no se pudo confirmar la habitación automáticamente: ${error.message || "verifica la disponibilidad en la lista de reservas pagadas por confirmar."}`
+              );
+            }
+            setRefreshKey((key) => key + 1);
+            setQueueRefreshKey((key) => key + 1);
+          }
+          return;
+        }
+
+        if (["DECLINED", "VOIDED", "ERROR"].includes(estadoPago)) {
+          setReservasError("Wompi no aprobó el pago. La reserva no fue confirmada.");
+          setQueueRefreshKey((key) => key + 1);
+          return;
+        }
+
+        if (intentos >= 14) {
+          setReservasNotice("El pago sigue en confirmación. No inicies otro pago; actualiza la lista en unos minutos.");
+          return;
+        }
+        reintentar();
+      } catch (error) {
+        if (active) {
+          setReservasError(error.message || "No se pudo consultar el estado del pago.");
+        }
+      }
+    };
+
+    revisarPago();
+    return () => {
+      active = false;
+      window.clearTimeout(timeout);
+    };
+  }, []);
+
   const actualizarDatos = () => {
     setLoadingRooms(true);
     setLoadingReservas(true);
@@ -344,11 +444,21 @@ function Reservas() {
             y confirma la estadía del huésped.
           </p>
         </div>
-        <Link className="reservations-room-link" to="/Habitaciones">
-          <i className="fa-solid fa-bed" aria-hidden="true" />
-          Ver habitaciones
-          <i className="fa-solid fa-arrow-up-right-from-square" aria-hidden="true" />
-        </Link>
+        <div className="reservations-welcome-actions">
+          <button
+            type="button"
+            className="reservation-create-trigger"
+            onClick={() => setMostrarCrearReserva(true)}
+          >
+            <i className="fa-solid fa-plus" aria-hidden="true" />
+            Crear reserva
+          </button>
+          <Link className="reservations-room-link" to="/Habitaciones">
+            <i className="fa-solid fa-bed" aria-hidden="true" />
+            Ver habitaciones
+            <i className="fa-solid fa-arrow-up-right-from-square" aria-hidden="true" />
+          </Link>
+        </div>
         <div className="reservations-welcome-art" aria-hidden="true">
           <i className="fa-solid fa-bell-concierge" />
         </div>
@@ -520,6 +630,19 @@ function Reservas() {
           </div>
         )}
       </section>
+
+      {mostrarCrearReserva && (
+        <Suspense fallback={
+          <div className="reservation-create-backdrop">
+            <div className="reservation-create-loading" role="status">Cargando formulario de reserva…</div>
+          </div>
+        }>
+          <ReservaRecepcionModal
+            habitaciones={habitaciones}
+            onClose={() => setMostrarCrearReserva(false)}
+          />
+        </Suspense>
+      )}
     </div>
   );
 }

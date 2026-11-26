@@ -111,7 +111,7 @@ function Empleados() {
 
   return (
     <div className="dashboard-page">
-      <div className="dashboard-page-header">
+      <div className="dashboard-page-header dashboard-page-header-with-search">
         <h1>Empleados</h1>
         <div className="dashboard-actions">
           <div className="dashboard-search">

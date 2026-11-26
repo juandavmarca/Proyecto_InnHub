@@ -191,6 +191,23 @@ export function confirmarReservaRecepcion(idReserva, idHabitacion) {
   });
 }
 
+export function obtenerHabitacionesDisponiblesParaNuevaReserva(fechaEntrada, fechaSalida, tipoHabitacion) {
+  const query = new URLSearchParams({
+    fecha_entrada: fechaEntrada,
+    fecha_salida: fechaSalida,
+    tipo_habitacion: tipoHabitacion,
+  });
+  return solicitarGestionReservas("habitaciones_nueva", { query: `?${query.toString()}` });
+}
+
+export function iniciarPagoReservaRecepcion(datos) {
+  return solicitarGestionReservas("iniciar_pago", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(datos),
+  });
+}
+
 export async function enviarSugerenciaAtencion(email, descripcion) {
   const response = await fetch(`${BASE_URL}/Contacto/sugerencia.php`, {
     method: "POST",
