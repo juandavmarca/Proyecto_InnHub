@@ -55,6 +55,7 @@ const formatMoney = (value) => {
 function ReservationAssignmentCard({ reserva, onConfirm, confirming }) {
   const [habitaciones, setHabitaciones] = useState(null);
   const [habitacionSeleccionada, setHabitacionSeleccionada] = useState("");
+  const [mensajeCliente, setMensajeCliente] = useState("");
   const [cargandoHabitaciones, setCargandoHabitaciones] = useState(false);
   const [errorHabitaciones, setErrorHabitaciones] = useState("");
 
@@ -201,10 +202,22 @@ function ReservationAssignmentCard({ reserva, onConfirm, confirming }) {
                 })}
               </select>
             </label>
+            <label className="reservation-assignment-message-field">
+              Mensaje para el cliente (opcional)
+              <textarea
+                value={mensajeCliente}
+                onChange={(event) => setMensajeCliente(event.target.value)}
+                placeholder="Escribe aquí la información que quieres compartirle al huésped."
+                maxLength={500}
+                rows={3}
+                disabled={confirming}
+              />
+              <small>{mensajeCliente.length}/500 caracteres</small>
+            </label>
             <button
               type="button"
               className="reservations-confirm-button"
-              onClick={() => onConfirm(reserva, habitacionSeleccionada)}
+              onClick={() => onConfirm(reserva, habitacionSeleccionada, mensajeCliente.trim())}
               disabled={!habitacionSeleccionada || confirming}
             >
               <i className={`fa-solid ${confirming ? "fa-spinner fa-spin" : "fa-check"}`} aria-hidden="true" />
@@ -293,7 +306,7 @@ function Reservas() {
       if (document.visibilityState === "visible") {
         setQueueRefreshKey((key) => key + 1);
       }
-    }, 30000);
+    }, 5000);
 
     return () => window.clearInterval(interval);
   }, []);
@@ -404,13 +417,17 @@ function Reservas() {
     setQueueRefreshKey((key) => key + 1);
   };
 
-  const confirmarReserva = async (reserva, idHabitacion) => {
+  const confirmarReserva = async (reserva, idHabitacion, mensajeCliente) => {
     setConfirmingId(reserva.id_reserva);
     setReservasError("");
     setReservasNotice("");
 
     try {
-      const resultado = await confirmarReservaRecepcion(reserva.id_reserva, Number(idHabitacion));
+      const resultado = await confirmarReservaRecepcion(
+        reserva.id_reserva,
+        Number(idHabitacion),
+        mensajeCliente
+      );
       setReservas((actuales) => actuales.filter((item) => item.id_reserva !== reserva.id_reserva));
       setReservasNotice(resultado.mensaje || `La reserva #${reserva.id_reserva} quedó confirmada.`);
     } catch (error) {

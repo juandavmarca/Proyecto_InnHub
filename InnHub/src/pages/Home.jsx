@@ -773,7 +773,7 @@ function Home() {
     };
 
     actualizarDisponibilidad();
-    const interval = window.setInterval(actualizarDisponibilidad, 30000);
+    const interval = window.setInterval(actualizarDisponibilidad, 5000);
     const actualizarAlVolver = () => {
       if (document.visibilityState === "visible") actualizarDisponibilidad();
     };
@@ -1596,13 +1596,13 @@ function Home() {
             </button>
             <div className="experience-carousel">
               <button className="carousel-control prev" type="button" onClick={handlePrevSlide} aria-label="Imagen anterior">
-                ‹
+                <i className="fa-solid fa-chevron-left" aria-hidden="true" />
               </button>
               <div className="carousel-slide">
                 <img src={galleryImages[activeSlide]} alt={`Imagen ${activeSlide + 1} de la experiencia`} />
               </div>
               <button className="carousel-control next" type="button" onClick={handleNextSlide} aria-label="Imagen siguiente">
-                ›
+                <i className="fa-solid fa-chevron-right" aria-hidden="true" />
               </button>
             </div>
             <div className="experience-gallery-footer">
@@ -1841,6 +1841,15 @@ function Home() {
                           <p className="reservation-lookup-observation">
                             <strong>Nota:</strong> {reserva.observacion}
                           </p>
+                        )}
+                        {reserva.mensaje_cliente && (
+                          <section className="reservation-lookup-hotel-message" aria-label="Mensaje de recepción">
+                            <strong>
+                              <i className="fa-regular fa-comment-dots" aria-hidden="true" />
+                              Mensaje de recepción
+                            </strong>
+                            <p>{reserva.mensaje_cliente}</p>
+                          </section>
                         )}
                       </article>
                     );

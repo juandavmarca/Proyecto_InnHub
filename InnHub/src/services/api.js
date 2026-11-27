@@ -183,11 +183,15 @@ export function obtenerHabitacionesParaReserva(idReserva) {
   return solicitarGestionReservas("habitaciones_disponibles", { query: `?${query.toString()}` });
 }
 
-export function confirmarReservaRecepcion(idReserva, idHabitacion) {
+export function confirmarReservaRecepcion(idReserva, idHabitacion, mensajeCliente = "") {
   return solicitarGestionReservas("confirmar", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ id_reserva: idReserva, id_habitacion: idHabitacion }),
+    body: JSON.stringify({
+      id_reserva: idReserva,
+      id_habitacion: idHabitacion,
+      mensaje_cliente: mensajeCliente,
+    }),
   });
 }
 

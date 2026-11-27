@@ -5495,16 +5495,17 @@ html body .dashboard-page .table.table-innhub.table-striped tbody tr td,
   position: absolute;
   top: 50%;
   z-index: 2;
-  align-self: auto;
-  justify-self: auto;
-  width: 3.2rem;
-  height: 3.2rem;
+  display: grid;
+  place-items: center;
+  width: 3rem;
+  height: 3rem;
+  padding: 0;
   transform: translateY(-50%);
   border-radius: 50%;
-  background: rgba(0, 0, 0, 0.56);
-  color: #ffffff;
-  border: 1px solid rgba(255, 255, 255, 0.28);
-  font-size: 2rem;
+  background: rgba(12, 12, 12, 0.68);
+  color: var(--brand-soft);
+  border: 1px solid rgba(240, 207, 119, 0.62);
+  font-size: 0.85rem;
   line-height: 1;
 }
 
@@ -5518,8 +5519,10 @@ html body .dashboard-page .table.table-innhub.table-striped tbody tr td,
 
 .experience-modal .carousel-control:hover,
 .experience-modal .carousel-control:focus-visible {
-  background: rgba(0, 0, 0, 0.78);
-  color: #ffffff;
+  background: var(--brand-medium);
+  color: #090807;
+  border-color: var(--brand-medium);
+  box-shadow: 0 0 16px rgba(200, 150, 41, 0.32);
   transform: translateY(-50%) scale(1.05);
 }
 
@@ -7634,6 +7637,39 @@ html body .dashboard-page .table.table-innhub.table-striped tbody tr td,
   font-size: 0.72rem;
 }
 
+.reservation-assignment-controls .reservation-assignment-message-field {
+  flex-basis: 100%;
+}
+
+.reservation-assignment-message-field textarea {
+  width: 100%;
+  min-height: 82px;
+  padding: 0.65rem 0.75rem;
+  border: 1px solid rgba(211, 169, 64, 0.3);
+  border-radius: 9px;
+  outline: 0;
+  background: #171716;
+  color: #fffaf0;
+  font: inherit;
+  line-height: 1.5;
+  resize: vertical;
+}
+
+.reservation-assignment-message-field textarea:focus {
+  border-color: rgba(240, 207, 119, 0.75);
+  box-shadow: 0 0 0 3px rgba(211, 169, 64, 0.1);
+}
+
+.reservation-assignment-message-field textarea:disabled {
+  opacity: 0.65;
+}
+
+.reservation-assignment-message-field small {
+  justify-self: end;
+  color: rgba(255, 255, 255, 0.48);
+  font-size: 0.65rem;
+}
+
 .reservation-assignment-controls select {
   width: 100%;
   min-height: 44px;
@@ -8991,6 +9027,32 @@ html body .dashboard-page .table.table-innhub.table-striped tbody tr td,
 
 .reservation-lookup-observation strong {
   color: #e6bd5d;
+}
+
+.reservation-lookup-hotel-message {
+  display: grid;
+  gap: 0.45rem;
+  padding: 0.75rem 0.85rem;
+  border: 1px solid rgba(230, 189, 93, 0.24);
+  border-radius: 11px;
+  background: rgba(211, 169, 64, 0.07);
+}
+
+.reservation-lookup-hotel-message > strong {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  color: #e6bd5d;
+  font-size: 0.73rem;
+}
+
+.reservation-lookup-hotel-message > p {
+  margin: 0;
+  color: rgba(255, 250, 240, 0.82);
+  font-size: 0.76rem;
+  line-height: 1.55;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
 }
 
 .reservation-lookup-no-results {

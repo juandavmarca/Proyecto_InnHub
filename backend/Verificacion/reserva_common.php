@@ -53,7 +53,7 @@ function consultarReservasDeClientes(array $clientes): array
     $marcadores = implode(',', array_fill(0, count($clientes), '?'));
     $stmt = $pdo->prepare(
         "SELECT r.id_reserva, r.fecha_reserva, r.fecha_entrada, r.fecha_salida,
-                r.estado, r.numero_persona, r.observacion, r.monto_total,
+                r.estado, r.numero_persona, r.observacion, r.mensaje_cliente, r.monto_total,
                 h.numero AS numero_habitacion,
                 COALESCE(NULLIF(TRIM(r.tipo_habitacion_solicitada), ''), h.tipo) AS tipo_habitacion,
                 p.estado AS estado_pago, p.monto, p.metodo_pago, p.fecha_pago,

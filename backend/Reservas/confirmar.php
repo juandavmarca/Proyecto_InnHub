@@ -15,8 +15,17 @@ if (!is_array($entrada)) {
 
 $idReserva = filter_var($entrada['id_reserva'] ?? null, FILTER_VALIDATE_INT);
 $idHabitacion = filter_var($entrada['id_habitacion'] ?? null, FILTER_VALIDATE_INT);
+$mensajeCliente = $entrada['mensaje_cliente'] ?? '';
 if (!$idReserva || $idReserva < 1 || !$idHabitacion || $idHabitacion < 1) {
     responderReservas(400, ['exito' => false, 'mensaje' => 'Selecciona la reserva y una habitación válidas.']);
+}
+if (!is_string($mensajeCliente)) {
+    responderReservas(400, ['exito' => false, 'mensaje' => 'El mensaje para el cliente no es válido.']);
+}
+$mensajeCliente = trim($mensajeCliente);
+$longitudMensaje = preg_match_all('/./us', $mensajeCliente, $caracteresMensaje);
+if ($longitudMensaje === false || $longitudMensaje > 500) {
+    responderReservas(400, ['exito' => false, 'mensaje' => 'El mensaje para el cliente no puede superar 500 caracteres.']);
 }
 
 try {
@@ -102,13 +111,15 @@ try {
          SET habitaciones_id_habitacion = :id_habitacion,
              tipo_habitacion_solicitada = :tipo_habitacion,
              id_empleado = :id_empleado,
-             estado = 'Confirmada'
+             estado = 'Confirmada',
+             mensaje_cliente = :mensaje_cliente
          WHERE id_reserva = :id_reserva"
     );
     $actualizar->execute([
         ':id_habitacion' => $idHabitacion,
         ':tipo_habitacion' => $habitacion['tipo'],
         ':id_empleado' => $usuario['id_empleado'],
+        ':mensaje_cliente' => $mensajeCliente !== '' ? $mensajeCliente : null,
         ':id_reserva' => $idReserva,
     ]);
 
