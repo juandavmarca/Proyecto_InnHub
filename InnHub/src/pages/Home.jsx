@@ -11,6 +11,7 @@ import {
   actualizarReservasVerificadas,
   obtenerCamas,
   obtenerCaracteristicas,
+  obtenerDisponibilidadPublica,
   obtenerHabitaciones,
   obtenerImagenes,
   reenviarCorreoAceptacion,
@@ -109,6 +110,9 @@ const translations = {
     "Consultar disponibilidad…": "Checking availability…",
     "Reservar ahora": "Book now",
     "No disponible": "Unavailable",
+    "En proceso": "In progress",
+    "No se pudo actualizar la disponibilidad.": "Availability could not be updated.",
+    "No se pudo actualizar la disponibilidad. Verifica nuevamente antes de reservar.": "Availability could not be updated. Check again before booking.",
     "Ver fotos, video y características": "View photos, video, and features",
     "Explora": "Explore",
     "Hospitalidad elegante en Sonsón, donde cada detalle está pensado para tu descanso.": "Elegant hospitality in Sonsón, where every detail is designed for your comfort.",
@@ -418,6 +422,18 @@ function Home() {
   const [lookupError, setLookupError] = useState("");
   const [lookupNotice, setLookupNotice] = useState("");
   const [publicRooms, setPublicRooms] = useState([]);
+  const [availabilitySnapshot, setAvailabilitySnapshot] = useState({
+    checkIn: "",
+    checkOut: "",
+    availability: null,
+    error: "",
+  });
+  const hasValidAvailabilityDates = Boolean(checkIn && checkOut && checkOut > checkIn);
+  const availabilityMatchesDates = availabilitySnapshot.checkIn === checkIn
+    && availabilitySnapshot.checkOut === checkOut;
+  const availabilityByCategory = availabilityMatchesDates ? availabilitySnapshot.availability : null;
+  const availabilityError = availabilityMatchesDates ? availabilitySnapshot.error : "";
+  const availabilityLoading = hasValidAvailabilityDates && !availabilityMatchesDates;
   const [mostrarUbicacion, setMostrarUbicacion] = useState(false);
   const [mostrarAtencion, setMostrarAtencion] = useState(false);
   const [roomsLoading, setRoomsLoading] = useState(true);
@@ -476,9 +492,18 @@ function Home() {
   const getAvailabilityLabel = (count) =>
     `${count} ${t(count === 1 ? "habitación disponible" : "habitaciones disponibles")}`;
 
+  const getAvailableRoomCount = (room) => {
+    if (!room) return 0;
+    if (hasValidAvailabilityDates && !availabilityByCategory) return 0;
+    const datedAvailability = availabilityByCategory?.[room.category];
+    return Number(datedAvailability ?? room.habitacionesDisponibles ?? 0);
+  };
+
   const getCategoryAvailabilityLabel = (category) => {
+    if (availabilityError) return t("No se pudo actualizar la disponibilidad.");
+    if (availabilityLoading) return t("Consultar disponibilidad…");
     const room = obtenerDatosCategoria(category);
-    return getAvailabilityLabel(room?.habitacionesDisponibles || 0);
+    return getAvailabilityLabel(getAvailableRoomCount(room));
   };
 
   const getFullPhoneNumber = () => `${phoneCountry.code}${guestDetails.phone.replace(/\D/g, "")}`;
@@ -573,7 +598,6 @@ function Home() {
       } catch (error) {
         if (active) {
           setLookupRefreshError(error.message || "No se pudieron actualizar los estados de tus reservas.");
-          window.clearInterval(interval);
         }
       }
     };
@@ -713,6 +737,55 @@ function Home() {
     cargarHabitacionesPublicas();
   }, []);
 
+  useEffect(() => {
+    if (!hasValidAvailabilityDates) return undefined;
+
+    let active = true;
+    let requestInProgress = false;
+
+    const actualizarDisponibilidad = async () => {
+      if (!active || requestInProgress || document.visibilityState !== "visible") return;
+      requestInProgress = true;
+      try {
+        const resultado = await obtenerDisponibilidadPublica(checkIn, checkOut);
+        if (active) {
+          setAvailabilitySnapshot({
+            checkIn,
+            checkOut,
+            availability: resultado.disponibilidad || {},
+            error: "",
+          });
+        }
+      } catch (error) {
+        if (active) {
+          setAvailabilitySnapshot((previous) => ({
+            checkIn,
+            checkOut,
+            availability: previous.checkIn === checkIn && previous.checkOut === checkOut
+              ? previous.availability
+              : null,
+            error: error.message || "No se pudo actualizar la disponibilidad.",
+          }));
+        }
+      } finally {
+        requestInProgress = false;
+      }
+    };
+
+    actualizarDisponibilidad();
+    const interval = window.setInterval(actualizarDisponibilidad, 30000);
+    const actualizarAlVolver = () => {
+      if (document.visibilityState === "visible") actualizarDisponibilidad();
+    };
+    document.addEventListener("visibilitychange", actualizarAlVolver);
+
+    return () => {
+      active = false;
+      window.clearInterval(interval);
+      document.removeEventListener("visibilitychange", actualizarAlVolver);
+    };
+  }, [checkIn, checkOut, hasValidAvailabilityDates]);
+
   const nights = checkIn && checkOut
     ? Math.round((new Date(`${checkOut}T00:00:00`) - new Date(`${checkIn}T00:00:00`)) / 86400000)
     : 0;
@@ -761,7 +834,7 @@ function Home() {
   };
 
   const handleContinueToDateSelection = (room) => {
-    if (Number(room.habitacionesDisponibles || 0) < 1) return;
+    if (getAvailableRoomCount(room) < 1) return;
 
     setRoomForDateSelection(room);
     setSelectedRoom(null);
@@ -779,7 +852,7 @@ function Home() {
       document.getElementById("hero")?.scrollIntoView({ behavior: "smooth" });
       return;
     }
-    if (Number(room.habitacionesDisponibles || 0) < 1) return;
+    if (getAvailableRoomCount(room) < 1) return;
 
     setSelectedRoom(room);
     setBookingOrigin("search");
@@ -1304,7 +1377,7 @@ function Home() {
             <div className="reservation-room-list">
               {rooms.map((room) => {
                 const roomData = publicRooms.find((item) => item.category === room.category);
-                const availableRooms = Number(roomData?.habitacionesDisponibles || 0);
+                const availableRooms = getAvailableRoomCount(roomData);
                 const image = roomData?.imagenesReales?.[0] || roomData?.image || room.image;
                 return (
                   <article className="reservation-room-card" key={room.category}>
@@ -1317,7 +1390,7 @@ function Home() {
                       <button
                         className="reservation-room-preview"
                         type="button"
-                        disabled={!roomData || availableRooms < 1}
+                        disabled={!roomData || availabilityLoading || availabilityError || availableRooms < 1}
                         onClick={() => handlePreviewRoom({ ...room, ...roomData, image })}
                         aria-label={`${t("Ver fotos, video y características")} de ${getRoomTitle(roomData?.title || room.title)}`}
                         title={t("Ver fotos, video y características")}
@@ -1329,7 +1402,9 @@ function Home() {
                       <h3>{getRoomTitle(roomData?.title || room.title)}</h3>
                       <p>{t(room.description)}</p>
                       <span className={availableRooms ? "reservation-availability" : "reservation-unavailable"}>
-                        {roomsLoading ? t("Consultar disponibilidad…") : getAvailabilityLabel(availableRooms)}
+                        {roomsLoading || availabilityLoading
+                          ? t("Consultar disponibilidad…")
+                          : getAvailabilityLabel(availableRooms)}
                       </span>
                     </div>
                     <div className="reservation-room-action">
@@ -1338,10 +1413,14 @@ function Home() {
                       <button
                         className="btn btn-book"
                         type="button"
-                        disabled={!roomData || availableRooms < 1}
+                        disabled={!roomData || availabilityLoading || availabilityError || availableRooms < 1}
                         onClick={() => handleStartBooking({ ...room, ...roomData, image })}
                       >
-                        {availableRooms ? t("Reservar ahora") : t("No disponible")}
+                        {availabilityLoading
+                          ? t("Consultar disponibilidad…")
+                          : availableRooms
+                            ? t("Reservar ahora")
+                            : t("No disponible")}
                       </button>
                     </div>
                   </article>
@@ -1350,9 +1429,14 @@ function Home() {
             </div>
             <p className="reservation-disclaimer">
               {language === "en"
-                ? "Availability reflects the current status registered at the hotel; date-based occupancy requires connecting the reservations module."
-                : "La disponibilidad corresponde al estado actual registrado en el hotel; la consulta de ocupación por fechas requiere conectar el módulo de reservas."}
+                ? "Availability updates for the selected stay dates and reflects active reservations automatically."
+                : "La disponibilidad se calcula para las fechas elegidas y refleja automáticamente las reservas activas."}
             </p>
+            {availabilityError && (
+              <p className="reservation-disclaimer" role="alert">
+                {t("No se pudo actualizar la disponibilidad. Verifica nuevamente antes de reservar.")}
+              </p>
+            )}
           </section>
         </div>
       )}
@@ -1669,7 +1753,7 @@ function Home() {
                     const enEsperaRecepcion = estadoNormalizado.includes("pago aprobado")
                       || estadoNormalizado.includes("pendiente de confirmación")
                       || estadoNormalizado.includes("pendiente de confirmacion");
-                    const estadoLabel = enEsperaRecepcion ? "En espera de confirmación" : estado;
+                    const estadoLabel = enEsperaRecepcion ? "En proceso" : estado;
                     const estadoClase = estadoNormalizado.includes("cancel")
                       ? "cancelada"
                       : estadoNormalizado.includes("rechaz")
@@ -2148,7 +2232,7 @@ function Home() {
                     : activeRoom.tipo || activeRoom.category}
                 </p>
                 <p className="room-modal-registered-count">
-                  {activeRoom.habitacionesDisponibles || 0}/{activeRoom.totalHabitaciones || 0} {t("habitaciones disponibles")}
+                  {getAvailableRoomCount(activeRoom)}/{activeRoom.totalHabitaciones || 0} {t("habitaciones disponibles")}
                 </p>
                 <div className="room-modal-real-data">
                   <p><strong>{t("Camas:")}</strong> {activeRoom.numeroCamas || 0}</p>
@@ -2177,9 +2261,9 @@ function Home() {
                         ? handleStartBooking(activeRoom)
                         : handleContinueToDateSelection(activeRoom)
                     )}
-                    disabled={Number(activeRoom.habitacionesDisponibles || 0) < 1}
+                    disabled={availabilityLoading || availabilityError || getAvailableRoomCount(activeRoom) < 1}
                   >
-                    {Number(activeRoom.habitacionesDisponibles || 0) > 0 ? t("Continuar") : t("No disponible")}
+                    {getAvailableRoomCount(activeRoom) > 0 ? t("Continuar") : t("No disponible")}
                   </button>
                   {roomPreviewFromSearch && (
                     <button
