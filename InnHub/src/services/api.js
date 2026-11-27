@@ -200,6 +200,14 @@ export function obtenerHabitacionesDisponiblesParaNuevaReserva(fechaEntrada, fec
   return solicitarGestionReservas("habitaciones_nueva", { query: `?${query.toString()}` });
 }
 
+export function obtenerDisponibilidadPublica(fechaEntrada, fechaSalida) {
+  const query = new URLSearchParams({
+    fecha_entrada: fechaEntrada,
+    fecha_salida: fechaSalida,
+  });
+  return solicitarGestionReservas("disponibilidad_publica", { query: `?${query.toString()}` });
+}
+
 export function iniciarPagoReservaRecepcion(datos) {
   return solicitarGestionReservas("iniciar_pago", {
     method: "POST",
